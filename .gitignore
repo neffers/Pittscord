@@ -5,5 +5,8 @@
 # ignore any files with secret in the name
 *secret*
 
+# allow example secrets
+!secret.example.py
+
 # IDE files
 .idea/

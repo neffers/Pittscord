@@ -32,3 +32,11 @@ To deactivate:
 ```
 deactivate
 ```
+
+# Usage
+The bot requires the following permissions:
+- TODO
+## Configuration
+In order to run the bot, there must be a `secret.py` containing the bot account's token.
+
+See `secret.example.py`
