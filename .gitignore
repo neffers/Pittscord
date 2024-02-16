@@ -1,5 +1,6 @@
-# ignore venv
+# ignore venv & pycache
 /venv/
+*/__pycache__/
 
 # ignore any files with secret in the name
 *secret*
