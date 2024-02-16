@@ -1,1 +1,8 @@
+# ignore venv
 /venv/
+
+# ignore any files with secret in the name
+*secret*
+
+# IDE files
+.idea/
