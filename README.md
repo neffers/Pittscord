@@ -14,3 +14,10 @@ Next install the requirements
 ```
 pip install -r requirements.txt
 ```
+
+# Windows Installation
+Run
+```
+.\venv\Scripts\activate
+```
+in a Command Prompt
