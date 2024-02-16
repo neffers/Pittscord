@@ -15,7 +15,12 @@ Next install the requirements
 ```
 pip install -r requirements.txt
 ```
-## Windows
-TODO
 ## Python venv use
 As above, to activate the venv,
+
+# Windows Installation
+Run
+```
+.\venv\Scripts\activate
+```
+in a Command Prompt
