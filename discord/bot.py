@@ -2,6 +2,7 @@ import discord
 
 # get token from parent directory
 import sys
+
 sys.path.append('..')
 from secret import discord_token
 
@@ -36,8 +37,14 @@ class MyClient(discord.Client):
         await bot_testing_channel.send("Hello World!")
 
 
-intents = discord.Intents.default()
-intents.message_content = True
+def make_bot():
+    intents = discord.Intents.default()
+    intents.message_content = True
 
-client = MyClient(intents=intents)
-client.run(discord_token)
+    client = MyClient(intents=intents)
+    return client, discord_token
+
+
+if __name__ == '__main__':
+    client, token = make_bot()
+    client.run(token)
