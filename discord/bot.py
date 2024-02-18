@@ -41,8 +41,8 @@ def make_bot():
     intents = discord.Intents.default()
     intents.message_content = True
 
-    client = MyClient(intents=intents)
-    return client, discord_token
+    c = MyClient(intents=intents)
+    return c, discord_token
 
 
 if __name__ == '__main__':
