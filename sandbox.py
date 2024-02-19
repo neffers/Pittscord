@@ -1,9 +1,9 @@
-from quart import Quart
+from flask import Flask
 import discord
 from secret import discord_token
 from threading import Thread
 
-app = Quart(__name__)
+app = Flask(__name__)
 
 # local server channel IDs
 bot_testing_channel_id = 1208576315070877706
@@ -32,20 +32,15 @@ async def default():
     return ""
 
 
-async def run_bot():
+def run_bot():
+    # DON'T USE RUN!!!
     client.run(discord_token)
 
 
-async def run_flask():
+def run_flask():
+    # maybe don't use run??
     app.run()
 
 
 if __name__ == "__main__":
-    bot_thread = Thread(target=run_bot())
-    flask_thread = Thread(target=run_flask())
-
-    bot_thread.run()
-    flask_thread.run()
-
-    bot_thread.join()
-    flask_thread.join()
+    pass
