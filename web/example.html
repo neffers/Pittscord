@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <title>Example UI</title>
     <style>
+        div {
+            margin: 1px;
+            padding: 4px;
+        }
         .container {
             display: flex;
-            div {
-                margin: 1px;
-                padding: 4px;
-            }
         }
         .left {
             background-color: wheat;
+        }
+        .right {
+            margin-left: auto;
         }
         .outer {
             background-color: pink;
@@ -97,7 +100,10 @@
                     <label for="TAChannelAccess">TA Only Channel (Announcement channels will be made TA-Writable)</label><br />
                     <input type="checkbox" id="studentOnly">
                     <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
-                    <button>remove channel</button>
+                    <div class="container middle">
+                        <button>commit configuration</button>
+                        <button class="right">remove channel</button>
+                    </div>
                 </div>
             </div>
             <br/>
@@ -115,6 +121,7 @@
                     <input type="text" id="className"><br />
                     <label for="classCanvasID">Canvas ID</label><br />
                     <input type="text" id="classCanvasID"><br />
+                    <button>Commit configuration</button><br />
                     <button>Remove Course</button>
                 </div>
                 <div class="inner">
