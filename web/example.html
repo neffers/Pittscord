@@ -30,6 +30,12 @@
             overflow-y: auto;
             min-width: 50%;
         }
+        .managed {
+            background-color: blueviolet;
+        }
+        .warning {
+            background-color: red;
+        }
     </style>
 </head>
 <body>
@@ -38,21 +44,24 @@
         <div class="left">
             <label for="servers">Current Server Outline</label><br />
             <select id="servers" name="serverOutline" size="20">
-                <option value="" draggable="true">Events</option>
-                <option value="" draggable="true">Browse Channels</option>
-                <option value="" draggable="true">Members</option>
+                <option value="">Events</option>
+                <option value="">Browse Channels</option>
+                <option value="">Members</option>
                 <hr />
-                <option value="" draggable="true">Rules</option>
-                <option value="" draggable="true">moderator-only</option>
-                <optgroup label="Text Channels" draggable="true">
-                    <option value="" draggable="true">General</option>
-                    <option value="" draggable="true">bot-testing</option>
-                    <option value="" draggable="true">forum-test</option>
-                    <option value="" draggable="true">poc-chat</option>
-                    <option value="" draggable="true">developer-chat</option>
+                <option value="">Rules</option>
+                <option value="">moderator-only</option>
+                <optgroup label="Text Channels">
+                    <option value="">General</option>
+                    <option value="">bot-testing</option>
+                    <option value="">forum-test</option>
+                    <option value="">poc-chat</option>
+                    <option value="">developer-chat</option>
                 </optgroup>
-                <optgroup label="Voice Channels" draggable="true">
-                    <option value="" draggable="true">General</option>
+                <optgroup label="Voice Channels">
+                    <option value="">General</option>
+                </optgroup>
+                <optgroup label="Example managed" class="managed">
+                    <option value="">managed general</option>
                 </optgroup>
             </select>
         </div>
@@ -107,6 +116,10 @@
                     <label for="classCanvasID">Canvas ID</label><br />
                     <input type="text" id="classCanvasID"><br />
                     <button>Remove Course</button>
+                </div>
+                <div class="inner">
+                    <button class="warning">Semester Cleanup</button><br />
+                    <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
                 </div>
             </div>
         </div>
