@@ -8,12 +8,14 @@ app = Quart(__name__)
 # local server channel IDs
 bot_testing_channel_id = 1208576315070877706
 
-
+# Discord Bot class
 class Pittscord(discord.Client):
+    # print an opening message to console
     async def on_ready(self):
         print(f'Logged in as {self.user} (ID: {self.user.id})')
         print('------')
 
+    # send message to testing channel
     async def say_hello(self):
         bot_testing_channel = self.get_channel(bot_testing_channel_id)
         await bot_testing_channel.send("Hello World!")
@@ -24,7 +26,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 client = Pittscord(intents=intents)
-
 
 @app.route("/")
 async def default():
@@ -41,5 +42,6 @@ async def main():
 
 
 # WARNING: can't be stopped with ctrl+c
+    # seems to stop with ctrl+c?
 if __name__ == "__main__":
     asyncio.run(main())
