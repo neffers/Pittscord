@@ -1,15 +1,7 @@
-import asyncio
-
 import discord
 from discord import app_commands
 from discord.ext import commands
-
-# get token from parent directory
-import sys
-
-sys.path.append('..')
 from secret import discord_token
-
 
 intents = discord.Intents.all()
 intents.message_content = True
@@ -25,8 +17,18 @@ async def on_ready():
 @bot.tree.command()
 @app_commands.checks.has_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
-    print("in identify func")
     await interaction.response.send_message(f"{user.id}", ephemeral=True)
+
+
+@identify.error
+async def identify_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    if interaction.user.guild_permissions.administrator:
+        response = "Encountered some unknown error! Check the logs for more."
+        print(repr(error))
+    else:
+        response = "You are not authorized to use that command! This incident will be recorded."
+        print(f"User {interaction.user.name} tried to use identify.")
+    await interaction.response.send_message(response, ephemeral=True)
 
 
 @bot.command()
