@@ -1,4 +1,8 @@
+import asyncio
+
 import discord
+from discord import app_commands
+from discord.ext import commands
 
 # get token from parent directory
 import sys
@@ -6,45 +10,30 @@ import sys
 sys.path.append('..')
 from secret import discord_token
 
-# local server channel IDs
-bot_testing_channel_id = 1208576315070877706
+
+intents = discord.Intents.all()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 
-class MyClient(discord.Client):
-    async def on_ready(self):
-        print(f'Logged in as {self.user} (ID: {self.user.id})')
-        print('------')
-
-        # Causes the bot to say "hello world" on load
-        # await self.say_hello()
-
-    async def on_message(self, message: discord.Message):
-        # we do not want the bot to reply to itself
-        if message.author.id == self.user.id:
-            return
-
-        if message.author.dm_channel is None:
-            await message.author.create_dm()
-
-        if message.content.startswith('!hello'):
-            await message.author.dm_channel.send(
-                f"I saw your message at {message.created_at}, it was in the channel {message.channel}"
-            )
-            print(repr(message))
-
-    async def say_hello(self):
-        bot_testing_channel = self.get_channel(bot_testing_channel_id)
-        await bot_testing_channel.send("Hello World!")
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
 
 
-def make_bot():
-    intents = discord.Intents.default()
-    intents.message_content = True
+@bot.tree.command()
+@app_commands.checks.has_permissions(administrator=True)
+async def identify(interaction: discord.Interaction, user: discord.User):
+    print("in identify func")
+    await interaction.response.send_message(f"{user.id}", ephemeral=True)
 
-    c = MyClient(intents=intents)
-    return c, discord_token
 
+@bot.command()
+async def sync(interaction: discord.Interaction):
+    print("Attempting sync")
+    globalsync = await bot.tree.sync()
+    localsync = await bot.tree.sync(guild=interaction.guild)
+    print(f"global sync returned:\n{globalsync}\n\nlocal sync returned:\n{localsync}")
 
-if __name__ == '__main__':
-    client, token = make_bot()
-    client.run(token)
+bot.run(discord_token)
