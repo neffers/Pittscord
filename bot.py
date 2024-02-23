@@ -15,6 +15,8 @@ async def on_ready():
 
 
 @bot.tree.command()
+@app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
 @app_commands.checks.has_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
     await interaction.response.send_message(f"{user.id}", ephemeral=True)
