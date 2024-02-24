@@ -37,10 +37,14 @@ async def identify_error(interaction: discord.Interaction, error: app_commands.A
 
 @bot.command()
 async def sync(interaction: discord.Interaction):
-    """Command to re-register 'app_commands' (slash commands) with Discord so that they can be used."""
-    print("Attempting sync")
+    """Command to re-register 'app_commands' (slash commands) with Discord so that they can be used.
+    Shouldn't need to use this command usually, only during development?"""
+    print("Attempting to sync global commands")
     globalsync = await bot.tree.sync()
-    localsync = await bot.tree.sync(guild=interaction.guild)
-    print(f"global sync returned:\n{globalsync}\n\nlocal sync returned:\n{localsync}")
+    print(f"global sync returned:\n{globalsync}")
+    if interaction.guild is not None:
+        print("Attempting to sync guild commands")
+        localsync = await bot.tree.sync(guild=interaction.guild)
+        print(f"local sync returned:\n{localsync}")
 
 bot.run(discord_token)
