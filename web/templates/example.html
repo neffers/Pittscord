@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example UI</title>
+    <style>
+        div {
+            margin: 1px;
+            padding: 4px;
+        }
+        .container {
+            display: flex;
+        }
+        .left {
+            background-color: wheat;
+        }
+        .right {
+            margin-left: auto;
+        }
+        .outer {
+            background-color: pink;
+        }
+        .middle {
+            background-color: lightskyblue;
+        }
+        .inner {
+            background-color: aquamarine;
+        }
+        .sink {
+            align-self: flex-end;
+        }
+        select {
+            overflow-y: auto;
+            min-width: 50%;
+        }
+        .managed {
+            background-color: blueviolet;
+        }
+        .warning {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+<form id="theForm">
+    <div class="container">
+        <div class="left">
+            <label for="servers">Current Server Outline</label><br />
+            <select id="servers" name="serverOutline" size="20">
+                <option value="">Events</option>
+                <option value="">Browse Channels</option>
+                <option value="">Members</option>
+                <hr />
+                <option value="">Rules</option>
+                <option value="">moderator-only</option>
+                <optgroup label="Text Channels">
+                    <option value="">General</option>
+                    <option value="">bot-testing</option>
+                    <option value="">forum-test</option>
+                    <option value="">poc-chat</option>
+                    <option value="">developer-chat</option>
+                </optgroup>
+                <optgroup label="Voice Channels">
+                    <option value="">General</option>
+                </optgroup>
+                <optgroup label="Example managed" class="managed">
+                    <option value="">managed general</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="outer">
+            <div class="middle container">
+                <div class="inner">
+                    <label for="classTemplate">Templates per class<br />
+                        <small>(Categories will be inserted at the bottom of the current hierarchy)</small></label><br />
+                    <select id="classTemplate" size="10">
+                        <option value="Announcements">Announcements</option>
+                        <option value="qa-forum" >qa-forum</option>
+                        <option value="general">general</option>
+                        <option value="assignment-discussion">assignment-discussion</option>
+                        <option value="ta-chat">ta-chat</option>
+                    </select> <br />
+                    <button>Add Channel</button>
+                </div>
+                <div class="inner">
+                    <label for="channelName">Channel Name</label><br />
+                    <input type="text" id="channelName"><br />
+                    <fieldset>
+                        <legend>Channel Type</legend>
+                        <input type="radio" id="announcement" name="channelType" value="A">
+                        <label for="announcement">Announcements</label><br />
+                        <input type="radio" id="textChannel" name="channelType" value="T" checked>
+                        <label for="textChannel">Text</label><br />
+                        <input type="radio" id="voiceChannel" name="channelType" value="V">
+                        <label for="voiceChannel">Voice</label><br />
+                        <input type="radio" id="forum" name="channelType" value="F">
+                        <label for="forum">Forum</label><br />
+                    </fieldset><br />
+                    <input type="checkbox" id="TAChannelAccess">
+                    <label for="TAChannelAccess">TA Only Channel (Announcement channels will be made TA-Writable)</label><br />
+                    <input type="checkbox" id="studentOnly">
+                    <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
+                    <div class="container middle">
+                        <button>commit configuration</button>
+                        <button class="right">remove channel</button>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <div class="middle container sink">
+                <div class="inner">
+                    <label for="classes">Semester Classes</label><br />
+                    <select id="classes" name="classes" size="5">
+                        <option value="">447</option>
+                        <option value="">449</option>
+                    </select><br />
+                    <button>Add Course</button>
+                </div>
+                <div class="inner">
+                    <label for="className">Class Name</label><br />
+                    <input type="text" id="className"><br />
+                    <label for="classCanvasID">Canvas ID</label><br />
+                    <input type="text" id="classCanvasID"><br />
+                    <button>Commit configuration</button><br />
+                    <button>Remove Course</button>
+                </div>
+                <div class="inner">
+                    <button class="warning">Semester Cleanup</button><br />
+                    <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    classTemplate.onchange = function setInputValue () {
+        var input = document.getElementById('channelName');
+        channelName.value = "New Value";
+    }
+
+    // classTemplate.onchange = function () {
+    //     channelName.text = this.value;
+    // }
+</script>
+</body>
+</html>
