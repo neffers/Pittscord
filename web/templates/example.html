@@ -79,7 +79,7 @@
                         <option value="assignment-discussion">assignment-discussion</option>
                         <option value="ta-chat">ta-chat</option>
                     </select> <br />
-                    <button>Add Channel</button>
+                    <button onclick="insertNewChannel();">Add Channel</button>
                 </div>
                 <div class="inner">
                     <label for="channelName">Channel Name</label><br />
@@ -100,7 +100,7 @@
                     <input type="checkbox" id="studentOnly">
                     <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
                     <div class="container middle">
-                        <button onclick="insertValue();">commit configuration</button>
+                        <button>commit configuration</button>
                         <button class="right">remove channel</button>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                         <option value="">447</option>
                         <option value="">449</option>
                     </select><br />
-                    <button>Add Course</button>
+                    <button onclick="insertNewCourse();">Add Course</button>
                 </div>
                 <div class="inner">
                     <label for="className">Class Name</label><br />
@@ -122,6 +122,22 @@
                     <input type="text" id="classCanvasID"><br />
                     <button>Commit configuration</button><br />
                     <button>Remove Course</button>
+                </div>
+                <div class="inner">
+                    <label for="recitations">Class Recitation Sections</label><br />
+                    <select id="recitations" name="recitations" size="5">
+                        <option value="">10am</option>
+                        <option value="">12pm</option>
+                    </select><br />
+                    <button onclick="insertNewRecitation();">Add Recitation Section</button>
+                    <button>Remove Recitation</button><br />
+                    <label for="recitationTime">Recitation Time</label>
+                    <input type="text" id="recitationTime"><br />
+                    <button>Commit Recitation Time</button>
+                </div>
+                <div class="inner">
+                    <button>Preview Changes in Left Panel</button><br /><br />
+                    <button>Commit Semester Options</button>
                 </div>
                 <div class="inner">
                     <button class="warning">Semester Cleanup</button><br />
@@ -167,15 +183,43 @@
 
     }
 
-    function insertValue () {
+    function insertNewChannel () {
         var select = document.getElementById("classTemplate"),
-            txtVal = document.getElementById("channelName").value,
             newOption = document.createElement("OPTION"),
-            newOptionVal = document.createTextNode(txtVal);
+            newOptionVal = document.createTextNode("new-channel");
 
         newOption.appendChild(newOptionVal);
         select.insertBefore(newOption,select.lastChild);
     }
+
+    function insertNewRecitation () {
+        var select = document.getElementById("recitations"),
+            newOption = document.createElement("OPTION"),
+            newOptionVal = document.createTextNode("new-recitation");
+
+        newOption.appendChild(newOptionVal);
+        select.insertBefore(newOption,select.lastChild);
+    }
+
+    function insertNewCourse () {
+        var select = document.getElementById("classes"),
+            newOption = document.createElement("OPTION"),
+            newOptionVal = document.createTextNode("new-course");
+
+        newOption.appendChild(newOptionVal);
+        select.insertBefore(newOption,select.lastChild);
+    }
+
+
+    // function insertValue () {
+    //     var select = document.getElementById("classTemplate"),
+    //         txtVal = document.getElementById("channelName").value,
+    //         newOption = document.createElement("OPTION"),
+    //         newOptionVal = document.createTextNode(txtVal);
+
+    //     newOption.appendChild(newOptionVal);
+    //     select.insertBefore(newOption,select.lastChild);
+    // }
     
 </script>
 </body>
