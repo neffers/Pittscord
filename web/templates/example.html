@@ -151,34 +151,35 @@
         var input = document.getElementById('channelName');
         channelName.value = this.value;
 
-        if (channelName.value === "Announcements") {
-            document.getElementById('announcement').checked = true;
-            document.getElementById('TAChannelAccess').checked = true;
-            document.getElementById('studentOnly').checked = true;
+        if (channelName.value === "Announcements") { //MDN docs for fieldsetId.value
+            document.getElementById(Config.template[0].type).checked = true;
+            // document.getElementById('announcement').checked = true;
+            document.getElementById('TAChannelAccess').checked = Config.template[0].TAonly;
+            document.getElementById('studentOnly').checked = Config.template[0].StudOnly;
         }
         
         if (channelName.value === "qa-forum") {
-            document.getElementById('forum').checked = true;
-            document.getElementById('TAChannelAccess').checked = false;
-            document.getElementById('studentOnly').checked = false;
+            document.getElementById(Config.template[1].type).checked = true;
+            document.getElementById('TAChannelAccess').checked = Config.template[1].TAonly;
+            document.getElementById('studentOnly').checked = Config.template[1].StudOnly;
         }
 
         if (channelName.value === "general") {
-            document.getElementById('textChannel').checked = true;
-            document.getElementById('TAChannelAccess').checked = false;
-            document.getElementById('studentOnly').checked = false;
+            document.getElementById(Config.template[2].type).checked = true;
+            document.getElementById('TAChannelAccess').checked = Config.template[2].TAonly;
+            document.getElementById('studentOnly').checked = Config.template[2].StudOnly;
         }
 
         if (channelName.value === "assignment-discussion") {
-            document.getElementById('voiceChannel').checked = true;
-            document.getElementById('TAChannelAccess').checked = false;
-            document.getElementById('studentOnly').checked = true;
+            document.getElementById(Config.template[3].type).checked = true;
+            document.getElementById('TAChannelAccess').checked = Config.template[3].TAonly;
+            document.getElementById('studentOnly').checked = Config.template[3].StudOnly;
         }
 
         if (channelName.value === "ta-chat") {
-            document.getElementById('textChannel').checked = true;
-            document.getElementById('TAChannelAccess').checked = true;
-            document.getElementById('studentOnly').checked = false;
+            document.getElementById(Config.template[4].type).checked = true;
+            document.getElementById('TAChannelAccess').checked = Config.template[4].TAonly;
+            document.getElementById('studentOnly').checked = Config.template[4].StudOnly;
         }
 
     }
