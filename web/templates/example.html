@@ -210,6 +210,20 @@
         select.insertBefore(newOption,select.lastChild);
     }
 
+    const Config = {
+        template: [
+            {name: "Announcements", type: "A", TAonly: true, StudOnly: true},
+            {name: "qa-forum", type: "F", TAonly: false, StudOnly: false},
+            {name: "general", type: "T", TAonly: false, StudOnly: false},
+            {name: "assignment-discussion", type: "V", TAonly: false, StudOnly: true},
+            {name: "ta-chat", type: "T", TAonly: true, StudOnly: true},
+        ],
+        classes: [
+            {name:"447", canvasId: "123", recitations: ["10am", "12pm"]},
+            {name: "449", canvasId: "456", recitations: ["10am", "12pm"]}
+        ]
+    }
+
 
     // function insertValue () {
     //     var select = document.getElementById("classTemplate"),
