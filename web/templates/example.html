@@ -110,8 +110,8 @@
                 <div class="inner">
                     <label for="classes">Semester Classes</label><br />
                     <select id="classes" name="classes" size="5">
-                        <option value="">447</option>
-                        <option value="">449</option>
+                        <option value="447">447</option>
+                        <option value="449">449</option>
                     </select><br />
                     <button onclick="insertNewCourse();">Add Course</button>
                 </div>
@@ -126,8 +126,8 @@
                 <div class="inner">
                     <label for="recitations">Class Recitation Sections</label><br />
                     <select id="recitations" name="recitations" size="5">
-                        <option value="">10am</option>
-                        <option value="">12pm</option>
+                        <option value="10am">10am</option>
+                        <option value="12pm">12pm</option>
                     </select><br />
                     <button onclick="insertNewRecitation();">Add Recitation Section</button>
                     <button>Remove Recitation</button><br />
@@ -147,7 +147,7 @@
         </div>
     </div>
 <script>
-    classTemplate.onchange = function setInputValue () {
+    classTemplate.onchange = function setInputValueCh () {
         var input = document.getElementById('channelName');
         channelName.value = this.value;
 
@@ -183,6 +183,16 @@
 
     }
 
+    recitations.onchange = function setInputValueR () {
+        var input = document.getElementById('recitationTime');
+        recitationTime.value = this.value;
+    }
+
+    classes.onchange = function setInputValueCl () {
+        var input = document.getElementById('className');
+        className.value = this.value;
+    }
+
     function insertNewChannel () {
         var select = document.getElementById("classTemplate"),
             newOption = document.createElement("OPTION"),
@@ -212,11 +222,13 @@
 
     const Config = {
         template: [
-            {name: "Announcements", type: "A", TAonly: true, StudOnly: true},
-            {name: "qa-forum", type: "F", TAonly: false, StudOnly: false},
-            {name: "general", type: "T", TAonly: false, StudOnly: false},
-            {name: "assignment-discussion", type: "V", TAonly: false, StudOnly: true},
-            {name: "ta-chat", type: "T", TAonly: true, StudOnly: true},
+            // types seem to need to line up with the id of the particular radio button - I want it to match up to the value,
+            // but I don't think there's a document.getElementByValue function
+            {name: "Announcements", type: "announcement", TAonly: true, StudOnly: true},
+            {name: "qa-forum", type: "forum", TAonly: false, StudOnly: false},
+            {name: "general", type: "textChannel", TAonly: false, StudOnly: false},
+            {name: "assignment-discussion", type: "voiceChannel", TAonly: false, StudOnly: true},
+            {name: "ta-chat", type: "textChannel", TAonly: true, StudOnly: true},
         ],
         classes: [
             {name:"447", canvasId: "123", recitations: ["10am", "12pm"]},
