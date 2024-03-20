@@ -1,10 +1,57 @@
 import discord
+import json
 from discord import app_commands
 from discord.ext import commands
 from secret import discord_token
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="!", intents=intents)
+
+
+class PittscordBot(commands.Bot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def generate_server_json(self, server_id: int) -> str:
+        """Generates a simple json list of the server's channel structure and returns it as a string"""
+        guild = self.get_guild(server_id)
+        if guild is None:
+            raise KeyError
+        channels = guild.by_category()
+        json_channels = []
+        print(channels)
+        for category, chan_list in channels:
+            if category is None:
+                parent = json_channels
+            else:  # category is some
+                cat = {
+                    'name': category.name,
+                    'type': 'category',
+                    'channels': []
+                }
+                json_channels.append(cat)
+                parent = cat['channels']
+            for chan in chan_list:
+                match type(chan):
+                    case discord.TextChannel:
+                        chan_type = 'text'
+                    case discord.VoiceChannel:
+                        chan_type = 'voice'
+                    case discord.ForumChannel:
+                        chan_type = 'forum'
+                    case discord.StageChannel:  # unlikely but possible
+                        chan_type = 'stage'
+                    case _:
+                        chan_type = None
+                c = {
+                    'name': chan.name,
+                    'type': chan_type,
+                }
+                parent.append(c)
+
+        return json.dumps(json_channels)
+
+
+bot = PittscordBot(command_prefix="!", intents=intents)
 
 
 @bot.event
@@ -46,5 +93,11 @@ async def sync(interaction: discord.Interaction):
         print("Attempting to sync guild commands")
         localsync = await bot.tree.sync(guild=interaction.guild)
         print(f"local sync returned:\n{localsync}")
+
+
+@bot.command()
+async def serverjson(interaction: discord.Interaction):
+    print(bot.generate_server_json(interaction.guild.id))
+
 
 bot.run(discord_token)
