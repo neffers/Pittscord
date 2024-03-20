@@ -16,13 +16,14 @@ class PittscordBot(commands.Bot):
         guild = self.get_guild(server_id)
         if guild is None:
             raise KeyError
+
         channels = guild.by_category()
         json_channels = []
-        print(channels)
+
         for category, chan_list in channels:
             if category is None:
                 parent = json_channels
-            else:  # category is some
+            else:
                 cat = {
                     'name': category.name,
                     'type': 'category',
@@ -30,6 +31,7 @@ class PittscordBot(commands.Bot):
                 }
                 json_channels.append(cat)
                 parent = cat['channels']
+
             for chan in chan_list:
                 match type(chan):
                     case discord.TextChannel:
@@ -42,10 +44,12 @@ class PittscordBot(commands.Bot):
                         chan_type = 'stage'
                     case _:
                         chan_type = None
+
                 c = {
                     'name': chan.name,
                     'type': chan_type,
                 }
+
                 parent.append(c)
 
         return json.dumps(json_channels)
