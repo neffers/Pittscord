@@ -125,6 +125,22 @@
                     <button>Remove Course</button>
                 </div>
                 <div class="inner">
+                    <label for="recitations">Class Recitation Sections</label><br />
+                    <select id="recitations" name="recitations" size="5">
+                        <option value="">10am</option>
+                        <option value="">12pm</option>
+                    </select><br />
+                    <button>Add Recitation Section</button>
+                    <button>Remove Recitation</button><br />
+                    <label for="recitationTime">Recitation Time</label>
+                    <input type="text" id="recitationTime"><br />
+                    <button>Commit Recitation Time</button>
+                </div>
+                <div class="inner">
+                    <button>Preview Changes in Left Panel</button><br /><br />
+                    <button>Commit Semester Options</button>
+                </div>
+                <div class="inner">
                     <button class="warning">Semester Cleanup</button><br />
                     <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
                 </div>
