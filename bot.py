@@ -1,9 +1,13 @@
+import asyncio
 import discord
 import json
 import re
+import grpc
 from discord import app_commands
 from discord.ext import commands
-from secret import discord_token
+
+import Pittscord_ipc_pb2
+import Pittscord_ipc_pb2_grpc
 
 intents = discord.Intents.all()
 
@@ -11,6 +15,7 @@ intents = discord.Intents.all()
 bot_testing_channel_id = 1208576315070877706
 
 
+# Custom Bot Class Definition
 class PittscordBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -65,6 +70,30 @@ class PittscordBot(commands.Bot):
 
 
 bot = PittscordBot(command_prefix="!", intents=intents)
+
+
+class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
+    def __init__(self, bot: PittscordBot):
+        self.bot = bot
+
+    async def GetJSON(
+            self,
+            request: Pittscord_ipc_pb2.JSONRequest,
+            context: grpc.aio.ServicerContext
+    ) -> Pittscord_ipc_pb2.JSONResponse:
+        json = self.bot.generate_server_json(request.server_id)
+        response = Pittscord_ipc_pb2.JSONResponse(json=json)
+        return response
+
+    async def SayHello(
+            self,
+            request: Pittscord_ipc_pb2.HelloRequest,
+            context: grpc.aio.ServicerContext
+    ):
+        await self.bot.say_hello()
+        return Pittscord_ipc_pb2.HelloResponse()
+
+
 
 
 @bot.event
@@ -137,5 +166,15 @@ async def serverjson(interaction: discord.Interaction):
     print(bot.generate_server_json(interaction.guild.id))
 
 
+async def begin(token) -> None:
+    server = grpc.aio.server()
+    Pittscord_ipc_pb2_grpc.add_Pittscord_ipcServicer_to_server(PittscordIpcServer(bot), server)
+    listen_addr = "[::]:50051"
+    server.add_insecure_port(listen_addr)
+    print("starting rpc server")
+    await server.start()
+    await bot.start(token)
+
 if __name__ == "__main__":
-    bot.run(discord_token)
+    from secret import discord_token
+    asyncio.run(begin(discord_token))
