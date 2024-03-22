@@ -7,6 +7,9 @@ from secret import discord_token
 
 intents = discord.Intents.all()
 
+# For Testing Purposes
+bot_testing_channel_id = 1208576315070877706
+
 
 class PittscordBot(commands.Bot):
     def __init__(self, *args, **kwargs):
@@ -54,6 +57,11 @@ class PittscordBot(commands.Bot):
                 parent.append(c)
 
         return json.dumps(json_channels)
+
+    # send message to testing channel
+    async def say_hello(self):
+        bot_testing_channel = self.get_channel(bot_testing_channel_id)
+        await bot_testing_channel.send("Hello World!")
 
 
 bot = PittscordBot(command_prefix="!", intents=intents)
