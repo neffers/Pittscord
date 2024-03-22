@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+service Pittscord_ipc {
+    rpc GetJSON (JSONRequest) returns (JSONResponse) {}
+    rpc SayHello (HelloRequest) returns (HelloResponse) {}
+}
+
+message JSONRequest {
+    int64 server_id = 1;
+}
+
+message JSONResponse {
+    string json = 1;
+}
+
+message HelloRequest {
+    string msg = 1;
+}
+
+message HelloResponse {
+    string msg = 1;
+}
