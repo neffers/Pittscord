@@ -104,4 +104,5 @@ async def serverjson(interaction: discord.Interaction):
     print(bot.generate_server_json(interaction.guild.id))
 
 
-bot.run(discord_token)
+if __name__ == "__main__":
+    bot.run(discord_token)
