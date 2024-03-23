@@ -1,13 +1,8 @@
-import asyncio
 import discord
 import json
 import re
-import grpc
 from discord import app_commands
 from discord.ext import commands
-
-import Pittscord_ipc_pb2
-import Pittscord_ipc_pb2_grpc
 
 intents = discord.Intents.all()
 
@@ -72,30 +67,6 @@ class PittscordBot(commands.Bot):
 bot = PittscordBot(command_prefix="!", intents=intents)
 
 
-class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
-    def __init__(self, bot: PittscordBot):
-        self.bot = bot
-
-    async def GetJSON(
-            self,
-            request: Pittscord_ipc_pb2.JSONRequest,
-            context: grpc.aio.ServicerContext
-    ) -> Pittscord_ipc_pb2.JSONResponse:
-        json = self.bot.generate_server_json(request.server_id)
-        response = Pittscord_ipc_pb2.JSONResponse(json=json)
-        return response
-
-    async def SayHello(
-            self,
-            request: Pittscord_ipc_pb2.HelloRequest,
-            context: grpc.aio.ServicerContext
-    ):
-        await self.bot.say_hello()
-        return Pittscord_ipc_pb2.HelloResponse()
-
-
-
-
 @bot.event
 async def on_ready():
     """Runs when the bot is successfully logged in and ready to accept commands.
@@ -111,7 +82,7 @@ async def on_member_join(member: discord.Member):
     await member.dm_channel.send(f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
 
     def check(m):
-        return m.channel == member.dm_channel
+        return m.channel == member.dm_channel and m.author == member
 
     pitt_id_regex = re.compile('[a-z]{3}\d+')
     while True:
@@ -166,15 +137,6 @@ async def serverjson(interaction: discord.Interaction):
     print(bot.generate_server_json(interaction.guild.id))
 
 
-async def begin(token) -> None:
-    server = grpc.aio.server()
-    Pittscord_ipc_pb2_grpc.add_Pittscord_ipcServicer_to_server(PittscordIpcServer(bot), server)
-    listen_addr = "[::]:50051"
-    server.add_insecure_port(listen_addr)
-    print("starting rpc server")
-    await server.start()
-    await bot.start(token)
-
 if __name__ == "__main__":
     from secret import discord_token
-    asyncio.run(begin(discord_token))
+    bot.run(discord_token)
