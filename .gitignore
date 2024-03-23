@@ -1,6 +1,7 @@
 # ignore venv & pycache
 /venv/
-*/__pycache__/
+/__pycache__/
+*.pyc
 
 # ignore any files with secret in the name
 *secret*
