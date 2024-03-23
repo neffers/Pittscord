@@ -6,7 +6,6 @@ import signal
 from secret import discord_token
 import Pittscord_ipc_pb2_grpc
 from ipc_server import PittscordIpcServer
-import bot
 import web
 
 
