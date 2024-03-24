@@ -63,6 +63,10 @@ class PittscordBot(commands.Bot):
         bot_testing_channel = self.get_channel(bot_testing_channel_id)
         await bot_testing_channel.send("Hello World!")
 
+    async def process_semester_config(self, config: str):
+        #TODO: implement based on received config
+        raise NotImplementedError
+
 
 bot = PittscordBot(command_prefix="!", intents=intents)
 

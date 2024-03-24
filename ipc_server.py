@@ -24,3 +24,11 @@ class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
     ):
         await self.bot.say_hello()
         return Pittscord_ipc_pb2.HelloResponse()
+
+    async def SendConfig(
+            self,
+            request: Pittscord_ipc_pb2.ConfigRequest,
+            context: grpc.aio.ServicerContext
+    ):
+        response_code = await self.bot.process_semester_config(request.config)
+        return Pittscord_ipc_pb2.ConfigResponse(code=response_code)
