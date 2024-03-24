@@ -4,6 +4,9 @@ import re
 from discord import app_commands
 from discord.ext import commands
 
+import database
+from secret import db_filename
+
 intents = discord.Intents.all()
 
 # For Testing Purposes
@@ -14,6 +17,7 @@ bot_testing_channel_id = 1208576315070877706
 class PittscordBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.db = database.Database(db_filename)
 
     def generate_server_json(self, server_id: int) -> str:
         """Generates a simple json list of the server's channel structure and returns it as a string"""
