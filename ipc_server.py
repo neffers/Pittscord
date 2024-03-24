@@ -1,8 +1,7 @@
 import grpc
 
 from bot import bot
-import Pittscord_ipc_pb2
-import Pittscord_ipc_pb2_grpc
+from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
 
 
 class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):

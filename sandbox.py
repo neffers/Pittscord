@@ -4,7 +4,7 @@ import multiprocessing
 import signal
 
 from secret import discord_token
-import Pittscord_ipc_pb2_grpc
+from rpc import Pittscord_ipc_pb2_grpc
 from ipc_server import PittscordIpcServer
 import web
 
@@ -23,14 +23,15 @@ async def launch_ipc_server(token) -> None:
     server.add_insecure_port(listen_addr)
     print("starting rpc server")
     await server.start()
+    print("starting discord bot")
     await ipc_server.bot.start(token)
 
 
 def start_server(token):
     asyncio.run(launch_ipc_server(token))
 
+
 if __name__ == "__main__":
-    #bot_process = multiprocessing.Process(target=bot.begin, args=(discord_token,))
     bot_process = multiprocessing.Process(target=start_server, args=(discord_token,))
     web_process = multiprocessing.Process(target=web.app.run, args=())
 
