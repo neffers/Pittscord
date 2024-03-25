@@ -25,6 +25,10 @@ class Database:
         # TODO: find a student id given a discord account id, return None if not in table
         raise NotImplementedError
 
+    def remove_student_association(self, discord_id):
+        # TODO: Remove a row from that table
+        raise NotImplementedError
+
     def add_semester_course(self, course_canvas_id, course_name, category_channel_id, recitation_react_message_id):
         # TODO: add a row to the table
         raise NotImplementedError
