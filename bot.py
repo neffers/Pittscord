@@ -114,7 +114,10 @@ async def on_member_join(member: discord.Member):
 async def identify(interaction: discord.Interaction, user: discord.User):
     """Look up a user's Pitt ID. Currently only responds with Discord ID."""
     student_id = bot.db.get_student_id(user.id)
-    await interaction.response.send_message(f"{student_id}", ephemeral=True)
+    if student_id is None:
+        await interaction.response.send_message(f"No pitt id available!", ephemeral=True)
+    else:
+        await interaction.response.send_message(f"{student_id}", ephemeral=True)
 
 
 @identify.error
