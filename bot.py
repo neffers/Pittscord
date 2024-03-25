@@ -127,6 +127,16 @@ async def identify_error(interaction: discord.Interaction, error: app_commands.A
     await interaction.response.send_message(response, ephemeral=True)
 
 
+@bot.tree.command()
+@app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
+async def deregister(interaction: discord.Interaction, user: discord.User):
+    """Remove an association of pitt id from discord id"""
+    student_id = bot.db.get_student_id(user.id)
+    bot.db.remove_student_association(user.id)
+    await interaction.response.send_message(f"Removed association with {student_id}", ephemeral=True)
+
+
 @bot.command()
 async def sync(interaction: discord.Interaction):
     """Command to re-register 'app_commands' (slash commands) with Discord so that they can be used.
