@@ -86,33 +86,33 @@ async def on_ready():
 async def on_member_join(member: discord.Member):
     if member.dm_channel is None:
         await member.create_dm()
-    # TODO: Check for user's presence in DB
-    await member.dm_channel.send(f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
+    if bot.db.get_student_id(member.id) is None:
+        await member.dm_channel.send(f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
 
-    def check(m):
-        return m.channel == member.dm_channel and m.author == member
+        def check(m):
+            return m.channel == member.dm_channel and m.author == member
 
-    pitt_id_regex = re.compile('[a-z]{3}\d+')
-    while True:
-        msg = await bot.wait_for('message', check=check)
-        pittid = pitt_id_regex.fullmatch(msg.content.lower())
-        if pittid is not None:
-            break
-        else:
-            await member.dm_channel.send(f'I don\'t recognize that, please try again.')
+        pitt_id_regex = re.compile('[a-z]{3}\d+')
+        while True:
+            msg = await bot.wait_for('message', check=check)
+            pittid = pitt_id_regex.fullmatch(msg.content.lower())
+            if pittid is not None:
+                break
+            else:
+                await member.dm_channel.send(f'I don\'t recognize that, please try again.')
 
-    # TODO: insert pittid.string alongside member.id
-    await member.dm_channel.send(f'Registering {pittid.string} and {member.id}')
+        bot.db.add_student(pittid, member.id)
+        await member.dm_channel.send(f'Thanks!')
+    # TODO: find the student in classes and add to roles
 
 
 @bot.tree.command()
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
-@app_commands.checks.has_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
     """Look up a user's Pitt ID. Currently only responds with Discord ID."""
-    # TODO: Make this use DB
-    await interaction.response.send_message(f"{user.id}", ephemeral=True)
+    student_id = bot.db.get_student_id(user.id)
+    await interaction.response.send_message(f"{student_id}", ephemeral=True)
 
 
 @identify.error
