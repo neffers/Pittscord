@@ -3,6 +3,9 @@
 /__pycache__/
 *.pyc
 
+# Ignore database files
+*.db
+
 # ignore any files with secret in the name
 *secret*
 

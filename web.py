@@ -1,8 +1,7 @@
 from quart import Quart
 
 import grpc
-import Pittscord_ipc_pb2
-import Pittscord_ipc_pb2_grpc
+from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
 
 
 async def do_hello() -> None:
