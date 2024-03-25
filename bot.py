@@ -4,7 +4,8 @@ import re
 from discord import app_commands
 from discord.ext import commands
 
-import database
+#import database
+import pretend_database as database
 from secret import db_filename
 
 intents = discord.Intents.all()
