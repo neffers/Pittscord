@@ -97,6 +97,7 @@ async def on_member_join(member: discord.Member):
             msg = await bot.wait_for('message', check=check)
             pittid = pitt_id_regex.fullmatch(msg.content.lower())
             if pittid is not None:
+                pittid = pittid.string
                 break
             else:
                 await member.dm_channel.send(f'I don\'t recognize that, please try again.')
@@ -135,6 +136,15 @@ async def deregister(interaction: discord.Interaction, user: discord.User):
     student_id = bot.db.get_student_id(user.id)
     bot.db.remove_student_association(user.id)
     await interaction.response.send_message(f"Removed association with {student_id}", ephemeral=True)
+
+
+@bot.tree.command()
+@app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
+async def ask_user_to_register(interaction: discord.Interaction, user: discord.User):
+    """Ask user to identify themselves to the bot"""
+    await interaction.response.send_message("Asking!", ephemeral=True)
+    await on_member_join(user)
 
 
 @bot.command()
