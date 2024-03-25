@@ -4,12 +4,6 @@ from flask import request, abort, url_for, redirect, session
 
 app = Flask(__name__)
 
-# hello
-
-# @app.route("/")
-# def hello():
-#     return "Hello World! :("
-
 @app.route("/foo")
 def fooController():
     return "<h1>THIS IS THE FOO PAGE</h1>"
