@@ -12,9 +12,11 @@ class Database:
     """
     def __init__(self, db_filename):
         self.conn = sqlite3.connect(db_filename)
+        # TODO: Make sure that stuff like foreign key rules are maintained
 
     def init_db(self):
         # TODO: Initialize DB Schema here (as things like CREATE TABLE IF NOT EXISTS) and probably call this in __init__
+        # i recommend also using stuff like on_delete(cascade) to make sure if we delete a course that its recitations also get deleted
         raise NotImplementedError
 
     def add_student(self, pitt_id, discord_id):
@@ -25,12 +27,20 @@ class Database:
         # TODO: find a student id given a discord account id, return None if not in table
         raise NotImplementedError
 
+    def remove_student_association(self, discord_id):
+        # TODO: Remove a row from that table
+        raise NotImplementedError
+
     def add_semester_course(self, course_canvas_id, course_name, category_channel_id, recitation_react_message_id):
         # TODO: add a row to the table
         raise NotImplementedError
 
     def get_semester_courses(self):
         # TODO: just return the entries from the database as a dictionary or tuple or something
+        raise NotImplementedError
+
+    def remove_semester_courses(self):
+        # TODO: Probably just empty the table for now
         raise NotImplementedError
 
     def add_course_recitation(self, course_canvas_id, recitation_name, reaction_id, associated_role_id):
