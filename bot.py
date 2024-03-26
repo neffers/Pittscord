@@ -72,6 +72,13 @@ class PittscordBot(commands.Bot):
         #TODO: implement based on received config
         raise NotImplementedError
 
+    async def semester_cleanup(self):
+        # TODO
+        # get current semester roles and move those students to "previous student" role
+        # delete the old roles
+        # delete the old channels (saving logs?)
+        raise NotImplementedError
+
 
 bot = PittscordBot(command_prefix="!", intents=intents)
 
