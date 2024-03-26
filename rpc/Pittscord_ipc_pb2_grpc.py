@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import Pittscord_ipc_pb2 as Pittscord__ipc__pb2
+from . import Pittscord_ipc_pb2 as Pittscord__ipc__pb2
 
 
 class Pittscord_ipcStub(object):
@@ -24,6 +24,11 @@ class Pittscord_ipcStub(object):
                 request_serializer=Pittscord__ipc__pb2.HelloRequest.SerializeToString,
                 response_deserializer=Pittscord__ipc__pb2.HelloResponse.FromString,
                 )
+        self.SendConfig = channel.unary_unary(
+                '/Pittscord_ipc/SendConfig',
+                request_serializer=Pittscord__ipc__pb2.ConfigRequest.SerializeToString,
+                response_deserializer=Pittscord__ipc__pb2.ConfigResponse.FromString,
+                )
 
 
 class Pittscord_ipcServicer(object):
@@ -41,6 +46,12 @@ class Pittscord_ipcServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SendConfig(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_Pittscord_ipcServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -53,6 +64,11 @@ def add_Pittscord_ipcServicer_to_server(servicer, server):
                     servicer.SayHello,
                     request_deserializer=Pittscord__ipc__pb2.HelloRequest.FromString,
                     response_serializer=Pittscord__ipc__pb2.HelloResponse.SerializeToString,
+            ),
+            'SendConfig': grpc.unary_unary_rpc_method_handler(
+                    servicer.SendConfig,
+                    request_deserializer=Pittscord__ipc__pb2.ConfigRequest.FromString,
+                    response_serializer=Pittscord__ipc__pb2.ConfigResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -95,5 +111,22 @@ class Pittscord_ipc(object):
         return grpc.experimental.unary_unary(request, target, '/Pittscord_ipc/SayHello',
             Pittscord__ipc__pb2.HelloRequest.SerializeToString,
             Pittscord__ipc__pb2.HelloResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SendConfig(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Pittscord_ipc/SendConfig',
+            Pittscord__ipc__pb2.ConfigRequest.SerializeToString,
+            Pittscord__ipc__pb2.ConfigResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

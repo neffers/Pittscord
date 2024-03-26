@@ -3,6 +3,7 @@ syntax = "proto3";
 service Pittscord_ipc {
     rpc GetJSON (JSONRequest) returns (JSONResponse) {}
     rpc SayHello (HelloRequest) returns (HelloResponse) {}
+    rpc SendConfig (ConfigRequest) returns (ConfigResponse) {}
 }
 
 message JSONRequest {
@@ -19,4 +20,12 @@ message HelloRequest {
 
 message HelloResponse {
     string msg = 1;
+}
+
+message ConfigRequest {
+    string config = 1;
+}
+
+message ConfigResponse {
+    int32 code = 1;
 }
