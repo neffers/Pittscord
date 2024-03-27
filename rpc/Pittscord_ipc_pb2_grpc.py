@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from . import Pittscord_ipc_pb2 as Pittscord__ipc__pb2
+import Pittscord_ipc_pb2 as Pittscord__ipc__pb2
 
 
 class Pittscord_ipcStub(object):
@@ -29,6 +29,11 @@ class Pittscord_ipcStub(object):
                 request_serializer=Pittscord__ipc__pb2.ConfigRequest.SerializeToString,
                 response_deserializer=Pittscord__ipc__pb2.ConfigResponse.FromString,
                 )
+        self.Cleanup = channel.unary_unary(
+                '/Pittscord_ipc/Cleanup',
+                request_serializer=Pittscord__ipc__pb2.CleanupRequest.SerializeToString,
+                response_deserializer=Pittscord__ipc__pb2.CleanupResponse.FromString,
+                )
 
 
 class Pittscord_ipcServicer(object):
@@ -52,6 +57,12 @@ class Pittscord_ipcServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Cleanup(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_Pittscord_ipcServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -69,6 +80,11 @@ def add_Pittscord_ipcServicer_to_server(servicer, server):
                     servicer.SendConfig,
                     request_deserializer=Pittscord__ipc__pb2.ConfigRequest.FromString,
                     response_serializer=Pittscord__ipc__pb2.ConfigResponse.SerializeToString,
+            ),
+            'Cleanup': grpc.unary_unary_rpc_method_handler(
+                    servicer.Cleanup,
+                    request_deserializer=Pittscord__ipc__pb2.CleanupRequest.FromString,
+                    response_serializer=Pittscord__ipc__pb2.CleanupResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -128,5 +144,22 @@ class Pittscord_ipc(object):
         return grpc.experimental.unary_unary(request, target, '/Pittscord_ipc/SendConfig',
             Pittscord__ipc__pb2.ConfigRequest.SerializeToString,
             Pittscord__ipc__pb2.ConfigResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Cleanup(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Pittscord_ipc/Cleanup',
+            Pittscord__ipc__pb2.CleanupRequest.SerializeToString,
+            Pittscord__ipc__pb2.CleanupResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

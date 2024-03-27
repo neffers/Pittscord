@@ -72,6 +72,13 @@ class PittscordBot(commands.Bot):
         #TODO: implement based on received config
         raise NotImplementedError
 
+    async def semester_cleanup(self):
+        # TODO
+        # get current semester roles and move those students to "previous student" role
+        # delete the old roles
+        # delete the old channels (saving logs?)
+        raise NotImplementedError
+
 
 bot = PittscordBot(command_prefix="!", intents=intents)
 
@@ -85,15 +92,21 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member: discord.Member):
+    """A method that runs when a user joins a guild the bot is in."""
+    # We're probably going to send this user some messages, so make sure that the dm channel exists
     if member.dm_channel is None:
         await member.create_dm()
+
+    # Check for the user's presence in the database (in case of a leave-rejoin)
     if bot.db.get_student_id(member.id) is None:
         await member.dm_channel.send(f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
 
         def check(m):
             return m.channel == member.dm_channel and m.author == member
 
+        # Matches three alphabetic characters followed at least one numeric digit
         pitt_id_regex = re.compile('[a-z]{3}\d+')
+
         while True:
             msg = await bot.wait_for('message', check=check)
             pittid = pitt_id_regex.fullmatch(msg.content.lower())
@@ -166,6 +179,7 @@ async def sync(interaction: discord.Interaction):
 
 @bot.command()
 async def serverjson(interaction: discord.Interaction):
+    """Development command, so I can see what json I'm making"""
     print(bot.generate_server_json(interaction.guild.id))
 
 
