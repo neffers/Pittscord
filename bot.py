@@ -6,7 +6,9 @@ from discord.ext import commands
 
 #import database
 import pretend_database as database
+# TODO: Move to a config file?
 from secret import db_filename
+reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
 intents = discord.Intents.all()
 
@@ -88,6 +90,26 @@ async def on_ready():
     """Runs when the bot is successfully logged in and ready to accept commands.
     May also run after network failures? Don't use it to schedule things. (That's why there's a !sync command)"""
     print(f'We have logged in as {bot.user}')
+
+
+@bot.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    role_id = bot.db.get_role_id(payload.message_id, payload.emoji.name)
+    if role_id:
+        guild = bot.get_guild(payload.guild_id)
+        member = guild.get_member(payload.user_id)
+        role = guild.get_role(role_id)
+        await member.add_roles(role)
+
+
+@bot.event
+async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
+    role_id = bot.db.get_role_id(payload.message_id, payload.emoji.name)
+    if role_id:
+        guild = bot.get_guild(payload.guild_id)
+        member = guild.get_member(payload.user_id)
+        role = guild.get_role(role_id)
+        await member.remove_roles(role)
 
 
 @bot.event
