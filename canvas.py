@@ -1,17 +1,15 @@
 import canvasapi
 
+# TODO: put in a 'config' file?
 canvas_base_url = "https://canvas.pitt.edu"
-
-# Pretending I can fetch this from the database of current courses
-#TODO: Remove this
-current_course_ids = [241938, 245557, 241683]
 
 
 class Canvas:
-    def __init__(self, token):
-        self.c = canvasapi.Canvas(canvas_base_url, token)
+    def __init__(self, canvas_token: str):
+        self.c = canvasapi.Canvas(canvas_base_url, canvas_token)
 
     def get_courses_by_term(self):
+        """Right now this probably won't get used, but if we end up implementing some auto-population it would probably involve this"""
         all_courses_paginated = self.c.get_courses()
         visible_courses = []
         for course in all_courses_paginated:
@@ -32,13 +30,13 @@ class Canvas:
 
         return ret
 
-    def find_student_in_current_classes(self, student_id):
-        #TODO: get current course ids from db
+    def find_student_in_classes(self, student_id, course_ids):
         course_students = {}
-        for course_id in current_course_ids:
+
+        for course_id in course_ids:
             course = self.c.get_course(course_id)
             students = course.get_users()
-            course_students[course_id] = [student.login_id for student in students]
+            course_students[course_id] = [student.login_id.lower() for student in students]
 
         ret = []
 
@@ -53,6 +51,9 @@ class Canvas:
 
 
 if __name__ == "__main__":
-    from secret import canvas_token
-    c = Canvas(canvas_token)
-    c.find_student_in_current_classes('lun8')
+    from secret import canvas_token as token
+    # TODO: Get luis to tell me what his courses for the semester are
+    courses = []
+    c = Canvas(token)
+    # once we have that data, with luis's key this should print all the courses
+    print(c.find_student_in_classes('lun8', courses))
