@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import Pittscord_ipc_pb2 as Pittscord__ipc__pb2
+from . import Pittscord_ipc_pb2 as Pittscord__ipc__pb2
 
 
 class Pittscord_ipcStub(object):
