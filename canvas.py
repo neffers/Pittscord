@@ -52,8 +52,6 @@ class Canvas:
 
 if __name__ == "__main__":
     from secret import canvas_token as token
-    # TODO: Get luis to tell me what his courses for the semester are
-    courses = []
+    courses = [241505, 241457]
     c = Canvas(token)
-    # once we have that data, with luis's key this should print all the courses
     print(c.find_student_in_classes('lun8', courses))
