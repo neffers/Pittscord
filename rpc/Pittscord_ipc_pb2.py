@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13Pittscord_ipc.proto\" \n\x0bJSONRequest\x12\x11\n\tserver_id\x18\x01 \x01(\x03\"\x1c\n\x0cJSONResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x1b\n\x0cHelloRequest\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\x1c\n\rHelloResponse\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\x1f\n\rConfigRequest\x12\x0e\n\x06\x63onfig\x18\x01 \x01(\t\"\x1e\n\x0e\x43onfigResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x32\x97\x01\n\rPittscord_ipc\x12(\n\x07GetJSON\x12\x0c.JSONRequest\x1a\r.JSONResponse\"\x00\x12+\n\x08SayHello\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12/\n\nSendConfig\x12\x0e.ConfigRequest\x1a\x0f.ConfigResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13Pittscord_ipc.proto\" \n\x0bJSONRequest\x12\x11\n\tserver_id\x18\x01 \x01(\x03\"\x1c\n\x0cJSONResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x1b\n\x0cHelloRequest\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\x1c\n\rHelloResponse\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\x1f\n\rConfigRequest\x12\x0e\n\x06\x63onfig\x18\x01 \x01(\t\"\x1e\n\x0e\x43onfigResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\"#\n\x0e\x43leanupRequest\x12\x11\n\tserver_id\x18\x01 \x01(\x03\"\x1f\n\x0f\x43leanupResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x32\xc7\x01\n\rPittscord_ipc\x12(\n\x07GetJSON\x12\x0c.JSONRequest\x1a\r.JSONResponse\"\x00\x12+\n\x08SayHello\x12\r.HelloRequest\x1a\x0e.HelloResponse\"\x00\x12/\n\nSendConfig\x12\x0e.ConfigRequest\x1a\x0f.ConfigResponse\"\x00\x12.\n\x07\x43leanup\x12\x0f.CleanupRequest\x1a\x10.CleanupResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,6 +33,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_CONFIGREQUEST']._serialized_end=177
   _globals['_CONFIGRESPONSE']._serialized_start=179
   _globals['_CONFIGRESPONSE']._serialized_end=209
-  _globals['_PITTSCORD_IPC']._serialized_start=212
-  _globals['_PITTSCORD_IPC']._serialized_end=363
+  _globals['_CLEANUPREQUEST']._serialized_start=211
+  _globals['_CLEANUPREQUEST']._serialized_end=246
+  _globals['_CLEANUPRESPONSE']._serialized_start=248
+  _globals['_CLEANUPRESPONSE']._serialized_end=279
+  _globals['_PITTSCORD_IPC']._serialized_start=282
+  _globals['_PITTSCORD_IPC']._serialized_end=481
 # @@protoc_insertion_point(module_scope)

@@ -39,3 +39,15 @@ class ConfigResponse(_message.Message):
     CODE_FIELD_NUMBER: _ClassVar[int]
     code: int
     def __init__(self, code: _Optional[int] = ...) -> None: ...
+
+class CleanupRequest(_message.Message):
+    __slots__ = ("server_id",)
+    SERVER_ID_FIELD_NUMBER: _ClassVar[int]
+    server_id: int
+    def __init__(self, server_id: _Optional[int] = ...) -> None: ...
+
+class CleanupResponse(_message.Message):
+    __slots__ = ("code",)
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    code: int
+    def __init__(self, code: _Optional[int] = ...) -> None: ...
