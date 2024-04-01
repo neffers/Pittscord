@@ -39,7 +39,8 @@ class Database:
         # TODO: Remove a row from that table
         raise NotImplementedError
 
-    def add_semester_course(self, course_canvas_id, course_name, category_channel_id, recitation_react_message_id):
+    def add_semester_course(self, course_canvas_id, course_name, student_role_id, ta_role_id, category_channel_id,
+                            recitation_react_message_id):
         # TODO: add a row to the table
         raise NotImplementedError
 
