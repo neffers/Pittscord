@@ -68,11 +68,45 @@ class PittscordBot(commands.Bot):
         bot_testing_channel = self.get_channel(bot_testing_channel_id)
         await bot_testing_channel.send("Hello World!")
 
-    async def process_semester_config(self, config: str):
-        #TODO: implement based on received config
-        raise NotImplementedError
+    async def process_semester_config(self, config_json: str):
+        config_dict = json.loads(config_json)
+        server_id = config_dict['server']
+        guild = self.get_guild(server_id)
+        for semester_class in config_dict['classes']:
+            class_name = semester_class['name']
+            class_canvas_id = semester_class['canvasId']
+            class_recitations = semester_class['recitations']
 
-    async def semester_cleanup(self):
+            ta_role = await guild.create_role(name=class_name+' TA')
+            student_role = await guild.create_role(name=class_name)
+
+            class_category = await guild.create_category(class_name)
+            class_announcements = None
+
+            for channel_template in config_dict['template']:
+                channel_name = channel_template['name']
+                channel_type = channel_template['type']
+                channel_ta_only = channel_template['TAOnly']
+                channel_student_only = channel_template['StudOnly']
+
+                match channel_type:
+                    case 'announcement':
+                        # TODO
+                        pass
+                    case 'textChannel':
+                        # TODO
+                        pass
+                    case 'forum':
+                        # TODO
+                        pass
+                    case 'voiceChannel':
+                        # TODO
+                        pass
+
+            #TODO
+            self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id, )
+
+    async def semester_cleanup(self, server_id: int):
         # TODO
         # get current semester roles and move those students to "previous student" role
         # delete the old roles
@@ -181,6 +215,53 @@ async def sync(interaction: discord.Interaction):
 async def serverjson(interaction: discord.Interaction):
     """Development command, so I can see what json I'm making"""
     print(bot.generate_server_json(interaction.guild.id))
+
+
+@bot.command()
+async def config(interaction: discord.Interaction):
+    """Development command to test processing semester config"""
+    # Create dummy config object
+    channel1 = {
+        "name": "Announcements",
+        "type": "announcement",
+        "TAOnly": True,
+        "StudOnly": True
+    }
+    channel2 = {
+        "name": "qa-forum",
+        "type": "forum",
+        "TAOnly": False,
+        "StudOnly": False
+    }
+    channel3 = {
+        "name": "general",
+        "type": "textChannel",
+        "TAOnly": False,
+        "StudOnly": True
+    }
+    channel4 = {
+        "name": "ta-chat",
+        "type": "textChannel",
+        "TAOnly": True,
+        "StudOnly": True
+    }
+    template = [channel1, channel2, channel3, channel4]
+    class1 = {
+        "name": "447",
+        "canvasId": "123",
+        "recitations": ["10am", "12pm"]
+    }
+    class2 = {
+        "name": "449",
+        "canvasId": "456",
+        "recitations": ["11am", "1pm"]
+    }
+    classes = [class1, class2]
+    server = 1204258474851041330
+    cfg = {"classes": classes, "template": template, "server": server}
+
+    # send it to process config as json
+    await bot.process_semester_config(json.dumps(cfg))
 
 
 if __name__ == "__main__":
