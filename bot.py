@@ -3,6 +3,7 @@ import json
 import re
 from discord import app_commands
 from discord.ext import commands
+from database import Database
 
 intents = discord.Intents.all()
 
@@ -66,6 +67,8 @@ class PittscordBot(commands.Bot):
 
 bot = PittscordBot(command_prefix="!", intents=intents)
 
+db = Database("database.db")
+
 
 @bot.event
 async def on_ready():
@@ -78,7 +81,12 @@ async def on_ready():
 async def on_member_join(member: discord.Member):
     if member.dm_channel is None:
         await member.create_dm()
-    # TODO: Check for user's presence in DB
+
+    pitt_id = db.get_student_id(member.id)
+    if pitt_id is not None:
+        await member.dm_channel.send(f'Welcome back! Your Pitt ID is {pitt_id[0]}')
+        return
+
     await member.dm_channel.send(f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
 
     def check(m):
@@ -93,7 +101,8 @@ async def on_member_join(member: discord.Member):
         else:
             await member.dm_channel.send(f'I don\'t recognize that, please try again.')
 
-    # TODO: insert pittid.string alongside member.id
+    pittid = db.add_student(pittid.string, member.id)
+    
     await member.dm_channel.send(f'Registering {pittid.string} and {member.id}')
 
 
@@ -103,8 +112,9 @@ async def on_member_join(member: discord.Member):
 @app_commands.checks.has_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
     """Look up a user's Pitt ID. Currently only responds with Discord ID."""
-    # TODO: Make this use DB
-    await interaction.response.send_message(f"{user.id}", ephemeral=True)
+
+    pittid = db.get_student_id(user.id) # Will either be a Pitt ID or None
+    await interaction.response.send_message(f"{pittid}", ephemeral=True)
 
 
 @identify.error
