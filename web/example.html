@@ -40,6 +40,188 @@
             background-color: red;
         }
     </style>
+    <script>
+        let active_class
+        let active_rec_id
+
+        let classes = [
+            {
+                name: "447",
+                canvasId: "123",
+                recitations: ["10a", "12p"]
+            },
+            {
+                name: "449",
+                canvasId: "456",
+                recitations: ["11a", "1p"]
+            },
+
+        ]
+
+        function get_selected_child(element) {
+            for(let child of element.children) {
+                if(child.selected) {
+                    return child
+                }
+            }
+        }
+
+        function change_class() {
+            active_class = classes.find((x) => x.name === document.getElementById('classes').value)
+
+            let name_elem = document.getElementById('className')
+            let recitations_elem = document.getElementById('recitations')
+            let canvas_id_elem = document.getElementById('classCanvasID')
+
+            name_elem.value = active_class.name
+            canvas_id_elem.value = active_class.canvasId
+
+            for(let i = recitations_elem.childElementCount; i > 0; i--) {
+                recitations_elem.removeChild(recitations_elem.firstElementChild)
+            }
+
+            for(let rec of active_class.recitations) {
+                add_rec_to_display(rec)
+            }
+            change_recitation()
+        }
+
+        function change_recitation() {
+            let recitations_elem = document.getElementById('recitations')
+            let recitation_time_elem = document.getElementById('recitationTime')
+            let selected = get_selected_child(recitations_elem)
+
+            if(selected) {
+                active_rec_id = active_class.recitations.indexOf(selected.innerText)
+                recitation_time_elem.value = recitations_elem.value
+            } else {
+                active_rec_id = undefined
+                recitation_time_elem.value = ""
+            }
+        }
+
+        function remove_recitation() {
+            if(active_rec_id === undefined) {
+                return
+            }
+            const recitations_elem = document.getElementById('recitations')
+            const selected = get_selected_child(recitations_elem)
+            recitations_elem.removeChild(selected)
+
+            active_class.recitations = active_class.recitations.filter((x) => active_class.recitations.indexOf(x) !== active_rec_id)
+
+            if(recitations_elem.firstElementChild) {
+                recitations_elem.firstElementChild.selected = true
+                change_recitation()
+            } else {
+                document.getElementById('recitationTime').value = ""
+            }
+        }
+
+        function add_new_course() {
+            const new_course = {
+                name: "new course",
+                canvasId: "0",
+                recitations: []
+            }
+            classes.push(new_course)
+            add_course_to_display(new_course)
+        }
+
+        function add_new_recitation() {
+            if(!active_class) {
+                return
+            }
+            const new_rec = "new Rec"
+            active_class.recitations.push(new_rec)
+            add_rec_to_display(new_rec)
+        }
+
+        function add_course_to_display(new_class) {
+            const classes_elem = document.getElementById("classes")
+            const class_elem = document.createElement('option')
+            class_elem.innerText = new_class.name
+            classes_elem.appendChild(class_elem)
+            class_elem.selected = true
+            change_class()
+        }
+
+        function add_rec_to_display(rec) {
+            const recitations_elem = document.getElementById('recitations')
+            const rec_elem = document.createElement('option')
+            rec_elem.innerText = rec
+            recitations_elem.appendChild(rec_elem)
+            rec_elem.selected = true
+            change_recitation()
+        }
+
+        function remove_course () {
+            if(!active_class) {
+                alert("Please select a class to remove")
+                return
+            }
+            if(classes.length === 1) {
+                alert("Can't remove last class in the semester")
+                return
+            }
+            classes = classes.filter((x) => x !== active_class)
+            const classes_elem = document.getElementById('classes')
+            const selected = get_selected_child(classes_elem)
+            classes_elem.removeChild(selected)
+            classes_elem.firstElementChild.selected = true
+            change_class()
+        }
+
+        function update_course() {
+            if(!active_class) {
+                return
+            }
+            const class_name_elem = document.getElementById('className')
+            const class_id_elem = document.getElementById('classCanvasID')
+            const classes_elem = document.getElementById('classes')
+
+            active_class.name = class_name_elem.value
+            active_class.canvasId = class_id_elem.value
+
+            const selected = get_selected_child(classes_elem)
+            selected.innerText = class_name_elem.value
+        }
+
+        function update_rec() {
+            if(active_rec_id === undefined) {
+                return
+            }
+            const rec_time_elem = document.getElementById('recitationTime')
+            const recs_elem = document.getElementById('recitations')
+
+            active_class.recitations[active_rec_id] = rec_time_elem.value
+            const selected = get_selected_child(recs_elem)
+            selected.innerText = rec_time_elem.value
+        }
+
+        function onload() {
+            for(let sem_class of classes) {
+                add_course_to_display(sem_class)
+            }
+
+            document.getElementById("classes").addEventListener("change", change_class)
+
+            document.getElementById('addClassBtn').addEventListener("click", add_new_course)
+            document.getElementById('removeClassBtn').addEventListener("click", remove_course)
+
+            document.getElementById('className').addEventListener('input', update_course)
+            document.getElementById('classCanvasID').addEventListener('change', update_course)
+
+            document.getElementById('recitations').addEventListener("change", change_recitation)
+
+            document.getElementById('rmRecBtn').addEventListener('click', remove_recitation)
+            document.getElementById('addRecBtn').addEventListener('click', add_new_recitation)
+
+            document.getElementById('recitationTime').addEventListener('input', update_rec)
+        }
+
+        addEventListener("DOMContentLoaded", onload)
+    </script>
 </head>
 <body>
 <form id="theForm">
@@ -80,7 +262,7 @@
                         <option>assignment-discussion</option>
                         <option>ta-chat</option>
                     </select> <br />
-                    <button>Add Channel</button>
+                    <button type="button">Add Channel</button>
                 </div>
                 <div class="inner">
                     <label for="channelName">Channel Name</label><br />
@@ -101,8 +283,8 @@
                     <input type="checkbox" id="studentOnly">
                     <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
                     <div class="container middle">
-                        <button>commit configuration</button>
-                        <button class="right">remove channel</button>
+                        <button type="button">commit configuration</button>
+                        <button class="right" type="button">remove channel</button>
                     </div>
                 </div>
             </div>
@@ -111,37 +293,31 @@
                 <div class="inner">
                     <label for="classes">Semester Classes</label><br />
                     <select id="classes" name="classes" size="5">
-                        <option value="">447</option>
-                        <option value="">449</option>
                     </select><br />
-                    <button>Add Course</button>
+                    <button type="button" id="addClassBtn">Add Course</button>
                 </div>
                 <div class="inner">
                     <label for="className">Class Name</label><br />
                     <input type="text" id="className"><br />
                     <label for="classCanvasID">Canvas ID</label><br />
                     <input type="text" id="classCanvasID"><br />
-                    <button>Commit configuration</button><br />
-                    <button>Remove Course</button>
+                    <button type="button" id="removeClassBtn">Remove Course</button>
                 </div>
                 <div class="inner">
                     <label for="recitations">Class Recitation Sections</label><br />
                     <select id="recitations" name="recitations" size="5">
-                        <option value="">10am</option>
-                        <option value="">12pm</option>
                     </select><br />
-                    <button>Add Recitation Section</button>
-                    <button>Remove Recitation</button><br />
+                    <button type="button" id="addRecBtn">Add Recitation Section</button>
+                    <button type="button" id="rmRecBtn">Remove Recitation</button><br />
                     <label for="recitationTime">Recitation Time</label>
                     <input type="text" id="recitationTime"><br />
-                    <button>Commit Recitation Time</button>
                 </div>
                 <div class="inner">
-                    <button>Preview Changes in Left Panel</button><br /><br />
-                    <button>Commit Semester Options</button>
+                    <button type="button">Preview Changes in Left Panel</button><br /><br />
+                    <button type="button">Commit Semester Options</button>
                 </div>
                 <div class="inner">
-                    <button class="warning">Semester Cleanup</button><br />
+                    <button class="warning" type="button">Semester Cleanup</button><br />
                     <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
                 </div>
             </div>
