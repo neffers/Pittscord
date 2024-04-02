@@ -1,4 +1,4 @@
-from quart import Quart, render_template, session
+from quart import Quart, render_template, session, request
 import grpc
 import json
 from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
@@ -27,6 +27,9 @@ async def default():
 
 @app.route("/config", methods=["POST"])
 async def recv_config():
+    config = await request.json
+    print(config)
+    # TODO: make request to the ipc server and return the result
     return {}
 
 
@@ -34,6 +37,11 @@ async def recv_config():
 async def get_json():
     ret = await get_json_from_server(session['server'])
     return json.loads(ret)
+
+
+@app.route("/cleanup", methods=["DELETE"])
+async def cleanup():
+    return 200
 
 
 if __name__ == "__main__":

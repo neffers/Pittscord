@@ -216,6 +216,10 @@
 
             fetch("/config", fetch_options)
                 .then((response) => {
+                    return response.json()
+                })
+                .then((response) => {
+                    // TODO: do something with this
                     console.log(response)
                 })
                 .catch((err) => {
