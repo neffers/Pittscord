@@ -27,3 +27,15 @@ class HelloResponse(_message.Message):
     MSG_FIELD_NUMBER: _ClassVar[int]
     msg: str
     def __init__(self, msg: _Optional[str] = ...) -> None: ...
+
+class ConfigRequest(_message.Message):
+    __slots__ = ("config",)
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
+    config: str
+    def __init__(self, config: _Optional[str] = ...) -> None: ...
+
+class ConfigResponse(_message.Message):
+    __slots__ = ("code",)
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    code: int
+    def __init__(self, code: _Optional[int] = ...) -> None: ...
