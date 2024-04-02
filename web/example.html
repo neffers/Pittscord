@@ -199,6 +199,27 @@
             selected.innerText = rec_time_elem.value
         }
 
+        function send_config() {
+            let config = {
+                template: [],
+                classes: classes
+            }
+
+            let headers = new Headers()
+            headers.append('Content-type', 'application/json')
+
+            let fetch_options = {
+                headers: headers,
+                method: "POST",
+                body: JSON.stringify(config)
+            }
+
+            fetch("/config", fetch_options)
+                .then((response) => {
+                    console.log(response)
+                })
+        }
+
         function onload() {
             for(let sem_class of classes) {
                 add_course_to_display(sem_class)
@@ -218,6 +239,8 @@
             document.getElementById('addRecBtn').addEventListener('click', add_new_recitation)
 
             document.getElementById('recitationTime').addEventListener('input', update_rec)
+
+            document.getElementById('semCommitBtn').addEventListener('click', send_config)
         }
 
         addEventListener("DOMContentLoaded", onload)
@@ -313,8 +336,8 @@
                     <input type="text" id="recitationTime"><br />
                 </div>
                 <div class="inner">
-                    <button type="button">Preview Changes in Left Panel</button><br /><br />
-                    <button type="button">Commit Semester Options</button>
+                    <button type="button" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
+                    <button type="button" id="semCommitBtn">Commit Semester Options</button>
                 </div>
                 <div class="inner">
                     <button class="warning" type="button">Semester Cleanup</button><br />
