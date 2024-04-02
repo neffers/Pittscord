@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def default():
-    return render_template("templates/theButton.html")
+    return render_template("example.html")
 
 
 @app.route("/post", methods=["POST"])
