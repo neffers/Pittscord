@@ -21,7 +21,7 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS students(pitt_id VARCHAR PRIMARY KEY, discord_id VARCHAR)")
         cursor.execute("CREATE TABLE IF NOT EXISTS admin(name VARCHAR, server_id VARCHAR, discord_id VARCHAR)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS course(course_canvas_id VARCHAR PRIMARY KEY, course_name VARCHAR, category_channel_id VARCHAR, recitation_react_message_id VARCHAR)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS course(course_canvas_id VARCHAR PRIMARY KEY, course_name VARCHAR, category_channel_id VARCHAR, recitation_react_message_id VARCHAR, student_role_id VARCHAR, ta_role_id VARCHAR)")
         cursor.execute("CREATE TABLE IF NOT EXISTS recitation(course_canvas_id VARCHAR, recitation_name VARCHAR, reaction_id VARCHAR PRIMARY KEY, associated_role_id VARCHAR, FOREIGN KEY(course_canvas_id) REFERENCES course(course_canvas_id) ON DELETE CASCADE)")
         cursor.execute("CREATE TABLE IF NOT EXISTS messages(message_id VARCHAR PRIMARY KEY, message_time TIMESTAMP)")
 
@@ -66,10 +66,10 @@ class Database:
         self.conn.commit()
 
     # Adds a new course into the course table
-    def add_semester_course(self, course_canvas_id, course_name, category_channel_id, recitation_react_message_id):
+    def add_semester_course(self, course_canvas_id, course_name, student_role_id, ta_role_id, category_channel_id, recitation_react_message_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO course VALUES (?, ?, ?, ?)", (course_canvas_id, course_name, category_channel_id, recitation_react_message_id,))
+        cursor.execute("INSERT INTO course VALUES (?, ?, ?, ?, ?, ?)", (course_canvas_id, course_name, category_channel_id, recitation_react_message_id, student_role_id, ta_role_id,))
         
         self.conn.commit()
   
