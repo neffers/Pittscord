@@ -67,7 +67,17 @@
         }
 
         function change_class() {
-            active_class = classes.find((x) => x.name === document.getElementById('classes').value)
+            const classes_elem = document.getElementById('classes')
+            const selected = get_selected_child(classes_elem)
+
+            let active_class_index
+            for(let i = 0; i < classes_elem.children.length; i++) {
+                if(classes_elem.children.item(i) === selected) {
+                    active_class_index = i
+                    break
+                }
+            }
+            active_class = classes[active_class_index]
 
             let name_elem = document.getElementById('className')
             let recitations_elem = document.getElementById('recitations')
