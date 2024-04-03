@@ -348,7 +348,6 @@
 
             let config_template = []
             for(let child of template_elem.children) {
-                console.log(child)
                 let this_chan = {
                     channelName: child.innerText,
                     channelType: child.dataset.channelType,
@@ -363,6 +362,7 @@
                 classes: config_classes
             }
 
+            console.log("Config to be sent:")
             console.log(config)
 
             let headers = new Headers()
@@ -427,7 +427,7 @@
             template_elem.firstElementChild.selected = true
             load_channel()
             template_elem.addEventListener('change', load_channel)
-            document.getElementById('templateConfig').addEventListener('change', save_channel)
+            document.getElementById('templateConfig').addEventListener('input', save_channel)
             document.getElementById('rmChanBtn').addEventListener('click', remove_channel)
             document.getElementById('addChanBtn').addEventListener('click', add_new_channel)
 
