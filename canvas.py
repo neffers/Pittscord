@@ -1,7 +1,5 @@
 import canvasapi
-
-# TODO: put in a 'config' file?
-canvas_base_url = "https://canvas.pitt.edu"
+from config import canvas_base_url
 
 
 class Canvas:

@@ -6,8 +6,7 @@ from discord.ext import commands
 
 #import database
 import pretend_database as database
-# TODO: Move to a config file?
-from secret import db_filename
+from config import db_filename
 reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
 intents = discord.Intents.all()
