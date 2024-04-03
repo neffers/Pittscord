@@ -239,53 +239,6 @@ async def serverjson(interaction: discord.Interaction):
     print(bot.generate_server_json(interaction.guild.id))
 
 
-@bot.command()
-async def config(interaction: discord.Interaction):
-    """Development command to test processing semester config"""
-    # Create dummy config object
-    channel1 = {
-        "name": "Announcements",
-        "type": "announcement",
-        "TAOnly": True,
-        "StudOnly": True
-    }
-    channel2 = {
-        "name": "qa-forum",
-        "type": "forum",
-        "TAOnly": False,
-        "StudOnly": False
-    }
-    channel3 = {
-        "name": "general",
-        "type": "textChannel",
-        "TAOnly": False,
-        "StudOnly": True
-    }
-    channel4 = {
-        "name": "ta-chat",
-        "type": "textChannel",
-        "TAOnly": True,
-        "StudOnly": True
-    }
-    template = [channel1, channel2, channel3, channel4]
-    class1 = {
-        "name": "447",
-        "canvasId": "123",
-        "recitations": ["10am", "12pm"]
-    }
-    class2 = {
-        "name": "449",
-        "canvasId": "456",
-        "recitations": ["11am", "1pm"]
-    }
-    classes = [class1, class2]
-    server = 1204258474851041330
-    cfg = {"classes": classes, "template": template, "server": server}
-
-    # send it to process config as json
-    await bot.process_semester_config(json.dumps(cfg))
-
-
 if __name__ == "__main__":
     from secret import discord_token
     bot.run(discord_token)
