@@ -45,12 +45,12 @@
         let classes = [
             {
                 name: "447",
-                canvasId: "123",
+                canvasID: "123",
                 recitations: ["10a", "12p"]
             },
             {
                 name: "449",
-                canvasId: "456",
+                canvasID: "456",
                 recitations: ["11a", "1p"]
             }
         ]
@@ -175,7 +175,7 @@
             if(!new_course || is_event(new_course)) {
                 new_course = {
                     name: "new course",
-                    canvasId: "0",
+                    canvasID: "0",
                     recitations: []
                 }
             }
@@ -183,7 +183,7 @@
             // create the new element and set ts data according to what was passed in
             const new_course_elem = document.createElement('option')
             new_course_elem.innerText = new_course.name
-            new_course_elem.dataset.canvasID = new_course.canvasId
+            new_course_elem.dataset.canvasID = new_course.canvasID
             new_course_elem.dataset.recitations = JSON.stringify(new_course.recitations)
 
             // add it to the UI and selected it (nice UI feature when you click the button)
