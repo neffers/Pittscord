@@ -14,30 +14,56 @@ class Database:
         self.conn = sqlite3.connect(db_filename)
         self.conn.execute("PRAGMA foreign_keys = ON;")
         self.init_db()
-        # TODO: Make sure that stuff like foreign key rules are maintained
 
     # Initializes the DB schema
     def init_db(self):
         cursor = self.conn.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS students(pitt_id VARCHAR PRIMARY KEY, discord_id VARCHAR)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS admin(name VARCHAR, server_id VARCHAR, discord_id VARCHAR)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS course(course_canvas_id VARCHAR PRIMARY KEY, course_name VARCHAR, category_channel_id VARCHAR, recitation_react_message_id VARCHAR, student_role_id VARCHAR, ta_role_id VARCHAR)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS recitation(course_canvas_id VARCHAR, recitation_name VARCHAR, reaction_id VARCHAR PRIMARY KEY, associated_role_id VARCHAR, FOREIGN KEY(course_canvas_id) REFERENCES course(course_canvas_id) ON DELETE CASCADE)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS messages(message_id VARCHAR PRIMARY KEY, message_time TIMESTAMP)")
+        cursor.execute("""CREATE TABLE IF NOT EXISTS students(
+                       pitt_id TEXT PRIMARY KEY NOT NULL,
+                       discord_id INTEGER NOT NULL)""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS admin(
+                       admin_num INTEGER PRIMARY KEY NOT NULL,
+                       name TEXT NOT NULL, 
+                       server_id INTEGER NOT NULL, 
+                       discord_id INTEGER NOT NULL)""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS course(
+                       course_number INTEGER PRIMARY KEY NOT NULL AUTOINCREMENT,
+                       course_canvas_id INTEGER UNIQUE NOT NULL, 
+                       course_name TEXT NOT NULL, 
+                       category_channel_id INTEGER NOT NULL, 
+                       recitation_react_message_id INTEGER NOT NULL, 
+                       student_role_id INTEGER NOT NULL, 
+                       ta_role_id INTEGER NOT NULL,
+                       course_admin TEXT)""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS recitation(
+                       course_number INTEGER PRIMARY KEY NOT NULL AUTOINCREMENT,
+                       course_canvas_id INTEGER NOT NULL, 
+                       recitation_name TEXT NOT NULL, 
+                       reaction_id INTEGER NOT NULL, 
+                       associated_role_id INTEGER, NOT NULL 
+                       FOREIGN KEY(course_canvas_id) REFERENCES course(course_canvas_id) 
+                       ON DELETE CASCADE)""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS messages(
+                       message_id TEXT PRIMARY KEY NOT NULL, 
+                       message_time TEXT NOT NULL)""")
 
     # Adds a user to the admin table
-    def add_admin(self, name, server_id, discord_id):
+    def add_admin(self, admin_num, name, server_id, discord_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO admin VALUES (?, ?, ?)", (name, server_id, discord_id,))
+        cursor.execute("INSERT INTO admin VALUES (?, ?, ?, ?)", (admin_num, name, server_id, discord_id,))
         
         self.conn.commit()
 
     # Removes a user from the admin table
-    def remove_admin(self, name):
+    def remove_admin(self, admin_num):
         cursor = self.conn.cursor()
 
-        cursor.execute("DELETE FROM admin WHERE name = (?)", (name,))
+        cursor.execute("DELETE FROM admin WHERE admin_num = (?)", (admin_num,))
 
         self.conn.commit()
 
@@ -66,41 +92,41 @@ class Database:
         self.conn.commit()
 
     # Adds a new course into the course table
-    def add_semester_course(self, course_canvas_id, course_name, student_role_id, ta_role_id, category_channel_id, recitation_react_message_id):
+    def add_semester_course(self, course_number, course_canvas_id, course_name, category_channel_id, recitation_react_message_id, student_role_id, ta_role_id, course_admin):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO course VALUES (?, ?, ?, ?, ?, ?)", (course_canvas_id, course_name, category_channel_id, recitation_react_message_id, student_role_id, ta_role_id,))
+        cursor.execute("INSERT INTO course VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (course_number, course_canvas_id, course_name, category_channel_id, recitation_react_message_id, student_role_id, ta_role_id, course_admin,))
         
         self.conn.commit()
   
     # Returns a list of all courses
-    def get_semester_courses(self):
+    def get_semester_courses(self, course_admin):
         cursor = self.conn.cursor()
 
-        courseList = cursor.execute("SELECT course_name FROM course").fetchall()
+        courseList = cursor.execute("SELECT * FROM course WHERE course_admin = (?)", (course_admin,)).fetchall()
 
         return courseList
 
     # Deletes the course table
-    def remove_semester_courses(self):
+    def remove_semester_courses(self, course_admin):
         cursor = self.conn.cursor()
 
-        cursor.execute("DELETE FROM course")
+        cursor.execute("DELETE FROM course WHERE course_admin = (?)", (course_admin,))
         self.conn.commit()
         
     # Adds a recitation to the recitation table with a FK of its course's Canvas ID
-    def add_course_recitation(self, course_canvas_id, recitation_name, reaction_id, associated_role_id):
+    def add_course_recitation(self, course_number, course_canvas_id, recitation_name, reaction_id, associated_role_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO recitation VALUES (?, ?, ?, ?)", (course_canvas_id, recitation_name, reaction_id, associated_role_id,))
+        cursor.execute("INSERT INTO recitation VALUES (?, ?, ?, ?, ?)", (course_number, course_canvas_id, recitation_name, reaction_id, associated_role_id,))
 
         self.conn.commit()
 
     # Returns a list of all recitations associated with their course's Canvas ID
-    def get_course_recitations(self, course_canvas_id):
+    def get_course_recitations(self, course_number):
         cursor = self.conn.cursor()
 
-        recList = cursor.execute("SELECT recitation_name FROM recitation WHERE course_canvas_id = (?)", (course_canvas_id,)).fetchall()
+        recList = cursor.execute("SELECT recitation_name FROM recitation WHERE course_number = (?)", (course_number,)).fetchall()
 
         return recList
 
