@@ -271,29 +271,23 @@
             const selected_index = get_selected_child_index(channels_elem)
             const selected = channels_elem.children.item(selected_index)
             const template_form = document.getElementById('templateConfig')
-            const template_data = new FormData(template_form)
 
-            selected.innerText = template_data.get('channelName')
-            selected.dataset.channelType = template_data.get('channelType')
-            selected.dataset.studentOnly = JSON.stringify(!!template_data.get('studentOnly'))
-            selected.dataset.taOnly = JSON.stringify(!!template_data.get('taOnly'))
+            selected.innerText = template_form.elements.channelName.value
+            selected.dataset.channelType = template_form.elements.channelType.value
+            selected.dataset.studentOnly = JSON.stringify(template_form.elements.studentOnly.checked)
+            selected.dataset.taOnly = JSON.stringify(template_form.elements.taOnly.checked)
         }
 
         function load_channel() {
             const channels_elem = document.getElementById('classTemplate')
             const selected_index = get_selected_child_index(channels_elem)
             const selected = channels_elem.children.item(selected_index)
+            const form_elem = document.getElementById('templateConfig')
 
-            document.getElementById('channelName').value = selected.innerText
-            const radios = document.getElementsByName('channelType')
-            for(let elem of radios) {
-                if(elem.value === selected.dataset.channelType) {
-                    elem.checked = true
-                    break
-                }
-            }
-            document.getElementById('studentOnly').checked = JSON.parse(selected.dataset.studentOnly)
-            document.getElementById('taOnly').checked = JSON.parse(selected.dataset.taOnly)
+            form_elem.elements.channelName.value = selected.innerText
+            form_elem.elements.channelType.value = selected.dataset.channelType
+            form_elem.elements.studentOnly.checked = JSON.parse(selected.dataset.studentOnly)
+            form_elem.elements.taOnly.checked = JSON.parse(selected.dataset.taOnly)
         }
 
         function add_new_channel(new_channel) {
