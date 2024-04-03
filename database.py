@@ -19,6 +19,14 @@ class Database:
         # i recommend also using stuff like on_delete(cascade) to make sure if we delete a course that its recitations also get deleted
         raise NotImplementedError
 
+    def add_admin(self, name, server_id, discord_id):
+        # TODO: Add these to their own table. It'll be used for 'login' on the web frontend (and to make sure we're going to the right server)
+        raise NotImplementedError
+
+    def remove_admin(self, name):
+        # TODO: seems like a good idea to have this capability
+        raise NotImplementedError
+
     def add_student(self, pitt_id, discord_id):
         # TODO: Add a row to the student id associations table
         raise NotImplementedError
