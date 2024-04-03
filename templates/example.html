@@ -325,7 +325,7 @@
                 return
             }
             channels_elem.removeChild(selected)
-            selected_index -= 1
+            if(selected_index > 0) selected_index -= 1
             channels_elem.children.item(selected_index).selected = true
             load_channel()
         }
