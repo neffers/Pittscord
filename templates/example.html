@@ -55,6 +55,39 @@
             }
         ]
 
+        let template = [
+            {
+                channelName: "Announcements",
+                channelType: "A",
+                studentOnly: true,
+                taOnly: true
+            },
+            {
+                channelName: "qa-forum",
+                channelType: "F",
+                studentOnly: true,
+                taOnly: false
+            },
+            {
+                channelName: "general",
+                channelType: "T",
+                studentOnly: true,
+                taOnly: false
+            },
+            {
+                channelName: "assignment-discussion",
+                channelType: "V",
+                studentOnly: true,
+                taOnly: false
+            },
+            {
+                channelName: "ta-chat",
+                channelType: "T",
+                studentOnly: true,
+                taOnly: true
+            }
+        ]
+
         function get_selected_child_index(element) {
             for(let i = 0; i < element.children.length; i++) {
                 if (element.children[i].selected) {
@@ -231,6 +264,74 @@
             selected.innerText = rec_time_elem.value
         }
 
+        /* BEGIN TEMPLATE MANAGEMENT CODE */
+
+        function save_channel() {
+            const channels_elem = document.getElementById('classTemplate')
+            const selected_index = get_selected_child_index(channels_elem)
+            const selected = channels_elem.children.item(selected_index)
+            const template_form = document.getElementById('templateConfig')
+            const template_data = new FormData(template_form)
+
+            selected.innerText = template_data.get('channelName')
+            selected.dataset.channelType = template_data.get('channelType')
+            selected.dataset.studentOnly = JSON.stringify(!!template_data.get('studentOnly'))
+            selected.dataset.taOnly = JSON.stringify(!!template_data.get('taOnly'))
+        }
+
+        function load_channel() {
+            const channels_elem = document.getElementById('classTemplate')
+            const selected_index = get_selected_child_index(channels_elem)
+            const selected = channels_elem.children.item(selected_index)
+
+            document.getElementById('channelName').value = selected.innerText
+            const radios = document.getElementsByName('channelType')
+            for(let elem of radios) {
+                if(elem.value === selected.dataset.channelType) {
+                    elem.checked = true
+                    break
+                }
+            }
+            document.getElementById('studentOnly').checked = JSON.parse(selected.dataset.studentOnly)
+            document.getElementById('taOnly').checked = JSON.parse(selected.dataset.taOnly)
+        }
+
+        function add_new_channel(new_channel) {
+            if(!new_channel || is_event(new_channel)) {
+                new_channel = {
+                    channelName: "New Channel",
+                    channelType: "T",
+                    studentOnly: true,
+                    taOnly: false
+                }
+            }
+            const channels_elem = document.getElementById('classTemplate')
+            const new_channel_elem = document.createElement('option')
+            new_channel_elem.innerText = new_channel.channelName
+            new_channel_elem.dataset.channelType = new_channel.channelType
+            new_channel_elem.dataset.studentOnly = new_channel.studentOnly
+            new_channel_elem.dataset.taOnly = new_channel.taOnly
+
+            channels_elem.appendChild(new_channel_elem)
+        }
+
+        function remove_channel() {
+            const channels_elem = document.getElementById('classTemplate')
+            let selected_index = get_selected_child_index(channels_elem)
+            const selected = channels_elem.children.item(selected_index)
+
+            if(channels_elem.children.length < 2) {
+                alert("Can't remove last channel in template")
+                return
+            }
+            channels_elem.removeChild(selected)
+            selected_index -= 1
+            channels_elem.children.item(selected_index).selected = true
+            load_channel()
+        }
+
+        /* END TEMPLATE MANAGEMENT CODE */
+
         function send_config() {
             const courses_elem = document.getElementById('classes')
 
@@ -305,6 +406,15 @@
         }
 
         function onload() {
+            for(let chan of template) {
+                add_new_channel(chan)
+            }
+
+            document.getElementById('classTemplate').addEventListener('change', load_channel)
+            document.getElementById('templateConfig').addEventListener('change', save_channel)
+            document.getElementById('rmChanBtn').addEventListener('click', remove_channel)
+            document.getElementById('addChanBtn').addEventListener('click', add_new_channel)
+
             for(let sem_class of classes) {
                 add_new_course(sem_class)
             }
@@ -351,18 +461,13 @@
                 <label for="classTemplate">Templates per class<br />
                     <small>(Categories will be inserted at the bottom of the current hierarchy)</small></label><br />
                 <select id="classTemplate" size="10">
-                    <option>Announcements</option>
-                    <option>qa-forum</option>
-                    <option>general</option>
-                    <option>assignment-discussion</option>
-                    <option>ta-chat</option>
                 </select> <br />
-                <button type="button">Add Channel</button>
+                <button type="button" id="addChanBtn">Add Channel</button>
             </div>
             <div class="inner">
                 <form id="templateConfig">
                     <label for="channelName">Channel Name</label><br />
-                    <input type="text" id="channelName"><br />
+                    <input type="text" id="channelName" name="channelName"><br />
                     <fieldset>
                         <legend>Channel Type</legend>
                         <input type="radio" id="announcement" name="channelType" value="A">
@@ -374,15 +479,12 @@
                         <input type="radio" id="forum" name="channelType" value="F">
                         <label for="forum">Forum</label><br />
                     </fieldset><br />
-                    <input type="checkbox" id="TAChannelAccess" name="taOnly">
-                    <label for="TAChannelAccess">TA Only Channel (Announcement channels will be made TA-Writable)</label><br />
+                    <input type="checkbox" id="taOnly" name="taOnly">
+                    <label for="taOnly">TA Only Channel (Announcement channels will be made TA-Writable)</label><br />
                     <input type="checkbox" id="studentOnly" name="studentOnly">
                     <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
                 </form>
-                <div class="container middle">
-                    <button type="button">commit configuration</button>
-                    <button class="right" type="button">remove channel</button>
-                </div>
+                <button type="button" id="rmChanBtn">Remove channel</button>
             </div>
         </div>
         <br/>
