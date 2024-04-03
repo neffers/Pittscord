@@ -505,22 +505,24 @@
                 </select><br />
                 <button type="button" id="addClassBtn">Add Course</button>
             </div>
-            <div class="inner">
-                <label for="className">Class Name</label><br />
-                <input type="text" id="className"><br />
-                <label for="classCanvasID">Canvas ID</label><br />
-                <input type="text" id="classCanvasID"><br />
-                <button type="button" id="removeClassBtn">Remove Course</button>
-            </div>
-            <div class="inner">
-                <label for="recitations">Class Recitation Sections</label><br />
-                <select id="recitations" name="recitations" size="5">
-                </select><br />
-                <button type="button" id="addRecBtn">Add Recitation Section</button>
-                <button type="button" id="rmRecBtn">Remove Recitation</button><br />
-                <label for="recitationTime">Recitation Time</label>
-                <input type="text" id="recitationTime"><br />
-            </div>
+            <form id="classConfig" class="container">
+                <div class="inner">
+                    <label for="className">Class Name</label><br />
+                    <input type="text" id="className"><br />
+                    <label for="classCanvasID">Canvas ID</label><br />
+                    <input type="text" id="classCanvasID"><br />
+                    <button type="button" id="removeClassBtn">Remove Course</button>
+                </div>
+                <div class="inner">
+                    <label for="recitations">Class Recitation Sections</label><br />
+                    <select id="recitations" name="recitations" size="5">
+                    </select><br />
+                    <button type="button" id="addRecBtn">Add Recitation Section</button>
+                    <button type="button" id="rmRecBtn">Remove Recitation</button><br />
+                    <label for="recitationTime">Recitation Time</label>
+                    <input type="text" id="recitationTime"><br />
+                </div>
+            </form>
             <div class="inner">
                 <button type="button" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
                 <button type="button" id="semCommitBtn">Commit Semester Options</button>
