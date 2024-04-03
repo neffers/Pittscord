@@ -3,6 +3,12 @@ class Database:
         self.students = {}
         self.courses = []
 
+    def add_admin(self, name, server_id, discord_id):
+        raise NotImplementedError
+
+    def remove_admin(self, name):
+        raise NotImplementedError
+
     def add_student(self, pitt_id, discord_id):
         self.students[discord_id] = pitt_id
 
