@@ -68,24 +68,31 @@
         }
 
         function update_class_ui() {
+            // Get selected class
             const classes_elem = document.getElementById('classes')
             const selected_child_index = get_selected_child_index(classes_elem)
             const selected_child = classes_elem.children.item(selected_child_index)
 
+            // Get the text input elements
             const name_elem = document.getElementById('className')
-            const recitations_elem = document.getElementById('recitations')
             const canvas_id_elem = document.getElementById('classCanvasID')
             const recitation_time_elem = document.getElementById('recitationTime')
 
+            // Set the text elements to what we want
             name_elem.value = selected_child.innerText
             canvas_id_elem.value = selected_child.dataset.canvasID
+            recitation_time_elem.value = ""
+
+            // Prepare to reset the recitations list
+            const recitations_elem = document.getElementById('recitations')
             const recitations = JSON.parse(selected_child.dataset.recitations)
 
+            // Empty recitations list
             for(let i = recitations_elem.childElementCount; i > 0; i--) {
                 recitations_elem.removeChild(recitations_elem.firstElementChild)
             }
-            recitation_time_elem.value = ""
 
+            // Re-fill recitations list (and select the first item if it exists) using data from selected class
             for(let rec of recitations) {
                 add_new_recitation(rec)
             }
@@ -99,23 +106,29 @@
             const recitations_elem = document.getElementById('recitations')
             const recitation_time_elem = document.getElementById('recitationTime')
 
+            // If we have no recitations return
             if(!recitations_elem.children.length) {
                 recitation_time_elem.value = ""
                 return
             }
 
+            // Fill the text box
             const selected_child_index = get_selected_child_index(recitations_elem)
             const selected_child = recitations_elem.children.item(selected_child_index)
-
             recitation_time_elem.value = selected_child.innerText
         }
 
         function remove_recitation() {
             const recitations_elem = document.getElementById('recitations')
-            let selected_index = get_selected_child_index(recitations_elem)
+            const selected_index = get_selected_child_index(recitations_elem)
             const selected = recitations_elem.children.item(selected_index)
-            recitations_elem.removeChild(selected)
 
+            // because we're storing data in the html element this is actually all we need to do
+            recitations_elem.removeChild(selected)
+            // it might conceivably be more efficient to only save the changed item (recitations) but i'm not worried
+            update_course()
+
+            // make sure the UI stays nice
             if(recitations_elem.firstElementChild) {
                 recitations_elem.firstElementChild.selected = true
                 update_recitation_ui()
@@ -125,6 +138,7 @@
         }
 
         function add_new_course(new_course) {
+            // if this is used as an event handler (it is) then the first argument that gets passed in is the event
             if(!new_course || is_event(new_course)) {
                 new_course = {
                     name: "new course",
@@ -132,29 +146,37 @@
                     recitations: []
                 }
             }
-            const new_course_elem = document.createElement('option')
 
+            // create the new element and set ts data according to what was passed in
+            const new_course_elem = document.createElement('option')
             new_course_elem.innerText = new_course.name
             new_course_elem.dataset.canvasID = new_course.canvasId
             new_course_elem.dataset.recitations = JSON.stringify(new_course.recitations)
 
+            // add it to the UI and selected it (nice UI feature when you click the button)
             document.getElementById('classes').appendChild(new_course_elem)
-
             new_course_elem.selected = true
             update_class_ui()
         }
 
         function add_new_recitation(new_rec) {
+            // same as above, prevents trying to parse an event as the argument
             if(!new_rec || is_event(new_rec)) {
                 new_rec = "8am"
             }
 
+            // create the element and set its data
             const new_rec_elem = document.createElement('option')
             new_rec_elem.innerText = new_rec
 
+            // add the new recitation to the list
             const recs_elem = document.getElementById('recitations')
             recs_elem.appendChild(new_rec_elem)
 
+            // Save the newly added recitation
+            update_course()
+
+            // UI niceties
             new_rec_elem.selected = true
             update_recitation_ui()
         }
@@ -164,13 +186,24 @@
             let selected_index = get_selected_child_index(classes_elem)
             const selected = classes_elem.children.item(selected_index)
 
+            // Don't let the user remove all courses since I don't see a reason to allow that
+            // Also means we don't have to handle the special case of not having anything in our options list
+            if(classes_elem.children.length === 1) {
+                alert("Cannot remove last course")
+                return
+            }
+
+            // Again, the html is our data storage so this is sufficient
             classes_elem.removeChild(selected)
+
+            // select the item that was above that one in the list (below if top) and update the UI accordingly
             if(selected_index > 0) selected_index -= 1
             classes_elem.children.item(selected_index).selected = true
             update_class_ui()
         }
 
         function update_course() {
+            // This saves the data elsewhere in the UI to our storage (the option element)
             const class_name_elem = document.getElementById('className')
             const class_id_elem = document.getElementById('classCanvasID')
             const classes_elem = document.getElementById('classes')
@@ -306,28 +339,28 @@
     </script>
 </head>
 <body>
-<form id="theForm">
-    <div class="container">
-        <div class="left">
-            <label for="server">Current Server Outline</label><br />
-            <select id="server" name="serverOutline" size="20">
-            </select>
-        </div>
-        <div class="outer">
-            <div class="middle container">
-                <div class="inner">
-                    <label for="classTemplate">Templates per class<br />
-                        <small>(Categories will be inserted at the bottom of the current hierarchy)</small></label><br />
-                    <select id="classTemplate" size="10">
-                        <option>Announcements</option>
-                        <option>qa-forum</option>
-                        <option>general</option>
-                        <option>assignment-discussion</option>
-                        <option>ta-chat</option>
-                    </select> <br />
-                    <button type="button">Add Channel</button>
-                </div>
-                <div class="inner">
+<div class="container">
+    <div class="left">
+        <label for="server">Current Server Outline</label><br />
+        <select id="server" name="serverOutline" size="20">
+        </select>
+    </div>
+    <div class="outer">
+        <div class="middle container">
+            <div class="inner">
+                <label for="classTemplate">Templates per class<br />
+                    <small>(Categories will be inserted at the bottom of the current hierarchy)</small></label><br />
+                <select id="classTemplate" size="10">
+                    <option>Announcements</option>
+                    <option>qa-forum</option>
+                    <option>general</option>
+                    <option>assignment-discussion</option>
+                    <option>ta-chat</option>
+                </select> <br />
+                <button type="button">Add Channel</button>
+            </div>
+            <div class="inner">
+                <form id="templateConfig">
                     <label for="channelName">Channel Name</label><br />
                     <input type="text" id="channelName"><br />
                     <fieldset>
@@ -341,51 +374,51 @@
                         <input type="radio" id="forum" name="channelType" value="F">
                         <label for="forum">Forum</label><br />
                     </fieldset><br />
-                    <input type="checkbox" id="TAChannelAccess">
+                    <input type="checkbox" id="TAChannelAccess" name="taOnly">
                     <label for="TAChannelAccess">TA Only Channel (Announcement channels will be made TA-Writable)</label><br />
-                    <input type="checkbox" id="studentOnly">
+                    <input type="checkbox" id="studentOnly" name="studentOnly">
                     <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
-                    <div class="container middle">
-                        <button type="button">commit configuration</button>
-                        <button class="right" type="button">remove channel</button>
-                    </div>
-                </div>
-            </div>
-            <br/>
-            <div class="middle container sink">
-                <div class="inner">
-                    <label for="classes">Semester Classes</label><br />
-                    <select id="classes" name="classes" size="5">
-                    </select><br />
-                    <button type="button" id="addClassBtn">Add Course</button>
-                </div>
-                <div class="inner">
-                    <label for="className">Class Name</label><br />
-                    <input type="text" id="className"><br />
-                    <label for="classCanvasID">Canvas ID</label><br />
-                    <input type="text" id="classCanvasID"><br />
-                    <button type="button" id="removeClassBtn">Remove Course</button>
-                </div>
-                <div class="inner">
-                    <label for="recitations">Class Recitation Sections</label><br />
-                    <select id="recitations" name="recitations" size="5">
-                    </select><br />
-                    <button type="button" id="addRecBtn">Add Recitation Section</button>
-                    <button type="button" id="rmRecBtn">Remove Recitation</button><br />
-                    <label for="recitationTime">Recitation Time</label>
-                    <input type="text" id="recitationTime"><br />
-                </div>
-                <div class="inner">
-                    <button type="button" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
-                    <button type="button" id="semCommitBtn">Commit Semester Options</button>
-                </div>
-                <div class="inner">
-                    <button class="warning" type="button">Semester Cleanup</button><br />
-                    <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
+                </form>
+                <div class="container middle">
+                    <button type="button">commit configuration</button>
+                    <button class="right" type="button">remove channel</button>
                 </div>
             </div>
         </div>
+        <br/>
+        <div class="middle container sink">
+            <div class="inner">
+                <label for="classes">Semester Classes</label><br />
+                <select id="classes" name="classes" size="5">
+                </select><br />
+                <button type="button" id="addClassBtn">Add Course</button>
+            </div>
+            <div class="inner">
+                <label for="className">Class Name</label><br />
+                <input type="text" id="className"><br />
+                <label for="classCanvasID">Canvas ID</label><br />
+                <input type="text" id="classCanvasID"><br />
+                <button type="button" id="removeClassBtn">Remove Course</button>
+            </div>
+            <div class="inner">
+                <label for="recitations">Class Recitation Sections</label><br />
+                <select id="recitations" name="recitations" size="5">
+                </select><br />
+                <button type="button" id="addRecBtn">Add Recitation Section</button>
+                <button type="button" id="rmRecBtn">Remove Recitation</button><br />
+                <label for="recitationTime">Recitation Time</label>
+                <input type="text" id="recitationTime"><br />
+            </div>
+            <div class="inner">
+                <button type="button" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
+                <button type="button" id="semCommitBtn">Commit Semester Options</button>
+            </div>
+            <div class="inner">
+                <button class="warning" type="button">Semester Cleanup</button><br />
+                <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
+            </div>
+        </div>
     </div>
-</form>
+</div>
 </body>
 </html>
