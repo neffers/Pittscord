@@ -41,9 +41,7 @@
         }
     </style>
     <script>
-        let active_class
-        let active_rec_id
-
+        // Default classes to display
         let classes = [
             {
                 name: "447",
@@ -54,166 +52,171 @@
                 name: "449",
                 canvasId: "456",
                 recitations: ["11a", "1p"]
-            },
-
+            }
         ]
 
-        function get_selected_child(element) {
-            for(let child of element.children) {
-                if(child.selected) {
-                    return child
+        function get_selected_child_index(element) {
+            for(let i = 0; i < element.children.length; i++) {
+                if (element.children[i].selected) {
+                    return i
                 }
             }
         }
 
-        function change_class() {
+        function is_event(obj) {
+            return Event.prototype.isPrototypeOf(obj)
+        }
+
+        function update_class_ui() {
             const classes_elem = document.getElementById('classes')
-            const selected = get_selected_child(classes_elem)
+            const selected_child_index = get_selected_child_index(classes_elem)
+            const selected_child = classes_elem.children.item(selected_child_index)
 
-            let active_class_index
-            for(let i = 0; i < classes_elem.children.length; i++) {
-                if(classes_elem.children.item(i) === selected) {
-                    active_class_index = i
-                    break
-                }
-            }
-            active_class = classes[active_class_index]
+            const name_elem = document.getElementById('className')
+            const recitations_elem = document.getElementById('recitations')
+            const canvas_id_elem = document.getElementById('classCanvasID')
+            const recitation_time_elem = document.getElementById('recitationTime')
 
-            let name_elem = document.getElementById('className')
-            let recitations_elem = document.getElementById('recitations')
-            let canvas_id_elem = document.getElementById('classCanvasID')
-
-            name_elem.value = active_class.name
-            canvas_id_elem.value = active_class.canvasId
+            name_elem.value = selected_child.innerText
+            canvas_id_elem.value = selected_child.dataset.canvasID
+            const recitations = JSON.parse(selected_child.dataset.recitations)
 
             for(let i = recitations_elem.childElementCount; i > 0; i--) {
                 recitations_elem.removeChild(recitations_elem.firstElementChild)
             }
+            recitation_time_elem.value = ""
 
-            for(let rec of active_class.recitations) {
-                add_rec_to_display(rec)
+            for(let rec of recitations) {
+                add_new_recitation(rec)
             }
-            change_recitation()
+            if(recitations_elem.children.length) {
+                recitations_elem.firstElementChild.selected = true
+                update_recitation_ui()
+            }
         }
 
-        function change_recitation() {
-            let recitations_elem = document.getElementById('recitations')
-            let recitation_time_elem = document.getElementById('recitationTime')
-            let selected = get_selected_child(recitations_elem)
+        function update_recitation_ui() {
+            const recitations_elem = document.getElementById('recitations')
+            const recitation_time_elem = document.getElementById('recitationTime')
 
-            if(selected) {
-                active_rec_id = active_class.recitations.indexOf(selected.innerText)
-                recitation_time_elem.value = recitations_elem.value
-            } else {
-                active_rec_id = undefined
+            if(!recitations_elem.children.length) {
                 recitation_time_elem.value = ""
+                return
             }
+
+            const selected_child_index = get_selected_child_index(recitations_elem)
+            const selected_child = recitations_elem.children.item(selected_child_index)
+
+            recitation_time_elem.value = selected_child.innerText
         }
 
         function remove_recitation() {
-            if(active_rec_id === undefined) {
-                return
-            }
             const recitations_elem = document.getElementById('recitations')
-            const selected = get_selected_child(recitations_elem)
+            let selected_index = get_selected_child_index(recitations_elem)
+            const selected = recitations_elem.children.item(selected_index)
             recitations_elem.removeChild(selected)
-
-            active_class.recitations = active_class.recitations.filter((x) => active_class.recitations.indexOf(x) !== active_rec_id)
 
             if(recitations_elem.firstElementChild) {
                 recitations_elem.firstElementChild.selected = true
-                change_recitation()
+                update_recitation_ui()
             } else {
                 document.getElementById('recitationTime').value = ""
             }
         }
 
-        function add_new_course() {
-            const new_course = {
-                name: "new course",
-                canvasId: "0",
-                recitations: []
+        function add_new_course(new_course) {
+            if(!new_course || is_event(new_course)) {
+                new_course = {
+                    name: "new course",
+                    canvasId: "0",
+                    recitations: []
+                }
             }
-            classes.push(new_course)
-            add_course_to_display(new_course)
+            const new_course_elem = document.createElement('option')
+
+            new_course_elem.innerText = new_course.name
+            new_course_elem.dataset.canvasID = new_course.canvasId
+            new_course_elem.dataset.recitations = JSON.stringify(new_course.recitations)
+
+            document.getElementById('classes').appendChild(new_course_elem)
+
+            new_course_elem.selected = true
+            update_class_ui()
         }
 
-        function add_new_recitation() {
-            if(!active_class) {
-                return
+        function add_new_recitation(new_rec) {
+            if(!new_rec || is_event(new_rec)) {
+                new_rec = "8am"
             }
-            const new_rec = "new Rec"
-            active_class.recitations.push(new_rec)
-            add_rec_to_display(new_rec)
-        }
 
-        function add_course_to_display(new_class) {
-            const classes_elem = document.getElementById("classes")
-            const class_elem = document.createElement('option')
-            class_elem.innerText = new_class.name
-            classes_elem.appendChild(class_elem)
-            class_elem.selected = true
-            change_class()
-        }
+            const new_rec_elem = document.createElement('option')
+            new_rec_elem.innerText = new_rec
 
-        function add_rec_to_display(rec) {
-            const recitations_elem = document.getElementById('recitations')
-            const rec_elem = document.createElement('option')
-            rec_elem.innerText = rec
-            recitations_elem.appendChild(rec_elem)
-            rec_elem.selected = true
-            change_recitation()
+            const recs_elem = document.getElementById('recitations')
+            recs_elem.appendChild(new_rec_elem)
+
+            new_rec_elem.selected = true
+            update_recitation_ui()
         }
 
         function remove_course () {
-            if(!active_class) {
-                alert("Please select a class to remove")
-                return
-            }
-            if(classes.length === 1) {
-                alert("Can't remove last class in the semester")
-                return
-            }
-            classes = classes.filter((x) => x !== active_class)
             const classes_elem = document.getElementById('classes')
-            const selected = get_selected_child(classes_elem)
+            let selected_index = get_selected_child_index(classes_elem)
+            const selected = classes_elem.children.item(selected_index)
+
             classes_elem.removeChild(selected)
-            classes_elem.firstElementChild.selected = true
-            change_class()
+            if(selected_index > 0) selected_index -= 1
+            classes_elem.children.item(selected_index).selected = true
+            update_class_ui()
         }
 
         function update_course() {
-            if(!active_class) {
-                return
-            }
             const class_name_elem = document.getElementById('className')
             const class_id_elem = document.getElementById('classCanvasID')
             const classes_elem = document.getElementById('classes')
 
-            active_class.name = class_name_elem.value
-            active_class.canvasId = class_id_elem.value
+            const selected_index = get_selected_child_index(classes_elem)
+            const selected = classes_elem.children.item(selected_index)
 
-            const selected = get_selected_child(classes_elem)
+            const recitations_elem = document.getElementById('recitations')
+            let recs = []
+            for(let child of recitations_elem.children) {
+                recs.push(child.innerText)
+            }
+
             selected.innerText = class_name_elem.value
+            selected.dataset.canvasID = class_id_elem.value
+            selected.dataset.recitations = JSON.stringify(recs)
         }
 
         function update_rec() {
-            if(active_rec_id === undefined) {
-                return
-            }
             const rec_time_elem = document.getElementById('recitationTime')
             const recs_elem = document.getElementById('recitations')
+            const selected_index = get_selected_child_index(recs_elem)
+            const selected = recs_elem.children.item(selected_index)
 
-            active_class.recitations[active_rec_id] = rec_time_elem.value
-            const selected = get_selected_child(recs_elem)
             selected.innerText = rec_time_elem.value
         }
 
         function send_config() {
-            let config = {
-                template: [],
-                classes: classes
+            const courses_elem = document.getElementById('classes')
+
+            let config_classes = []
+            for(let child of courses_elem.children) {
+                let this_class = {
+                    name: child.innerText,
+                    canvasID: child.dataset.canvasID,
+                    recitations: JSON.parse(child.dataset.recitations)
+                }
+                config_classes.push(this_class)
             }
+
+            const config = {
+                template: [],
+                classes: config_classes
+            }
+
+            console.log(config)
 
             let headers = new Headers()
             headers.append('Content-type', 'application/json')
@@ -270,10 +273,14 @@
 
         function onload() {
             for(let sem_class of classes) {
-                add_course_to_display(sem_class)
+                add_new_course(sem_class)
             }
 
-            document.getElementById("classes").addEventListener("change", change_class)
+            const classes_elem = document.getElementById("classes")
+            classes_elem.firstElementChild.selected = true
+            update_class_ui()
+
+            classes_elem.addEventListener("change", update_class_ui)
 
             document.getElementById('addClassBtn').addEventListener("click", add_new_course)
             document.getElementById('removeClassBtn').addEventListener("click", remove_course)
@@ -281,12 +288,14 @@
             document.getElementById('className').addEventListener('input', update_course)
             document.getElementById('classCanvasID').addEventListener('change', update_course)
 
-            document.getElementById('recitations').addEventListener("change", change_recitation)
+            document.getElementById('recitations').addEventListener("change", update_recitation_ui)
 
             document.getElementById('rmRecBtn').addEventListener('click', remove_recitation)
             document.getElementById('addRecBtn').addEventListener('click', add_new_recitation)
 
-            document.getElementById('recitationTime').addEventListener('input', update_rec)
+            const rec_time_elem = document.getElementById('recitationTime')
+            rec_time_elem.addEventListener('input', update_rec)
+            rec_time_elem.addEventListener('change', update_course)
 
             document.getElementById('semCommitBtn').addEventListener('click', send_config)
 
