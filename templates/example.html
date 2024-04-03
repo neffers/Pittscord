@@ -334,6 +334,7 @@
 
         function send_config() {
             const courses_elem = document.getElementById('classes')
+            const template_elem = document.getElementById('classTemplate')
 
             let config_classes = []
             for(let child of courses_elem.children) {
@@ -345,8 +346,20 @@
                 config_classes.push(this_class)
             }
 
+            let config_template = []
+            for(let child of template_elem.children) {
+                console.log(child)
+                let this_chan = {
+                    channelName: child.innerText,
+                    channelType: child.dataset.channelType,
+                    studentOnly: JSON.parse(child.dataset.studentOnly),
+                    taOnly: JSON.parse(child.dataset.taOnly)
+                }
+                config_template.push(this_chan)
+            }
+
             const config = {
-                template: [],
+                template: config_template,
                 classes: config_classes
             }
 
@@ -410,7 +423,10 @@
                 add_new_channel(chan)
             }
 
-            document.getElementById('classTemplate').addEventListener('change', load_channel)
+            const template_elem = document.getElementById('classTemplate')
+            template_elem.firstElementChild.selected = true
+            load_channel()
+            template_elem.addEventListener('change', load_channel)
             document.getElementById('templateConfig').addEventListener('change', save_channel)
             document.getElementById('rmChanBtn').addEventListener('click', remove_channel)
             document.getElementById('addChanBtn').addEventListener('click', add_new_channel)
