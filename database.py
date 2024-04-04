@@ -1,6 +1,5 @@
 import sqlite3
 
-
 class Database:
     """
     So far, I've outlined functions in here according to this schema:
@@ -19,16 +18,12 @@ class Database:
     def init_db(self):
         cursor = self.conn.cursor()
 
-        # Links Pitt ID with a Discord ID
-        # TODO: Rename to Users
         cursor.execute("""CREATE TABLE IF NOT EXISTS user(
                        pitt_id TEXT UNIQUE NOT NULL,
-                       discord_id UNIQUE INTEGER NOT NULL,
+                       discord_id INTEGER UNIQUE NOT NULL,
                        user_row_num INTEGER PRIMARY KEY NOT NULL)""")
         
-        ##
-        ## RENAME ADMIN TO SERVER
-        ## RENAME ALL TO SERVER, REFERENCES STUDENTS/USERS
+        # FORMERLY KNOWN AS ADMIN
         cursor.execute("""CREATE TABLE IF NOT EXISTS server(
                        name TEXT NOT NULL, 
                        server_id INTEGER NOT NULL, 
@@ -45,8 +40,13 @@ class Database:
                        course_name TEXT NOT NULL, 
                        category_channel_id INTEGER NOT NULL, 
                        recitation_react_message_id INTEGER NOT NULL, 
+<<<<<<< Updated upstream
                        user_role_id INTEGER NOT NULL, 
                        ta_role_id INTEGER NOT NULL,
+=======
+                       user_role_id INTEGER, 
+                       ta_role_id INTEGER,
+>>>>>>> Stashed changes
                        course_admin INTEGER NOT NULL,
                        course_row_num INTEGER PRIMARY KEY NOT NULL,
                        FOREIGN KEY (course_admin) REFERENCES server(server_row_num)
@@ -56,14 +56,18 @@ class Database:
                        recitation_id INTEGER NOT NULL,
                        course_number INTEGER NOT NULL,
                        recitation_name TEXT NOT NULL, 
+<<<<<<< Updated upstream
                        reaction_id INTEGER NOT NULL, 
+=======
+                       reaction_id TEXT NOT NULL, 
+>>>>>>> Stashed changes
                        associated_role_id INTEGER NOT NULL, 
                        recitation_row_num INTEGER PRIMARY KEY NOT NULL,
                        FOREIGN KEY (course_number) REFERENCES course(course_row_num)
                        ON DELETE CASCADE)""")
         
         cursor.execute("""CREATE TABLE IF NOT EXISTS messages(
-                       message_id TEXT NOT NULL, 
+                       message_id INTEGER NOT NULL, 
                        message_time TEXT NOT NULL,
                        message_row_num INTEGER PRIMARY KEY NOT NULL)""")
 
@@ -74,6 +78,35 @@ class Database:
         cursor.execute("INSERT INTO server VALUES (?, ?, ?, ?, ?, ?)", (name, server_id, discord_id, previous_user_role_id, previous_ta_role_id, server_row_num))
         
         self.conn.commit()
+
+<<<<<<< Updated upstream
+    # Passing in the integer of an associated admin removes a user from the admin table, using ROWID as a PK
+    def remove_admin(self, discord_id):
+        cursor = self.conn.cursor()
+
+        cursor.execute("DELETE FROM server WHERE discord_id = (?)", (discord_id,))
+
+        self.conn.commit()
+
+    # Adds a user to the user table
+    def add_user(self, pitt_id, discord_id, user_row_num):
+        cursor = self.conn.cursor()
+
+        cursor.execute("INSERT INTO user VALUES (?, ?, ?)", (pitt_id, discord_id, user_row_num,))
+        
+        self.conn.commit()
+
+    # Returns the Pitt ID of the user who's Discord ID is given. If not found, returns None
+    def get_user_id(self, discord_id):
+        cursor = self.conn.cursor()
+
+=======
+    def get_admin(self):
+        cursor = self.conn.cursor()
+
+        adminList = cursor.execute("SELECT * FROM server").fetchall()
+
+        return adminList
 
     # Passing in the integer of an associated admin removes a user from the admin table, using ROWID as a PK
     def remove_admin(self, discord_id):
@@ -95,12 +128,17 @@ class Database:
     def get_user_id(self, discord_id):
         cursor = self.conn.cursor()
 
+>>>>>>> Stashed changes
         pittID = cursor.execute("SELECT pitt_id FROM user WHERE discord_id = (?)", (discord_id,)).fetchone()
         
         return pittID
         
     # Removes the association of a PittID and a Discord ID
+<<<<<<< Updated upstream
     def remove_user_association(self, discord_id):
+=======
+    def remove_user(self, discord_id):
+>>>>>>> Stashed changes
         cursor = self.conn.cursor()
 
         cursor.execute("DELETE FROM user WHERE discord_id = (?)", (discord_id,))
@@ -119,7 +157,11 @@ class Database:
     def get_semester_courses(self, course_canvas_id):
         cursor = self.conn.cursor()
 
+<<<<<<< Updated upstream
         courseList = cursor.execute("SELECT * FROM course WHERE course_admin = (?)", (course_canvas_id,)).fetchall()
+=======
+        courseList = cursor.execute("SELECT * FROM course WHERE course_canvas_id = (?)", (course_canvas_id,)).fetchall()
+>>>>>>> Stashed changes
 
         return courseList
 
@@ -142,8 +184,15 @@ class Database:
     def get_course_recitations(self, course_canvas_id):
         cursor = self.conn.cursor()
 
+<<<<<<< Updated upstream
         recList = cursor.execute("SELECT * FROM recitation WHERE course_canvas_id = (?)", (course_canvas_id,)).fetchall()
 
+=======
+        course_row_num = cursor.execute("SELECT course_row_num FROM course WHERE course_canvas_id = ?", (course_canvas_id,)).fetchone()
+
+        recList = cursor.execute("SELECT * FROM recitation WHERE course_number = ?", (course_row_num[0],)).fetchall()
+        
+>>>>>>> Stashed changes
         return recList
 
     # Gets the role that will be assigned to a user when they react correctly to a given message
@@ -162,6 +211,10 @@ class Database:
         
         self.conn.commit()
 
+<<<<<<< Updated upstream
+=======
+    # Returns the time a message has been sent
+>>>>>>> Stashed changes
     def get_message_time(self):
         cursor = self.conn.cursor()
 
@@ -169,11 +222,14 @@ class Database:
 
         return messageList
 
+<<<<<<< Updated upstream
     def remove_message(self, message_id):
         cursor = self.conn.cursor()
 
         cursor.execute("DELETE FROM messages WHERE message_time = (?)", (message_id,))
         self.conn.commit()
 
+=======
+>>>>>>> Stashed changes
     def close(self):
         self.conn.close()
