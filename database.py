@@ -28,7 +28,8 @@ class Database:
         cursor.execute("""CREATE TABLE IF NOT EXISTS admin(
                        name TEXT NOT NULL, 
                        server_id INTEGER NOT NULL, 
-                       discord_id INTEGER UNIQUE NOT NULL)""")
+                       discord_id INTEGER UNIQUE NOT NULL,
+                       FOREIGN KEY (discord_id) REFERENCES students(discord_id))""")
         
        # Can also use ROWID
         cursor.execute("""CREATE TABLE IF NOT EXISTS course(
@@ -66,10 +67,10 @@ class Database:
         self.conn.commit()
 
     # Passing in the integer of an associated admin removes a user from the admin table, using ROWID as a PK
-    def remove_admin(self, admin_num):
+    def remove_admin(self, discord_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("DELETE FROM admin WHERE ROWID = (?)", (admin_num,))
+        cursor.execute("DELETE FROM admin WHERE discord_id = (?)", (discord_id,))
 
         self.conn.commit()
 
