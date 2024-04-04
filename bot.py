@@ -149,11 +149,17 @@ class PittscordBot(commands.Bot):
             if class_recitations and class_announcements:
                 message = "React to sign up for the following recitation roles:"
                 recs = []
+
                 for (index, rec) in enumerate(class_recitations):
                     reaction = reactions[index]
                     role = await guild.create_role(name=class_name+" "+rec)
+                    message += f'\n\n{reaction}: {role.name}'
                     recs.append((rec, reaction, role.id))
-                class_react_message = await class_announcements.send(message)
+
+                class_react_message = await class_announcements.send(message, silent=True)
+
+                for (_, reaction, _) in recs:
+                    await class_react_message.add_reaction(reaction)
 
             self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id,
                                         class_react_message)
