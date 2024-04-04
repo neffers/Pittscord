@@ -79,28 +79,6 @@ class Database:
         
         self.conn.commit()
 
-<<<<<<< Updated upstream
-    # Passing in the integer of an associated admin removes a user from the admin table, using ROWID as a PK
-    def remove_admin(self, discord_id):
-        cursor = self.conn.cursor()
-
-        cursor.execute("DELETE FROM server WHERE discord_id = (?)", (discord_id,))
-
-        self.conn.commit()
-
-    # Adds a user to the user table
-    def add_user(self, pitt_id, discord_id, user_row_num):
-        cursor = self.conn.cursor()
-
-        cursor.execute("INSERT INTO user VALUES (?, ?, ?)", (pitt_id, discord_id, user_row_num,))
-        
-        self.conn.commit()
-
-    # Returns the Pitt ID of the user who's Discord ID is given. If not found, returns None
-    def get_user_id(self, discord_id):
-        cursor = self.conn.cursor()
-
-=======
     def get_admin(self):
         cursor = self.conn.cursor()
 
@@ -128,17 +106,12 @@ class Database:
     def get_user_id(self, discord_id):
         cursor = self.conn.cursor()
 
->>>>>>> Stashed changes
         pittID = cursor.execute("SELECT pitt_id FROM user WHERE discord_id = (?)", (discord_id,)).fetchone()
         
         return pittID
         
     # Removes the association of a PittID and a Discord ID
-<<<<<<< Updated upstream
-    def remove_user_association(self, discord_id):
-=======
     def remove_user(self, discord_id):
->>>>>>> Stashed changes
         cursor = self.conn.cursor()
 
         cursor.execute("DELETE FROM user WHERE discord_id = (?)", (discord_id,))
@@ -157,11 +130,7 @@ class Database:
     def get_semester_courses(self, course_canvas_id):
         cursor = self.conn.cursor()
 
-<<<<<<< Updated upstream
-        courseList = cursor.execute("SELECT * FROM course WHERE course_admin = (?)", (course_canvas_id,)).fetchall()
-=======
         courseList = cursor.execute("SELECT * FROM course WHERE course_canvas_id = (?)", (course_canvas_id,)).fetchall()
->>>>>>> Stashed changes
 
         return courseList
 
@@ -184,15 +153,10 @@ class Database:
     def get_course_recitations(self, course_canvas_id):
         cursor = self.conn.cursor()
 
-<<<<<<< Updated upstream
-        recList = cursor.execute("SELECT * FROM recitation WHERE course_canvas_id = (?)", (course_canvas_id,)).fetchall()
-
-=======
         course_row_num = cursor.execute("SELECT course_row_num FROM course WHERE course_canvas_id = ?", (course_canvas_id,)).fetchone()
 
         recList = cursor.execute("SELECT * FROM recitation WHERE course_number = ?", (course_row_num[0],)).fetchall()
         
->>>>>>> Stashed changes
         return recList
 
     # Gets the role that will be assigned to a user when they react correctly to a given message
@@ -211,10 +175,7 @@ class Database:
         
         self.conn.commit()
 
-<<<<<<< Updated upstream
-=======
     # Returns the time a message has been sent
->>>>>>> Stashed changes
     def get_message_time(self):
         cursor = self.conn.cursor()
 
@@ -222,14 +183,5 @@ class Database:
 
         return messageList
 
-<<<<<<< Updated upstream
-    def remove_message(self, message_id):
-        cursor = self.conn.cursor()
-
-        cursor.execute("DELETE FROM messages WHERE message_time = (?)", (message_id,))
-        self.conn.commit()
-
-=======
->>>>>>> Stashed changes
     def close(self):
         self.conn.close()
