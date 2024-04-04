@@ -6,7 +6,7 @@ from discord.ext import commands
 
 # import database
 import pretend_database as database
-from config import db_filename
+from config import db_filename, id_regex_string
 
 reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
@@ -218,7 +218,7 @@ async def on_member_join(member: discord.Member):
             return m.channel == member.dm_channel and m.author == member
 
         # Matches three alphabetic characters followed at least one numeric digit
-        pitt_id_regex = re.compile('[a-z]{3}\d+')
+        pitt_id_regex = re.compile(id_regex_string)
 
         while True:
             msg = await bot.wait_for('message', check=check)
