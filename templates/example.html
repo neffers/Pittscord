@@ -392,6 +392,20 @@
                 })
         }
 
+        function send_semester_cleanup() {
+            const fetch_options = {
+                method: "DELETE"
+            }
+            fetch("/cleanup", fetch_options)
+                .then((response) => {
+                    return response.json()
+                })
+                .then((response) => {
+                    // TODO: Do something with this?
+                    console.log(response)
+                })
+        }
+
         function fill_out_server_panel(config) {
             let server_elem = document.getElementById('server')
             for(let entry of config) {
@@ -451,6 +465,7 @@
             rec_time_elem.addEventListener('change', update_course)
 
             document.getElementById('semCommitBtn').addEventListener('click', send_config)
+            document.getElementById('semCleanupBtn').addEventListener('click', send_semester_cleanup)
 
             get_current_json()
         }
@@ -528,7 +543,7 @@
                 <button type="button" id="semCommitBtn">Commit Semester Options</button>
             </div>
             <div class="inner">
-                <button class="warning" type="button">Semester Cleanup</button><br />
+                <button class="warning" type="button" id="semCleanupBtn">Semester Cleanup</button><br />
                 <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
             </div>
         </div>

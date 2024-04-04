@@ -8,11 +8,11 @@ app = Quart(__name__)
 app.secret_key = "secret"
 
 
-async def get_json_from_server(server_id):
+async def get_json_from_server(admin_name):
     try:
         async with grpc.aio.insecure_channel('[::]:50051') as channel:
             stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
-            response = await stub.GetJSON(Pittscord_ipc_pb2.JSONRequest(admin_name=session['admin']))
+            response = await stub.GetJSON(Pittscord_ipc_pb2.JSONRequest(admin_name=admin_name))
         return response.json
     except grpc.aio.AioRpcError:
         return None
@@ -45,16 +45,19 @@ async def recv_config():
 
 @app.route("/get_server_json")
 async def get_json():
-    # TODO: get from database based on login? or should this be sending the admin name instead?
-    # Probably the second
-    server = 1204258474851041330
-    ret = await get_json_from_server(server)
+    ret = await get_json_from_server(session['admin'])
     return json.loads(ret)
 
 
 @app.route("/cleanup", methods=["DELETE"])
 async def cleanup():
-    return 200
+    try:
+        async with grpc.aio.insecure_channel('[::]:50051') as channel:
+            stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
+            response = await stub.Cleanup(Pittscord_ipc_pb2.CleanupRequest(admin_name=session['admin']))
+        return [response.code]
+    except grpc.aio.AioRpcError:
+        return 500
 
 
 if __name__ == "__main__":

@@ -171,12 +171,26 @@ class PittscordBot(commands.Bot):
         return 0
 
     async def semester_cleanup(self, server_id: int):
-        print("semester cleanup")
         # TODO
+        # I consider this mostly a temporary implementation. The real implementation will have to do things specified
+        # toward the bottom of this method.
+        guild = self.get_guild(server_id)
+        for role_id in self.db.get_roles_to_delete(server_id):
+            role = guild.get_role(role_id)
+            await role.delete()
+        for category_id in self.db.get_categories_to_delete(server_id):
+            category = guild.get_channel(category_id)
+            for channel in category.channels:
+                await channel.delete()
+            await category.delete()
+
+        # REAL IMPLEMENTATION CONCERNS
         # get current semester roles and move those students to "previous student" role
         # delete the old roles
         # delete the old channels (saving logs?)
-        raise NotImplementedError
+
+        # If everything went alright
+        return 0
 
 
 bot = PittscordBot(command_prefix="!", intents=intents)
