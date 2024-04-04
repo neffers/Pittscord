@@ -1,4 +1,4 @@
-from quart import Quart, render_template, session, request
+from quart import Quart, render_template, session, request, redirect, url_for
 import grpc
 import json
 from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
@@ -18,24 +18,33 @@ async def get_json_from_server(server_id):
         return None
 
 
-@app.route("/")
+@app.route('/')
 async def default():
     # In reality, get from a login
-    session['server'] = 1204258474851041330
+    session['admin'] = 'jbb65'
+    return redirect(url_for('ui'))
+
+
+@app.route("/ui")
+async def ui():
     return await render_template("example.html")
 
 
 @app.route("/config", methods=["POST"])
 async def recv_config():
     config = await request.json
-    print(config)
+    config_dict = json.loads(config)
+    config_dict['admin'] = session['admin']
     # TODO: make request to the ipc server and return the result
     return {}
 
 
 @app.route("/get_server_json")
 async def get_json():
-    ret = await get_json_from_server(session['server'])
+    # TODO: get from database based on login? or should this be sending the admin name instead?
+    # Probably the second
+    server = 1204258474851041330
+    ret = await get_json_from_server(server)
     return json.loads(ret)
 
 
