@@ -2,9 +2,13 @@ class Database:
     def __init__(self, db_filename):
         self.students = {}
         self.courses = []
+        self.recitations = []
 
     def add_admin(self, name, server_id, discord_id):
         raise NotImplementedError
+
+    def get_admin_server(self, name):
+        return 1204258474851041330
 
     def remove_admin(self, name):
         raise NotImplementedError
@@ -30,7 +34,7 @@ class Database:
         self.courses = []
 
     def add_course_recitation(self, course_canvas_id, recitation_name, reaction_id, associated_role_id):
-        raise NotImplementedError
+        self.recitations.append((course_canvas_id, recitation_name, reaction_id, associated_role_id))
 
     def get_course_recitations(self, course_canvas_id):
         raise NotImplementedError

@@ -33,10 +33,14 @@ async def ui():
 @app.route("/config", methods=["POST"])
 async def recv_config():
     config = await request.json
-    config_dict = json.loads(config)
-    config_dict['admin'] = session['admin']
-    # TODO: make request to the ipc server and return the result
-    return {}
+    config['admin'] = session['admin']
+    try:
+        async with grpc.aio.insecure_channel('[::]:50051') as channel:
+            stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
+            response = await stub.SendConfig(Pittscord_ipc_pb2.ConfigRequest(config=json.dumps(config)))
+        return [response.code]
+    except grpc.aio.AioRpcError:
+        return 500
 
 
 @app.route("/get_server_json")

@@ -4,9 +4,10 @@ import re
 from discord import app_commands
 from discord.ext import commands
 
-#import database
+# import database
 import pretend_database as database
 from config import db_filename
+
 reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
 intents = discord.Intents.all()
@@ -70,42 +71,98 @@ class PittscordBot(commands.Bot):
         await bot_testing_channel.send("Hello World!")
 
     async def process_semester_config(self, config_json: str):
+        print("processing semester config")
         config_dict = json.loads(config_json)
-        server_id = config_dict['server']
+        print(config_dict)
+        server_id = self.db.get_admin_server(config_dict['admin'])
         guild = self.get_guild(server_id)
         for semester_class in config_dict['classes']:
+            # Extract data
             class_name = semester_class['name']
-            class_canvas_id = semester_class['canvasId']
+            class_canvas_id = semester_class['canvasID']
             class_recitations = semester_class['recitations']
 
-            ta_role = await guild.create_role(name=class_name+' TA')
+            # Roles (for permission dicts)
+            ta_role = await guild.create_role(name=class_name + ' TA')
             student_role = await guild.create_role(name=class_name)
+            # don't use @everyone, use @student (need to get from database)
+            everyone = guild.default_role
 
+            # Create category channel and a placeholder for the announcements channel
+            category_overwrites = {
+
+            }
             class_category = await guild.create_category(class_name)
             class_announcements = None
 
             for channel_template in config_dict['template']:
-                channel_name = channel_template['name']
-                channel_type = channel_template['type']
-                channel_ta_only = channel_template['TAOnly']
-                channel_student_only = channel_template['StudOnly']
+                # Extract data
+                channel_name = channel_template['channelName']
+                channel_type = channel_template['channelType']
+                channel_ta_only = channel_template['taOnly']
+                channel_student_only = channel_template['studentOnly']
 
                 match channel_type:
-                    case 'announcement':
-                        # TODO
-                        pass
-                    case 'textChannel':
-                        # TODO
-                        pass
-                    case 'forum':
-                        # TODO
-                        pass
-                    case 'voiceChannel':
-                        # TODO
-                        pass
+                    case 'A':
+                        channel_overwrites = {
+                            ta_role: discord.PermissionOverwrite(
+                                read_messages=True,
+                                send_messages=channel_ta_only
+                            ),
+                            student_role: discord.PermissionOverwrite(
+                                read_messages=True,
+                                send_messages=False
+                            ),
+                            everyone: discord.PermissionOverwrite(
+                                read_messages=True if (not channel_student_only) else None
+                            )
+                        }
 
-            #TODO
-            self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id, )
+                        channel = await guild.create_text_channel(channel_name, news=True, category=class_category,
+                                                                  overwrites=channel_overwrites)
+                        class_announcements = channel
+                    case 'T':
+                        channel_overwrites = {
+                            ta_role: discord.PermissionOverwrite(
+                                read_messages=True,
+                                send_messages=True
+                            ),
+                            student_role: discord.PermissionOverwrite(
+                                read_messages=not channel_ta_only,
+                                send_messages=not channel_ta_only
+                            ),
+                            everyone: discord.PermissionOverwrite(
+                                read_messages=True if (not channel_student_only) else None
+                            )
+                        }
+                        channel = await guild.create_text_channel(channel_name, category=class_category,
+                                                                  overwrites=channel_overwrites)
+                    case 'F':
+                        # TODO: Permissions
+                        channel = await guild.create_forum(channel_name, category=class_category)
+                    case 'V':
+                        # TODO: Permissions
+                        channel = await guild.create_voice_channel(channel_name, category=class_category)
+
+            class_react_message = None
+            recs = None
+            if class_recitations and class_announcements:
+                message = "React to sign up for the following recitation roles:"
+                recs = []
+                for (index, rec) in enumerate(class_recitations):
+                    reaction = reactions[index]
+                    role = await guild.create_role(name=class_name+" "+rec)
+                    recs.append((rec, reaction, role.id))
+                class_react_message = await class_announcements.send(message)
+
+            self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id,
+                                        class_react_message)
+            if recs:
+                for (rec, reaction, role) in recs:
+                    self.db.add_course_recitation(class_canvas_id, rec, reaction, role)
+
+        # If everything went alright
+        return 0
 
     async def semester_cleanup(self, server_id: int):
         # TODO
@@ -154,7 +211,8 @@ async def on_member_join(member: discord.Member):
 
     # Check for the user's presence in the database (in case of a leave-rejoin)
     if bot.db.get_student_id(member.id) is None:
-        await member.dm_channel.send(f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
+        await member.dm_channel.send(
+            f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
 
         def check(m):
             return m.channel == member.dm_channel and m.author == member
@@ -219,6 +277,15 @@ async def ask_user_to_register(interaction: discord.Interaction, user: discord.U
     await on_member_join(user)
 
 
+@bot.tree.command()
+@app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
+async def configure_server(interaction: discord.Interaction, user: discord.User):
+    """Configure server for use with the bot. Will set most channels as not visible to non-verified users,
+    create roles for verified students, previous students, and previous TAs."""
+    # TODO
+
+
 @bot.command()
 async def sync(interaction: discord.Interaction):
     """Command to re-register 'app_commands' (slash commands) with Discord so that they can be used.
@@ -240,4 +307,5 @@ async def serverjson(interaction: discord.Interaction):
 
 if __name__ == "__main__":
     from secret import discord_token
+
     bot.run(discord_token)
