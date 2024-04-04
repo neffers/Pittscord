@@ -29,6 +29,9 @@ class Database:
                        name TEXT NOT NULL, 
                        server_id INTEGER NOT NULL, 
                        discord_id INTEGER UNIQUE NOT NULL,
+                       previous_student_role INTEGER NOT NULL,
+                       previous_ta_role_id INTEGER NOT NULL,
+                       verified INTEGER NOT NULL
                        FOREIGN KEY (discord_id) REFERENCES students(discord_id))""")
         
        # Can also use ROWID
@@ -59,10 +62,10 @@ class Database:
                        message_time TEXT NOT NULL)""")
 
     # Adds a user to the admin table
-    def add_admin(self, name, server_id, discord_id):
+    def add_admin(self, name, server_id, discord_id, previous_student_role_id, previous_ta_role_id, verified):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO admin VALUES (?, ?, ?)", (name, server_id, discord_id,))
+        cursor.execute("INSERT INTO admin VALUES (?, ?, ?)", (name, server_id, discord_id, previous_student_role_id, previous_ta_role_id, verified))
         
         self.conn.commit()
 
