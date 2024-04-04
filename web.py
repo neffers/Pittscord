@@ -12,7 +12,7 @@ async def get_json_from_server(server_id):
     try:
         async with grpc.aio.insecure_channel('[::]:50051') as channel:
             stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
-            response = await stub.GetJSON(Pittscord_ipc_pb2.JSONRequest(server_id=server_id))
+            response = await stub.GetJSON(Pittscord_ipc_pb2.JSONRequest(admin_name=session['admin']))
         return response.json
     except grpc.aio.AioRpcError:
         return None
