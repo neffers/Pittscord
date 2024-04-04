@@ -171,6 +171,7 @@ class PittscordBot(commands.Bot):
         return 0
 
     async def semester_cleanup(self, server_id: int):
+        print("semester cleanup")
         # TODO
         # get current semester roles and move those students to "previous student" role
         # delete the old roles

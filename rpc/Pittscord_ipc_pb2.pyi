@@ -5,10 +5,10 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class JSONRequest(_message.Message):
-    __slots__ = ("server_id",)
-    SERVER_ID_FIELD_NUMBER: _ClassVar[int]
-    server_id: int
-    def __init__(self, server_id: _Optional[int] = ...) -> None: ...
+    __slots__ = ("admin_name",)
+    ADMIN_NAME_FIELD_NUMBER: _ClassVar[int]
+    admin_name: str
+    def __init__(self, admin_name: _Optional[str] = ...) -> None: ...
 
 class JSONResponse(_message.Message):
     __slots__ = ("json",)
@@ -41,10 +41,10 @@ class ConfigResponse(_message.Message):
     def __init__(self, code: _Optional[int] = ...) -> None: ...
 
 class CleanupRequest(_message.Message):
-    __slots__ = ("server_id",)
-    SERVER_ID_FIELD_NUMBER: _ClassVar[int]
-    server_id: int
-    def __init__(self, server_id: _Optional[int] = ...) -> None: ...
+    __slots__ = ("admin_name",)
+    ADMIN_NAME_FIELD_NUMBER: _ClassVar[int]
+    admin_name: str
+    def __init__(self, admin_name: _Optional[str] = ...) -> None: ...
 
 class CleanupResponse(_message.Message):
     __slots__ = ("code",)
