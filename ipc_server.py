@@ -32,3 +32,22 @@ class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
     ):
         response_code = await self.bot.process_semester_config(request.config)
         return Pittscord_ipc_pb2.ConfigResponse(code=response_code)
+
+
+async def launch(discord_token):
+    server = grpc.aio.server()
+    ipc_server = PittscordIpcServer()
+    Pittscord_ipc_pb2_grpc.add_Pittscord_ipcServicer_to_server(ipc_server, server)
+    listen_addr = "[::]:50051"
+    server.add_insecure_port(listen_addr)
+    print("starting rpc server")
+    await server.start()
+    print("starting discord bot")
+    await ipc_server.bot.start(discord_token)
+
+
+if __name__ == '__main__':
+    import asyncio
+    from secret import discord_token as token
+
+    asyncio.run(launch(token))
