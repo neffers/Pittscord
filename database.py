@@ -40,13 +40,8 @@ class Database:
                        course_name TEXT NOT NULL, 
                        category_channel_id INTEGER NOT NULL, 
                        recitation_react_message_id INTEGER NOT NULL, 
-<<<<<<< Updated upstream
-                       user_role_id INTEGER NOT NULL, 
-                       ta_role_id INTEGER NOT NULL,
-=======
                        user_role_id INTEGER, 
                        ta_role_id INTEGER,
->>>>>>> Stashed changes
                        course_admin INTEGER NOT NULL,
                        course_row_num INTEGER PRIMARY KEY NOT NULL,
                        FOREIGN KEY (course_admin) REFERENCES server(server_row_num)
@@ -56,11 +51,7 @@ class Database:
                        recitation_id INTEGER NOT NULL,
                        course_number INTEGER NOT NULL,
                        recitation_name TEXT NOT NULL, 
-<<<<<<< Updated upstream
-                       reaction_id INTEGER NOT NULL, 
-=======
                        reaction_id TEXT NOT NULL, 
->>>>>>> Stashed changes
                        associated_role_id INTEGER NOT NULL, 
                        recitation_row_num INTEGER PRIMARY KEY NOT NULL,
                        FOREIGN KEY (course_number) REFERENCES course(course_row_num)
@@ -68,14 +59,15 @@ class Database:
         
         cursor.execute("""CREATE TABLE IF NOT EXISTS messages(
                        message_id INTEGER NOT NULL, 
-                       message_time TEXT NOT NULL,
-                       message_row_num INTEGER PRIMARY KEY NOT NULL)""")
+                       server_id INTEGER NOT NULL,
+                       message_row_num INTEGER PRIMARY KEY NOT NULL,
+                       FOREIGN KEY (server_id) REFERENCES server(server_row_num))""")
 
     # Adds a user to the admin table
-    def add_admin(self, name, server_id, discord_id, previous_user_role_id, previous_ta_role_id, server_row_num):
+    def add_admin(self, name, server_id, discord_id, previous_user_role_id, previous_ta_role_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO server VALUES (?, ?, ?, ?, ?, ?)", (name, server_id, discord_id, previous_user_role_id, previous_ta_role_id, server_row_num))
+        cursor.execute("INSERT INTO server (name, server_id, discord_id, previous_user_role_id, previous_ta_role_id) VALUES (?, ?, ?, ?, ?)", (name, server_id, discord_id, previous_user_role_id, previous_ta_role_id))
         
         self.conn.commit()
 
@@ -86,7 +78,7 @@ class Database:
 
         return adminList
 
-    # Passing in the integer of an associated admin removes a user from the admin table, using ROWID as a PK
+    # Passing in the integer of an associated admin removes a user from the admin table
     def remove_admin(self, discord_id):
         cursor = self.conn.cursor()
 
@@ -95,10 +87,10 @@ class Database:
         self.conn.commit()
 
     # Adds a user to the user table
-    def add_user(self, pitt_id, discord_id, user_row_num):
+    def add_user(self, pitt_id, discord_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO user VALUES (?, ?, ?)", (pitt_id, discord_id, user_row_num,))
+        cursor.execute("INSERT INTO user (pitt_id, discord_id) VALUES (?, ?)", (pitt_id, discord_id,))
         
         self.conn.commit()
 
@@ -119,10 +111,10 @@ class Database:
         self.conn.commit()
 
     # Adds a new course into the course table
-    def add_semester_course(self, course_number, course_canvas_id, course_name, category_channel_id, recitation_react_message_id, user_role_id, ta_role_id, course_admin, course_row_num):
+    def add_semester_course(self, course_number, course_canvas_id, course_name, category_channel_id, recitation_react_message_id, user_role_id, ta_role_id, course_admin):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO course VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (course_number, course_canvas_id, course_name, category_channel_id, recitation_react_message_id, user_role_id, ta_role_id, course_admin, course_row_num,))
+        cursor.execute("INSERT INTO course (course_number, course_canvas_id, course_name, category_channel_id, recitation_react_message_id, user_role_id, ta_role_id, course_admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (course_number, course_canvas_id, course_name, category_channel_id, recitation_react_message_id, user_role_id, ta_role_id, course_admin,))
         
         self.conn.commit()
   
@@ -142,10 +134,10 @@ class Database:
         self.conn.commit()
         
     # Adds a recitation to the recitation table with a FK of its course's Canvas ID
-    def add_course_recitation(self, recitation_id, course_number, recitation_name, reaction_id, associated_role_id, recitation_row_num):
+    def add_course_recitation(self, recitation_id, course_number, recitation_name, reaction_id, associated_role_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO recitation VALUES (?, ?, ?, ?, ?, ?)", (recitation_id, course_number, recitation_name, reaction_id, associated_role_id, recitation_row_num))
+        cursor.execute("INSERT INTO recitation (recitation_id, course_number, recitation_name, reaction_id, associated_role_id) VALUES (?, ?, ?, ?, ?)", (recitation_id, course_number, recitation_name, reaction_id, associated_role_id,))
 
         self.conn.commit()
 
@@ -168,20 +160,25 @@ class Database:
         return roleID
 
     # Add a message's ID and the time it was sent
-    def add_message(self, message_id, message_time, message_row_num):
+    def add_message(self, message_id, server_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO messages VALUES (?, ?, ?)", (message_id, message_time, message_row_num))
+        cursor.execute("INSERT INTO messages (message_id, server_id) VALUES (?, ?)", (message_id, server_id,))
         
         self.conn.commit()
 
     # Returns the time a message has been sent
-    def get_message_time(self):
+    def get_messages(self):
         cursor = self.conn.cursor()
 
         messageList = cursor.execute("SELECT * FROM messages").fetchall()
 
         return messageList
+    
+    def remove_message(self, message_id):
+        cursor = self.conn.cursor()
+
+        cursor.execute("DELETE FROM messages WHERE message_id = (?)", (message_id,))        
 
     def close(self):
         self.conn.close()

@@ -3,7 +3,6 @@ import json
 import re
 from discord import app_commands
 from discord.ext import commands
-from database import Database
 
 #import database
 import pretend_database as database
@@ -85,8 +84,6 @@ class PittscordBot(commands.Bot):
 
 bot = PittscordBot(command_prefix="!", intents=intents)
 
-db = Database("database.db")
-
 
 @bot.event
 async def on_ready():
@@ -114,6 +111,14 @@ async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
         role = guild.get_role(role_id)
         await member.remove_roles(role)
 
+@bot.event
+async def on_thread_create(thread):
+    bot.db.add_message(thread.id, thread.guild.id)
+
+@bot.event
+async def on_raw_thread_delete(payload: discord.RawThreadDeleteEvent):
+    guild = bot.get_guild(payload.guild_id)
+    bot.db.remove_message(guild)
 
 @bot.event
 async def on_member_join(member: discord.Member):
@@ -151,13 +156,11 @@ async def on_member_join(member: discord.Member):
 @app_commands.default_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
     """Look up a user's Pitt ID. Currently only responds with Discord ID."""
-
     student_id = bot.db.get_student_id(user.id)
     if student_id is None:
         await interaction.response.send_message(f"No pitt id available!", ephemeral=True)
     else:
         await interaction.response.send_message(f"{student_id}", ephemeral=True)
-
 
 @identify.error
 async def identify_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
