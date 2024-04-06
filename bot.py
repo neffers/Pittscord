@@ -252,7 +252,22 @@ async def on_member_join(member: discord.Member):
 
         bot.db.add_student(pittid, member.id)
         await member.dm_channel.send(f'Thanks!')
-    # TODO: find the student in classes and add to roles
+
+    student_id = bot.db.get_student_id(member.id)
+
+    guild_admin = bot.db.get_server_admin(member.guild.id)
+    class_ids_to_check = bot.db.get_semester_courses(guild_admin)
+    student_class_roles = bot.canvas.find_user_in_classes(student_id, class_ids_to_check)
+
+    for (class_id, role) in student_class_roles.items():
+        (student_role_id, ta_role_id) = bot.db.get_class_roles(class_id)
+        student_role = member.guild.get_role(student_role_id)
+        ta_role = member.guild.get_role(ta_role_id)
+        match role:
+            case canvas.EnrollmentType.Student:
+                await member.add_roles(student_role)
+            case canvas.EnrollmentType.TA:
+                await member.add_roles(ta_role)
 
 
 @bot.tree.command()
