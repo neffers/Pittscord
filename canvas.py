@@ -1,6 +1,11 @@
 import canvasapi
 from config import canvas_base_url
+from enum import IntEnum, auto
 
+
+class EnrollmentType(IntEnum):
+    Student = auto()
+    TA = auto()
 
 class Canvas:
     def __init__(self, canvas_token: str):
@@ -28,19 +33,17 @@ class Canvas:
 
         return ret
 
-    def find_student_in_classes(self, student_id, course_ids):
-        course_students = {}
-
+    def find_user_in_classes(self, student_id, course_ids):
+        ret = {}
         for course_id in course_ids:
             course = self.c.get_course(course_id)
-            students = course.get_users()
-            course_students[course_id] = [student.login_id.lower() for student in students]
+            students = [user.login_id.lower() for user in course.get_users(enrollment_type=['student'])]
+            tas = [user.login_id.lower() for user in course.get_users(enrollment_type=['teacher', 'ta', 'designer'])]
 
-        ret = []
-
-        for (course_id, students) in course_students.items():
             if student_id in students:
-                ret.append(course_id)
+                ret[course_id] = EnrollmentType.Student
+            elif course_id in tas:
+                ret[course_id] = EnrollmentType.TA
 
         if ret:
             return ret
@@ -52,4 +55,4 @@ if __name__ == "__main__":
     from secret import canvas_token as token
     courses = [241505, 241457]
     c = Canvas(token)
-    print(c.find_student_in_classes('lun8', courses))
+    print(c.find_user_in_classes('lun8', courses))
