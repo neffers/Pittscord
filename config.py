@@ -1,3 +1,6 @@
+# Admin pitt id
+admin_pitt_id = 'jbb65'
+
 # Canvas Configuration
 canvas_base_url = "https://canvas.pitt.edu"
 
