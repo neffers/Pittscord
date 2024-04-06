@@ -3,6 +3,8 @@ import grpc
 import json
 from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
 
+from config import admin_pitt_id
+
 app = Quart(__name__)
 
 app.secret_key = "secret"
@@ -20,8 +22,8 @@ async def get_json_from_server(admin_name):
 
 @app.route('/')
 async def default():
-    # In reality, get from a login
-    session['admin'] = 'jbb65'
+    # wanted this to come from a login page but ran out of time
+    session['admin'] = admin_pitt_id
     return redirect(url_for('ui'))
 
 
