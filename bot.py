@@ -1,3 +1,5 @@
+import datetime
+
 import discord
 import json
 import re
@@ -79,6 +81,9 @@ class PittscordBot(commands.Bot):
         print(config_dict)
         server_id = self.db.get_admin_server(config_dict['admin'])
         guild = self.get_guild(server_id)
+        (previous_student_role_id, _) = self.db.get_server_student_roles(server_id)
+        previous_student_role = guild.get_role(previous_student_role_id)
+        previous_student_perms = previous_student_role.permissions
         for semester_class in config_dict['classes']:
             # Extract data
             class_name = semester_class['name']
@@ -86,8 +91,8 @@ class PittscordBot(commands.Bot):
             class_recitations = semester_class['recitations']
 
             # Roles (for permission dicts)
-            ta_role = await guild.create_role(name=class_name + ' TA')
-            student_role = await guild.create_role(name=class_name)
+            ta_role = await guild.create_role(name=class_name + ' TA', hoist=True, permissions=previous_student_perms)
+            student_role = await guild.create_role(name=class_name, hoist=True, permissions=previous_student_perms)
             # don't use @everyone, use @student (need to get from database)
             everyone = guild.default_role
 
@@ -95,7 +100,7 @@ class PittscordBot(commands.Bot):
             category_overwrites = {
 
             }
-            class_category = await guild.create_category(class_name)
+            class_category = await guild.create_category(class_name, overwrites=category_overwrites)
             class_announcements = None
 
             for channel_template in config_dict['template']:
@@ -105,6 +110,19 @@ class PittscordBot(commands.Bot):
                 channel_ta_only = channel_template['taOnly']
                 channel_student_only = channel_template['studentOnly']
 
+                channel_overwrites = {
+                    ta_role: discord.PermissionOverwrite(
+                        read_messages=True,
+                        send_messages=True
+                    ),
+                    student_role: discord.PermissionOverwrite(
+                        read_messages=not channel_ta_only,
+                        send_messages=not channel_ta_only
+                    ),
+                    previous_student_role: discord.PermissionOverwrite(
+                        read_messages=True if (not channel_student_only) else None
+                    )
+                }
                 match channel_type:
                     case 'A':
                         channel_overwrites = {
@@ -116,7 +134,7 @@ class PittscordBot(commands.Bot):
                                 read_messages=True,
                                 send_messages=False
                             ),
-                            everyone: discord.PermissionOverwrite(
+                            previous_student_role: discord.PermissionOverwrite(
                                 read_messages=True if (not channel_student_only) else None
                             )
                         }
@@ -125,27 +143,14 @@ class PittscordBot(commands.Bot):
                                                                   overwrites=channel_overwrites)
                         class_announcements = channel
                     case 'T':
-                        channel_overwrites = {
-                            ta_role: discord.PermissionOverwrite(
-                                read_messages=True,
-                                send_messages=True
-                            ),
-                            student_role: discord.PermissionOverwrite(
-                                read_messages=not channel_ta_only,
-                                send_messages=not channel_ta_only
-                            ),
-                            everyone: discord.PermissionOverwrite(
-                                read_messages=True if (not channel_student_only) else None
-                            )
-                        }
                         channel = await guild.create_text_channel(channel_name, category=class_category,
                                                                   overwrites=channel_overwrites)
                     case 'F':
-                        # TODO: Permissions
-                        channel = await guild.create_forum(channel_name, category=class_category)
+                        channel = await guild.create_forum(channel_name, category=class_category,
+                                                           overwrites=channel_overwrites)
                     case 'V':
-                        # TODO: Permissions
-                        channel = await guild.create_voice_channel(channel_name, category=class_category)
+                        channel = await guild.create_voice_channel(channel_name, category=class_category,
+                                                                   overwrites=channel_overwrites)
 
             class_react_message = None
             recs = None
@@ -155,7 +160,7 @@ class PittscordBot(commands.Bot):
 
                 for (index, rec) in enumerate(class_recitations):
                     reaction = reactions[index]
-                    role = await guild.create_role(name=class_name+" "+rec)
+                    role = await guild.create_role(name=class_name+" "+rec, mentionable=True)
                     message += f'\n\n{reaction}: {role.name}'
                     recs.append((rec, reaction, role.id))
 
