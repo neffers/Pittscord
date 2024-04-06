@@ -53,6 +53,6 @@ class Canvas:
 
 if __name__ == "__main__":
     from secret import canvas_token as token
-    courses = [241505, 241457]
+    luis_current_courses = [241505, 241457]
     c = Canvas(token)
-    print(c.find_user_in_classes('lun8', courses))
+    print(c.find_user_in_classes('lun8', luis_current_courses))
