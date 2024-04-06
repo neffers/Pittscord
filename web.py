@@ -29,7 +29,7 @@ async def default():
 
 @app.route("/ui")
 async def ui():
-    return await render_template("example.html")
+    return await render_template("ui.html")
 
 
 @app.route("/config", methods=["POST"])
