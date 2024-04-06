@@ -174,23 +174,41 @@ class PittscordBot(commands.Bot):
         return 0
 
     async def semester_cleanup(self, server_id: int):
-        # TODO
-        # I consider this mostly a temporary implementation. The real implementation will have to do things specified
-        # toward the bottom of this method.
         guild = self.get_guild(server_id)
-        for role_id in self.db.get_roles_to_delete(server_id):
+
+        # Get recitation roles to remove them and then delete database entries
+        for role_id in self.db.get_server_recitation_roles(server_id):
             role = guild.get_role(role_id)
             await role.delete()
-        for category_id in self.db.get_categories_to_delete(server_id):
+        self.db.remove_semester_recitations(server_id)
+
+        # Move students from old roles to new
+        (previous_student_role_id, previous_ta_role_id) = self.db.get_server_student_roles(server_id)
+        ta_role = guild.get_role(previous_ta_role_id)
+        student_role = guild.get_role(previous_student_role_id)
+
+        for (course_student_role_id, course_ta_role_id) in self.db.get_semester_course_roles(server_id):
+            course_student_role = guild.get_role(course_student_role_id)
+            course_ta_role = guild.get_role(course_ta_role_id)
+            role_transitions = {course_student_role: student_role, course_ta_role: ta_role}
+            for (course_role, server_role) in role_transitions.items():
+                for user in course_role.members:
+                    await user.add_roles(server_role)
+                await course_role.delete()
+
+        # Delete channels saving logs
+        for category_id in self.db.get_semester_category_channels(server_id):
             category = guild.get_channel(category_id)
             for channel in category.channels:
+                channel_messages = [{'message': message.content, 'author': message.author.id, 'time': message.created_at}
+                                    async for message in channel.history()]
+                logfile_name = 'logs/' + datetime.datetime.now().strftime('%Y-%M-%d-') + channel.name + '-log.json'
+                with open(logfile_name, 'w') as logfile:
+                    logfile.write(json.dumps(channel_messages))
                 await channel.delete()
             await category.delete()
 
-        # REAL IMPLEMENTATION CONCERNS
-        # get current semester roles and move those students to "previous student" role
-        # delete the old roles
-        # delete the old channels (saving logs?)
+        self.db.remove_semester_courses(server_id)
 
         # If everything went alright
         return 0
