@@ -320,12 +320,6 @@ async def sync(interaction: discord.Interaction):
         print(f"local sync returned:\n{localsync}")
 
 
-@bot.command()
-async def serverjson(interaction: discord.Interaction):
-    """Development command, so I can see what json I'm making"""
-    print(bot.generate_server_json(interaction.guild.id))
-
-
 if __name__ == "__main__":
     from secret import discord_token
 
