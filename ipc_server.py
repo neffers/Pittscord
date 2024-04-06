@@ -14,8 +14,7 @@ class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
             context: grpc.aio.ServicerContext
     ) -> Pittscord_ipc_pb2.JSONResponse:
         admin_name = request.admin_name
-        # TODO: get server id associated with this admin's name
-        server_id = 1204258474851041330
+        server_id = self.bot.db.get_admin_server(admin_name)
         json = self.bot.generate_server_json(server_id)
         response = Pittscord_ipc_pb2.JSONResponse(json=json)
         return response
@@ -42,8 +41,7 @@ class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
             context: grpc.aio.ServicerContext
     ):
         admin_name = request.admin_name
-        # TODO: get server id associated with this admin's name
-        server_id = 1204258474851041330
+        server_id = self.bot.db.get_admin_server(admin_name)
         response_code = await self.bot.semester_cleanup(server_id)
         return Pittscord_ipc_pb2.CleanupResponse(code=response_code)
 
