@@ -316,10 +316,43 @@ async def ask_user_to_register(interaction: discord.Interaction, user: discord.U
 @bot.tree.command()
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
-async def configure_server(interaction: discord.Interaction, user: discord.User):
+async def configure_server(interaction: discord.Interaction, previous_student: discord.Role):
     """Configure server for use with the bot. Will set most channels as not visible to non-verified users,
-    create roles for verified students, previous students, and previous TAs."""
-    # TODO
+    create roles for verified students, previous students, and previous TAs. Expects community mode."""
+    # Check for a previous entry and fail if this has already been done
+    if bot.db.get_server_admin(interaction.guild.id):
+        await interaction.response.send_message("Server is already configured", ephemeral=True)
+        return
+
+    guild = interaction.guild
+
+    # Set minimal permissions for the default role
+    await guild.default_role.edit(permissions=discord.Permissions.none())
+    await guild.rules_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(view_channel=True)})
+    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels,you will need to reply "
+                                   "to the message that I send you!")
+
+    # Create "Previous Student" and "TA" roles
+    student_perms = discord.Permissions.none()
+    student_perms.send_messages = True
+    student_perms.read_messages = True
+    student_perms.change_nickname = True
+    student_perms.send_messages_in_threads = True
+    student_perms.create_public_threads = True
+    student_perms.embed_links = True
+    student_perms.attach_files = True
+    student_perms.add_reactions = True
+    student_perms.use_external_emojis = True
+    student_perms.read_message_history = True
+    # Voice Channel Perms
+    student_perms.connect = True
+    student_perms.speak = True
+    student_perms.stream = True
+
+    prev_student_role = await guild.create_role(name="Previous Student", permissions=student_perms)
+    prev_ta_role = await guild.create_role(name="Previous TA", permissions=student_perms, hoist=True)
+
+    bot.db.add_server(interaction.user.id, interaction.guild.id, prev_student_role.id, prev_ta_role.id)
 
 
 @bot.command()
