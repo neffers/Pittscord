@@ -318,10 +318,10 @@ async def deregister(interaction: discord.Interaction, user: discord.User):
 @bot.tree.command()
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
-async def ask_user_to_register(interaction: discord.Interaction, user: discord.User):
+async def reregister(interaction: discord.Interaction, user: discord.User):
     """Ask user to identify themselves to the bot"""
     await interaction.response.send_message("Asking!", ephemeral=True)
-    await on_member_join(user)
+    await on_member_join(interaction.guild.get_member(user.id))
 
 
 @bot.tree.command()
