@@ -350,7 +350,7 @@ async def reregister(interaction: discord.Interaction, user: discord.User):
 @bot.tree.command()
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
-async def configure_server(interaction: discord.Interaction, previous_student: discord.Role):
+async def configure_server(interaction: discord.Interaction):
     """Configure server for use with the bot. Will set most channels as not visible to non-verified users,
     create roles for verified students, previous students, and previous TAs. Expects community mode."""
     # Check for a previous entry and fail if this has already been done
