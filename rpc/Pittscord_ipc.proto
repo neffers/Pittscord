@@ -4,6 +4,7 @@ service Pittscord_ipc {
     rpc GetJSON (JSONRequest) returns (JSONResponse) {}
     rpc SayHello (HelloRequest) returns (HelloResponse) {}
     rpc SendConfig (ConfigRequest) returns (ConfigResponse) {}
+    rpc Cleanup (CleanupRequest) returns (CleanupResponse) {}
 }
 
 message JSONRequest {
@@ -27,5 +28,13 @@ message ConfigRequest {
 }
 
 message ConfigResponse {
+    int32 code = 1;
+}
+
+message CleanupRequest {
+    string name = 1;
+}
+
+message CleanupResponse {
     int32 code = 1;
 }

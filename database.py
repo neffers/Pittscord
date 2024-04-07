@@ -1,6 +1,5 @@
 import sqlite3
 
-
 class Database:
     """
     So far, I've outlined functions in here according to this schema:
@@ -14,124 +13,233 @@ class Database:
         self.conn = sqlite3.connect(db_filename)
         self.conn.execute("PRAGMA foreign_keys = ON;")
         self.init_db()
-        # TODO: Make sure that stuff like foreign key rules are maintained
 
     # Initializes the DB schema
     def init_db(self):
         cursor = self.conn.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS students(pitt_id VARCHAR PRIMARY KEY, discord_id VARCHAR)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS admin(name VARCHAR, server_id VARCHAR, discord_id VARCHAR)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS course(course_canvas_id VARCHAR PRIMARY KEY, course_name VARCHAR, category_channel_id VARCHAR, recitation_react_message_id VARCHAR, student_role_id VARCHAR, ta_role_id VARCHAR)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS recitation(course_canvas_id VARCHAR, recitation_name VARCHAR, reaction_id VARCHAR PRIMARY KEY, associated_role_id VARCHAR, FOREIGN KEY(course_canvas_id) REFERENCES course(course_canvas_id) ON DELETE CASCADE)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS messages(message_id VARCHAR PRIMARY KEY, message_time TIMESTAMP)")
 
-    # Adds a user to the admin table
-    def add_admin(self, name, server_id, discord_id):
+        cursor.execute("""CREATE TABLE IF NOT EXISTS user(
+                       pitt_id TEXT UNIQUE NOT NULL,
+                       user_discord_id INTEGER UNIQUE NOT NULL,
+                       user_row_num INTEGER PRIMARY KEY NOT NULL)""")
+        
+        # FORMERLY KNOWN AS ADMIN
+        cursor.execute("""CREATE TABLE IF NOT EXISTS server(
+                       server_id INTEGER UNIQUE NOT NULL, 
+                       admin_discord_id INTEGER NOT NULL,
+                       previous_user_role_id INTEGER,
+                       previous_ta_role_id INTEGER,
+                       server_row_num INTEGER PRIMARY KEY NOT NULL,
+                       FOREIGN KEY (discord_id) REFERENCES user(discord_id)
+                       ON DELETE CASCADE)""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS course(
+                       course_canvas_id INTEGER UNIQUE NOT NULL, 
+                       course_name TEXT NOT NULL, 
+                       category_channel_id INTEGER NOT NULL, 
+                       recitation_react_message_id INTEGER NOT NULL, 
+                       user_role_id INTEGER, 
+                       ta_role_id INTEGER,
+                       course_row_num INTEGER PRIMARY KEY NOT NULL,
+                       server_id INTEGER NOT NULL,
+                       FOREIGN KEY (server_id) REFERENCES server(server_id)
+                       ON DELETE CASCADE)""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS recitation(
+                       course_canvas_id INTEGER NOT NULL,
+                       recitation_name TEXT NOT NULL, 
+                       reaction_id TEXT NOT NULL, 
+                       associated_role_id INTEGER NOT NULL, 
+                       recitation_row_num INTEGER PRIMARY KEY NOT NULL,
+                       FOREIGN KEY (course_canvas_id) REFERENCES course(course_canvas_id)
+                       ON DELETE CASCADE)""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS messages(
+                       message_id INTEGER NOT NULL, 
+                       server_id INTEGER NOT NULL,
+                       message_row_num INTEGER PRIMARY KEY NOT NULL,
+                       FOREIGN KEY (server_id) REFERENCES server(server_row_num))""")
+
+    """get the pittid of the admin of a given server"""
+    def get_server_admin(self, server_discord_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO admin VALUES (?, ?, ?)", (name, server_id, discord_id,))
+        admin_id = cursor.execute("SELECT admin_discord_id FROM server WHERE server_id = (?)", server_discord_id).fetchone()
+    
+        pitt_id = cursor.execute("SELECT pitt_id FROM user JOIN server ON user.user_discord_id = server.admin_discord_id WHERE user.user_discord_id = (?)", admin_id).fetchone()
+        
+        return pitt_id
+
+    """Add a server to our database associated with a given userid, including the role IDs we care about"""
+    def add_server(self, admin_discord_user_id, server_discord_id, previous_student_role_id, previous_ta_role_id):
+        cursor = self.conn.cursor()
+
+        cursor.execute("INSERT INTO server (server_id, admin_discord_id, previous_student_role_id, previous_ta_role_id) VALUES (?, ?, ?, ?)", (server_discord_id, admin_discord_user_id, previous_student_role_id, previous_ta_role_id))
         
         self.conn.commit()
 
-    # Removes a user from the admin table
-    def remove_admin(self, name):
+    """Get the discord guild id of the server administrated by the user with a given pitt id"""
+    def get_admin_server(self, pitt_id):
+        cursor = self.conn.cursor()
+        admin_id = cursor.execute("SELECT discord_id from user WHERE pitt_id = (?)", (pitt_id,)).fetchone()
+
+        server_id = cursor.execute("SELECT server_id FROM server WHERE admin_discord_id = (?)", (admin_id,))
+
+        return server_id
+
+    """Return a tuple of (previous_student_role_id, previous_ta_role_id) associated with a guild"""
+    def get_server_student_roles(self, guild_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("DELETE FROM admin WHERE name = (?)", (name,))
+        student_ta_roles = cursor.execute("SELECT (previous_student_role_id, previous_ta_role_id) FROM server WHERE server_discord_id = (?)", (guild_id,))
 
-        self.conn.commit()
+        return student_ta_roles
 
-    # Adds a user to the students table
-    def add_student(self, pitt_id, discord_id):
+    """add a course to our table with the given fields"""
+    def add_semester_course(self, class_canvas_id, class_name, student_role_id, ta_role_id, category_channel_id, class_react_message, server_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO students VALUES (?, ?)", (pitt_id, discord_id,))
+        cursor.execute("INSERT INTO course (course_canvas_id, course_name, category_channel_id, recitation_react_message_id, student_role_id, ta_role_id, server_id) VALUES (?, ?, ?, ?, ?, ?, ?)", (class_canvas_id, class_name, category_channel_id, class_react_message, student_role_id, ta_role_id, server_id))
         
         self.conn.commit()
 
-    # Returns the Pitt ID of the user who's Discord ID is given. If not found, returns None
-    def get_student_id(self, discord_id):
-        cursor = self.conn.cursor()
+    """Add a recitation to our table with the given fields"""
+    def add_course_recitation(self, class_canvas_id, recitation_name, reaction, role_id):
+        cursor = self.conn.cursor() 
 
-        pittID = cursor.execute("SELECT pitt_id FROM students WHERE discord_id = (?)", (discord_id,)).fetchone()
-        
-        return pittID
-        
-    # Removes the association of a PittID and a Discord ID
-    def remove_student_association(self, discord_id):
-        cursor = self.conn.cursor()
-
-        cursor.execute("DELETE FROM students WHERE discord_id = (?)", (discord_id,))
+        cursor.execute("INSERT INTO recitation (course_canvas_id, recitation_name, reaction_id, associated_role_id) VALUES (?, ?, ?, ?)", (class_canvas_id, recitation_name, reaction, role_id))
 
         self.conn.commit()
 
-    # Adds a new course into the course table
-    def add_semester_course(self, course_canvas_id, course_name, student_role_id, ta_role_id, category_channel_id, recitation_react_message_id):
+    """Return an iterable of the role ids associated with a given guild id"""
+    def get_server_recitation_roles(self, guild_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO course VALUES (?, ?, ?, ?, ?, ?)", (course_canvas_id, course_name, category_channel_id, recitation_react_message_id, student_role_id, ta_role_id,))
+        recitation_roles = cursor.execute("""SELECT recitation.associated_role_id 
+                       FROM recitation 
+                       JOIN recitation ON course.course_canvas_id = recitation.course_canvas_id
+                       JOIN course ON server.server_id = course.server_id
+                       WHERE server.server_id = (?)""", (guild_id,)).fetchall()
+
+        return recitation_roles
+
+    """Remove the recitations associated with a given guild id from the database"""
+    def remove_semester_recitations(self, guild_id):
+        cursor = self.conn.cursor()
+
+        cursor.execute("""DELETE associated_role_id FROM recitation
+                       JOIN course ON course.course_canvas_id = recitation.course_canvas_id
+                       JOIN server ON server.server_id = course.server_id
+                       WHERE server.server_id = (?)""", (guild_id,))
         
         self.conn.commit()
-  
-    # Returns a list of all courses
-    def get_semester_courses(self):
+
+    """Return a tuple of (previous_student_role_id, previous_ta_role_id) associated with a given guild in the server"""
+    def get_semester_course_roles(self, guild_id):
         cursor = self.conn.cursor()
 
-        courseList = cursor.execute("SELECT course_name FROM course").fetchall()
+        course_roles = cursor.execute("""SELECT (previous_student_role_id, previous_ta_role_id)
+                                       FROM server
+                                       WHERE server_id = (?)""", (guild_id,)).fetchall()
+        return course_roles
 
-        return courseList
-
-    # Deletes the course table
-    def remove_semester_courses(self):
+    """return an iterable of the category ids associated with a guild"""
+    def get_semester_category_channels(self, guild_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("DELETE FROM course")
+        category_channels = cursor.execute("""SELECT category_channel_id
+                                           FROM course
+                                           JOIN server ON server.server_id = course.server_id
+                                           WHERE server.server_id = (?)""", (guild_id,))
+        return category_channels
+
+    """Remove the courses associated with a given guild from the database"""
+    def remove_semester_courses(self, guild_id):
+        cursor = self.conn.cursor()
+
+        cursor.execute("""DELETE FROM course
+                       JOIN server ON server.server_id = course.server_id
+                       WHERE server.server_id = (?)""" (guild_id,))
         self.conn.commit()
+
+    """Return the pitt id associated with a given discord account, or None if none"""
+    def get_student_id(self, discord_user_id):
+        cursor = self.conn.cursor()
+
+        pittid = cursor.execute("SELECT pitt_id FROM user WHERE user_discord_id = (?)", (discord_user_id,))
+
+        return pittid
+
+    """Add an entry to the users table"""
+    def add_student(self, pittid, discord_user_id):
+        cursor = self.conn.cursor()
+
+        cursor.execute("INSERT INTO user (pitt_id, user_discord_id) VALUES (?,?)", (pittid, discord_user_id))
+
+        self.conn.commit()
+
+    """Return the name associated with a given class canvas ID"""
+    def get_class_name(self, class_canvas_id):
+        cursor = self.conn.cursor()
+
+        course_name = cursor.execute("SELECT course_name FROM course WHERE course_canvas_id = (?)", (class_canvas_id,)).fetchone()
         
-    # Adds a recitation to the recitation table with a FK of its course's Canvas ID
-    def add_course_recitation(self, course_canvas_id, recitation_name, reaction_id, associated_role_id):
+        return course_name
+
+    """Return a tuple of (student_role_id, ta_role_id) associated with a given class"""
+    #TODO: Do we want recitation role_ids as well?
+    def get_class_roles(self, class_canvas_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO recitation VALUES (?, ?, ?, ?)", (course_canvas_id, recitation_name, reaction_id, associated_role_id,))
+        course_roles = cursor.execute("SELECT (student_role_id, ta_role_id) FROM course WHERE course_canvas_id = (?)", (class_canvas_id,)).fetchone()
 
-        self.conn.commit()
+        return course_roles
 
-    # Returns a list of all recitations associated with their course's Canvas ID
-    def get_course_recitations(self, course_canvas_id):
+    """Return an iterable of the canvas IDs of courses associated with a given guild"""
+    def get_semester_courses(self, guild_id):
         cursor = self.conn.cursor()
 
-        recList = cursor.execute("SELECT recitation_name FROM recitation WHERE course_canvas_id = (?)", (course_canvas_id,)).fetchall()
+        canvas_course_id_list = cursor.execute("SELECT course_canvas_id FROM course WHERE server_id = (?)", (guild_id,))
 
-        return recList
-
-    # Gets the role that will be assigned to a user when they react correctly to a given message
-    def get_role_id(self, reaction_message_id, reaction_id):
+    """Remove a row from the users table"""
+    def remove_student_association(self, discord_user_id):
         cursor = self.conn.cursor()
 
-        roleID = cursor.execute("SELECT associated_role_id FROM recitation WHERE reaction_id = (?) AND reaction_message_id = (?)", (reaction_id, reaction_message_id,)).fetchone()
+        cursor.execute("DELETE FROM user WHERE user_discord_id = (?)", (discord_user_id))
 
-        return roleID
+        self.conn.commit
+
+    """Return the role id id that should be assigned / removed after a given reaction, or None if there is none."""
+    def get_role_id(self, message_id, reaction):
+        cursor = self.conn.cursor()
+
+        role_id = cursor.execute("""SELECT recitation.associated_role_id
+                       FROM recitation
+                       JOIN course on recitation.course_canvas_id = course.course_canvas_id
+                       WHERE course.recitation_react_message = (?)
+                       AND recitation.reaction_id = (?)""", (message_id, reaction)).fetchone()
+        return role_id
 
     # Add a message's ID and the time it was sent
-    def add_message(self, message_id, message_time):
+    def add_message(self, message_id, server_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO messages VALUES (?, ?)", (message_id, message_time,))
+        cursor.execute("INSERT INTO messages (message_id, server_id) VALUES (?, ?)", (message_id, server_id,))
         
         self.conn.commit()
 
-    def get_message_time(self):
+    # Returns the time a message has been sent
+    def get_messages(self):
         cursor = self.conn.cursor()
 
-        messageList = cursor.execute("SELECT message_time FROM messages").fetchall()
+        messageList = cursor.execute("SELECT * FROM messages").fetchall()
 
         return messageList
-
+    
     def remove_message(self, message_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("DELETE FROM messages WHERE message_id = (?)", (message_id,))
-        self.conn.commit()
+        cursor.execute("DELETE FROM messages WHERE message_id = (?)", (message_id,))        
 
     def close(self):
         self.conn.close()

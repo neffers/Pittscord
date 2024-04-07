@@ -1,11 +1,9 @@
 import asyncio
-import grpc
 import multiprocessing
 import signal
 
+import ipc_server
 from secret import discord_token
-from rpc import Pittscord_ipc_pb2_grpc
-from ipc_server import PittscordIpcServer
 import web
 
 
@@ -15,20 +13,8 @@ def sigint_handler(sig, frame):
     web_process.terminate()
 
 
-async def launch_ipc_server(token) -> None:
-    server = grpc.aio.server()
-    ipc_server = PittscordIpcServer()
-    Pittscord_ipc_pb2_grpc.add_Pittscord_ipcServicer_to_server(ipc_server, server)
-    listen_addr = "[::]:50051"
-    server.add_insecure_port(listen_addr)
-    print("starting rpc server")
-    await server.start()
-    print("starting discord bot")
-    await ipc_server.bot.start(token)
-
-
 def start_server(token):
-    asyncio.run(launch_ipc_server(token))
+    asyncio.run(ipc_server.launch(token))
 
 
 if __name__ == "__main__":

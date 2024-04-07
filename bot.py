@@ -3,11 +3,12 @@ import json
 import re
 from discord import app_commands
 from discord.ext import commands
-from database import Database
 
 #import database
 import pretend_database as database
+# TODO: Move to a config file?
 from secret import db_filename
+reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
 intents = discord.Intents.all()
 
@@ -73,10 +74,15 @@ class PittscordBot(commands.Bot):
         #TODO: implement based on received config
         raise NotImplementedError
 
+    async def semester_cleanup(self):
+        # TODO
+        # get current semester roles and move those students to "previous student" role
+        # delete the old roles
+        # delete the old channels (saving logs?)
+        raise NotImplementedError
+
 
 bot = PittscordBot(command_prefix="!", intents=intents)
-
-db = Database("database.db")
 
 
 @bot.event
@@ -87,17 +93,50 @@ async def on_ready():
 
 
 @bot.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    role_id = bot.db.get_role_id(payload.message_id, payload.emoji.name)
+    if role_id:
+        guild = bot.get_guild(payload.guild_id)
+        member = guild.get_member(payload.user_id)
+        role = guild.get_role(role_id)
+        await member.add_roles(role)
+
+
+@bot.event
+async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
+    role_id = bot.db.get_role_id(payload.message_id, payload.emoji.name)
+    if role_id:
+        guild = bot.get_guild(payload.guild_id)
+        member = guild.get_member(payload.user_id)
+        role = guild.get_role(role_id)
+        await member.remove_roles(role)
+
+@bot.event
+async def on_thread_create(thread):
+    bot.db.add_message(thread.id, thread.guild.id)
+
+@bot.event
+async def on_raw_thread_delete(payload: discord.RawThreadDeleteEvent):
+    guild = bot.get_guild(payload.guild_id)
+    bot.db.remove_message(guild)
+
+@bot.event
 async def on_member_join(member: discord.Member):
+    """A method that runs when a user joins a guild the bot is in."""
+    # We're probably going to send this user some messages, so make sure that the dm channel exists
     if member.dm_channel is None:
         await member.create_dm()
 
+    # Check for the user's presence in the database (in case of a leave-rejoin)
     if bot.db.get_student_id(member.id) is None:
         await member.dm_channel.send(f'Hi! I don\'t recognize you! Can you send me your Pitt ID? It looks like `abc123`.')
 
         def check(m):
             return m.channel == member.dm_channel and m.author == member
 
+        # Matches three alphabetic characters followed at least one numeric digit
         pitt_id_regex = re.compile('[a-z]{3}\d+')
+
         while True:
             msg = await bot.wait_for('message', check=check)
             pittid = pitt_id_regex.fullmatch(msg.content.lower())
@@ -117,13 +156,11 @@ async def on_member_join(member: discord.Member):
 @app_commands.default_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
     """Look up a user's Pitt ID. Currently only responds with Discord ID."""
-
     student_id = bot.db.get_student_id(user.id)
     if student_id is None:
         await interaction.response.send_message(f"No pitt id available!", ephemeral=True)
     else:
         await interaction.response.send_message(f"{student_id}", ephemeral=True)
-
 
 @identify.error
 async def identify_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
@@ -171,6 +208,7 @@ async def sync(interaction: discord.Interaction):
 
 @bot.command()
 async def serverjson(interaction: discord.Interaction):
+    """Development command, so I can see what json I'm making"""
     print(bot.generate_server_json(interaction.guild.id))
 
 
