@@ -111,7 +111,7 @@ class Database:
 
         self.conn.commit()
 
-    """Return an iterable of the role ids associated with a given guild id"""
+    """Return a list of tuples of the role ids associated with a given guild id"""
     def get_server_recitation_roles(self, guild_id):
         cursor = self.conn.cursor()
 
@@ -144,7 +144,7 @@ class Database:
                                        WHERE server_id = (?)""", (guild_id,)).fetchall()
         return course_roles
 
-    """return an iterable of the category ids associated with a guild"""
+    """return a list of the category ids associated with a guild"""
     def get_semester_category_channels(self, guild_id):
         cursor = self.conn.cursor()
 
@@ -197,11 +197,13 @@ class Database:
 
         return course_roles
 
-    """Return an iterable of the canvas IDs of courses associated with a given guild"""
+    """Return a list of tuples of the canvas IDs of courses associated with a given guild"""
     def get_semester_courses(self, guild_id):
         cursor = self.conn.cursor()
 
-        canvas_course_id_list = cursor.execute("SELECT course_canvas_id FROM course WHERE server_id = (?)", (guild_id,))
+        canvas_course_id_list = cursor.execute("SELECT course_canvas_id FROM course WHERE server_id = (?)", (guild_id,)).fetchall()
+
+        return canvas_course_id_list
 
     """Remove a row from the users table"""
     def remove_student_association(self, discord_user_id):
