@@ -45,12 +45,12 @@
         let classes = [
             {
                 name: "447",
-                canvasId: "123",
+                canvasID: "123",
                 recitations: ["10a", "12p"]
             },
             {
                 name: "449",
-                canvasId: "456",
+                canvasID: "456",
                 recitations: ["11a", "1p"]
             }
         ]
@@ -175,7 +175,7 @@
             if(!new_course || is_event(new_course)) {
                 new_course = {
                     name: "new course",
-                    canvasId: "0",
+                    canvasID: "0",
                     recitations: []
                 }
             }
@@ -183,7 +183,7 @@
             // create the new element and set ts data according to what was passed in
             const new_course_elem = document.createElement('option')
             new_course_elem.innerText = new_course.name
-            new_course_elem.dataset.canvasID = new_course.canvasId
+            new_course_elem.dataset.canvasID = new_course.canvasID
             new_course_elem.dataset.recitations = JSON.stringify(new_course.recitations)
 
             // add it to the UI and selected it (nice UI feature when you click the button)
@@ -392,6 +392,20 @@
                 })
         }
 
+        function send_semester_cleanup() {
+            const fetch_options = {
+                method: "DELETE"
+            }
+            fetch("/cleanup", fetch_options)
+                .then((response) => {
+                    return response.json()
+                })
+                .then((response) => {
+                    // TODO: Do something with this?
+                    console.log(response)
+                })
+        }
+
         function fill_out_server_panel(config) {
             let server_elem = document.getElementById('server')
             for(let entry of config) {
@@ -451,6 +465,7 @@
             rec_time_elem.addEventListener('change', update_course)
 
             document.getElementById('semCommitBtn').addEventListener('click', send_config)
+            document.getElementById('semCleanupBtn').addEventListener('click', send_semester_cleanup)
 
             get_current_json()
         }
@@ -528,7 +543,7 @@
                 <button type="button" id="semCommitBtn">Commit Semester Options</button>
             </div>
             <div class="inner">
-                <button class="warning" type="button">Semester Cleanup</button><br />
+                <button class="warning" type="button" id="semCleanupBtn">Semester Cleanup</button><br />
                 <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
             </div>
         </div>
