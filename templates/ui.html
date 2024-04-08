@@ -4,21 +4,9 @@
     <meta charset="UTF-8">
     <title>Example UI</title>
     <style>
-        :root {
-            --blurple: #7770cc;
-            --blurpleDark1: #5d579d;
-            --blurpleDark2: #454074;
-
-            --orange: #f4511e;
-            --orangeDark1: #d24419;
-            --orangeDark2: #b43a14;
-
-            --darkBackground: #2a2f37;
-        }
         div {
-            border-radius: 25px;
             margin: 1px;
-            padding: 10px;
+            padding: 4px;
         }
         .container {
             display: flex;
@@ -58,117 +46,6 @@
         }
         .warning {
             background-color: red;
-        }
-        body {
-            /* 383a40
-            e5c040
-            efe07f
-            #efe07f
-            dark_background = #2a2f37; */
-            background-color: var(--darkBackground);
-        }
-        .buttonCleanup {
-            display: inline-block;
-            border-radius: 4px;
-            background-color: var(--orange);
-            border: none;
-            color: #FFFFFF;
-            text-align: center;
-            font-size: 13px;
-            padding: 3px;
-            width: 150px;
-            transition: all 0.5s;
-            cursor: pointer;
-            margin: 5px;
-            /*border-radius: 15px;*/
-            box-shadow: 0 5px #999;
-        }
-
-        .buttonCleanup span {
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            transition: 0.5s;
-        }
-
-        .buttonCleanup span:after {
-            content: '\0021';
-            position: static;
-            opacity: 0;
-            top: 0;
-            right: -4px;
-            transition: 0.5s;
-        }
-
-        .buttonCleanup:hover span {
-            padding-right: 25px;
-        }
-
-        .buttonCleanup:hover span:after {
-            opacity: 1;
-            right: 0;
-        }
-
-        .buttonCleanup:hover {
-            background-color: var(--orangeDark1);
-        }
-
-        .buttonCleanup:active {
-            background-color: var(--orangeDark2);
-            box-shadow: 0 2px #666;
-            transform: translateY(4px);
-        }
-
-        .buttonCommit {
-            background-color: var(--blurple);
-            display: inline-block;
-            border-radius: 4px;
-            border: none;
-            color: #FFFFFF;
-            text-align: center;
-            font-size: 13px;
-            padding: 3px;
-            width: 150px;
-            transition: all 0.5s;
-            cursor: pointer;
-            margin: 5px;
-            /*border-radius: 15px;*/
-            box-shadow: 0 5px #999;
-        }
-
-        .buttonCommit span {
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            transition: 0.5s;
-        }
-
-        .buttonCommit span:after {
-            content: '\0021';
-            position: static;
-            opacity: 0;
-            top: 0;
-            right: -4px;
-            transition: 0.5s;
-        }
-
-        .buttonCommit:hover span {
-            padding-right: 25px;
-        }
-
-        .buttonCommit:hover span:after {
-            opacity: 1;
-            right: 0;
-        }
-
-        .buttonCommit:hover {
-            background-color: var(--blurpleDark1);
-        }
-
-        .buttonCommit:active {
-            background-color: var(--blurpleDark2);
-            box-shadow: 0 2px #666;
-            transform: translateY(4px);
         }
     </style>
     <script>
@@ -675,10 +552,10 @@
             </div>
             <div class="general">
                 <button type="button" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
-                <button type="button" class="buttonCommit" id="semCommitBtn">Commit Semester Options</button>
+                <button type="button" id="semCommitBtn">Commit Semester Options</button>
             </div>
             <div class="general">
-                <button class="buttonCleanup" type="button" id="semCleanupBtn"> <span>Semester Cleanup</span></button><br />
+                <button class="warning" type="button" id="semCleanupBtn">Semester Cleanup</button><br />
                 <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
             </div>
         </div>
