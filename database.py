@@ -66,7 +66,7 @@ class Database:
 
         admin_id = cursor.execute("SELECT admin_discord_id FROM server WHERE server_id = (?)", (server_discord_id,)).fetchone()
     
-        pitt_id = cursor.execute("SELECT pitt_id FROM user JOIN server ON user.user_discord_id = server.admin_discord_id WHERE user.user_discord_id = (?)", (admin_id)).fetchone()
+        pitt_id = cursor.execute("SELECT pitt_id FROM user JOIN server ON user.user_discord_id = server.admin_discord_id WHERE user.user_discord_id = (?)", (admin_id[0],)).fetchone()
         
         return pitt_id
 
@@ -220,8 +220,8 @@ class Database:
         role_id = cursor.execute("""SELECT recitation.associated_role_id
                        FROM recitation
                        JOIN course on recitation.course_canvas_id = course.course_canvas_id
-                       WHERE course.recitation_react_message = (?)
-                       AND recitation.reaction_id = (?)""", (message_id, reaction)).fetchone()
+                       WHERE course.recitation_react_message_id = (?)
+                       AND recitation.reaction_id = (?)""", (message_id, reaction,)).fetchone()
         return role_id
 
     # Add a message's ID and the time it was sent

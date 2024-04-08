@@ -41,7 +41,6 @@ class TestDatabase(unittest.TestCase):
         self.db.add_semester_course(3445, "CS 447", 678, 876, 453, 545, 135)
         self.db.add_course_recitation(3445, "12:30", ":smiley_face:", 65)
         self.assertListEqual(self.db.get_server_recitation_roles(135), [(65,)])
-
     
     def tearDown(self):
         cursor = self.db.conn.cursor()
