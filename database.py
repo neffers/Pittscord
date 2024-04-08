@@ -91,7 +91,7 @@ class Database:
     def get_server_student_roles(self, guild_id):
         cursor = self.conn.cursor()
 
-        student_ta_roles = cursor.execute("SELECT previous_user_role_id, previous_ta_role_id FROM server WHERE server_id = (?)", (guild_id,)).fetchall()
+        student_ta_roles = cursor.execute("SELECT previous_user_role_id, previous_ta_role_id FROM server WHERE server_id = (?)", (guild_id,)).fetchone()
 
         return student_ta_roles
 
@@ -120,8 +120,10 @@ class Database:
                        JOIN course ON recitation.course_canvas_id = course.course_canvas_id
                        JOIN server ON course.server_id = server.server_id
                        WHERE server.server_id = (?)""", (guild_id,)).fetchall()
+        
+        recitation_list = [i[0] for i in recitation_roles]
 
-        return recitation_roles
+        return recitation_list
 
     """Remove the recitations associated with a given guild id from the database"""
     def remove_semester_recitations(self, guild_id):
@@ -152,7 +154,9 @@ class Database:
                                            FROM course
                                            JOIN server ON server.server_id = course.server_id
                                            WHERE server.server_id = (?)""", (guild_id,)).fetchall()
-        return category_channels
+        category_list = [i[0] for i in category_channels]
+
+        return category_list
 
     """Remove the courses associated with a given guild from the database"""
     def remove_semester_courses(self, guild_id):
