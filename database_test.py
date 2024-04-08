@@ -6,52 +6,43 @@ class TestDatabase(unittest.TestCase):
         self.db = Database(":memory:")
         self.db.init_db()
 
-    def test_add_user(self):
+    def test__user(self):
         self.setUp()
-        self.db.add_user("abc123", 123456789123456789)
-        self.assertTupleEqual(self.db.get_user_id(123456789123456789), ("abc123",))
+        self.db.add_student("abc123", 123456789123456789)
+        self.assertTupleEqual(self.db.get_student_id(123456789123456789), ("abc123",))
+        self.db.remove_student_association(123456789123456789)
+        self.assertIsNone(self.db.get_student_id(123456789123456789))
 
-    def test_remove_user(self):
+    def test_server(self):
         self.setUp()
-        self.db.add_user("abc123", 123456789123456789)
-        self.db.remove_user(123456789123456789)
-        self.assertIsNone(self.db.get_user_id(123456789123456789))
+        self.db.add_student("abc123", 123)
+        self.db.add_server(123, 135, 235, 456)
+        self.assertTupleEqual(self.db.get_server_admin(135), ("abc123",))
+        self.assertTupleEqual(self.db.get_admin_server("abc123"), (135,))
+        self.assertListEqual(self.db.get_server_student_roles(135), [(235, 456)])
 
-    def test_add_admin(self):
+    def test_course(self):
         self.setUp()
-        self.db.add_user("abc123", 123456789123456789)
-        self.db.add_admin("Probably Luis", 1204258474878941330, 123456789123456789, 1204258798656752448, 1204258798645352448)
-        self.assertTupleEqual(self.db.get_admin()[0], ("Probably Luis", 1204258474878941330, 123456789123456789, 1204258798656752448, 1204258798645352448, 1))        
+        self.db.add_student("abc123", 123)
+        self.db.add_server(123, 135, 235, 456)
+        self.db.add_semester_course(3445, "CS 447", 678, 876, 453, 545, 135)
+        self.assertTupleEqual(self.db.get_class_roles(3445), (678, 876))
+        self.assertTupleEqual(self.db.get_class_name(3445), ("CS 447",))
+        self.assertListEqual(self.db.get_semester_category_channels(135), [(453,)])
+        self.db.remove_semester_courses(135)
+        self.assertIsNone(self.db.get_class_roles(3445))
+        self.assertIsNone(self.db.get_class_name(3445))
+        self.assertListEqual(self.db.get_semester_category_channels(135), [])
     
-    def test_remove_admin(self):
+    def test_recitation(self):
         self.setUp()
-        self.db.add_user("abc123", 123456789123456789)
-        self.db.add_admin("Probably Luis", 1204258474878941330, 123456789123456789, 1204258798656752448, 1204258798645352448)
-        self.db.remove_admin(123456789123456789)
-        self.assertEqual(self.db.get_admin(), [])
+        self.db.add_student("abc123", 123)
+        self.db.add_server(123, 135, 235, 456)
+        self.db.add_semester_course(3445, "CS 447", 678, 876, 453, 545, 135)
+        self.db.add_course_recitation(3445, "12:30", ":smiley_face:", 65)
+        self.assertListEqual(self.db.get_server_recitation_roles(135), [(65,)])
 
-    def test_add_semester_course(self):
-        self.setUp()
-        self.db.add_user("abc123", 123456789123456789)
-        self.db.add_admin("Probably Luis", 1204258474878941330, 123456789123456789, 1204258798656752448, 1204258798645352448)
-        self.db.add_semester_course(447, 123456, "CS 447", 1204258476678902864, 1204258798656752448, 1204258798656752448, 1204258798656752448, 1)
-        self.assertTupleEqual(self.db.get_semester_courses(123456)[0], (447, 123456, "CS 447", 1204258476678902864, 1204258798656752448, 1204258798656752448, 1204258798656752448, 1, 1))
-        
-    def test_add_course_recitation(self):
-        self.setUp()
-        self.db.add_user("abc123", 123456789123456789)
-        self.db.add_admin("Probably Luis", 1204258474878941330, 123456789123456789, 1204258798656752448, 1204258798645352448)
-        self.db.add_semester_course(447, 123456, "CS 447", 1204258476678902864, 1204258798656752448, 1204258798656752448, 1204258798656752448, 1)
-        self.db.add_course_recitation(123654, 1, "Recitation Time", ":thumbs_up:", 1204258798656752448)
-        self.assertTupleEqual(self.db.get_course_recitations(123456)[0], (123654, 1, "Recitation Time", ":thumbs_up:", 1204258798656752448, 1))
-
-    def test_add_message(self):
-        self.setUp()
-        self.db.add_user("abc123", 123456789123456789)
-        self.db.add_admin("Probably Luis", 1204258474878941330, 123456789123456789, 1204258798656752448, 1204258798645352448)
-        self.db.add_message(1225464967729371000, 1)
-        self.assertTupleEqual(self.db.get_messages()[0], (1225464967729371000, 1, 1))
-
+    
     def tearDown(self):
         cursor = self.db.conn.cursor()
         self.db.close()
