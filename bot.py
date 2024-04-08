@@ -169,7 +169,7 @@ class PittscordBot(commands.Bot):
                     await class_react_message.add_reaction(reaction)
 
             self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id,
-                                        class_react_message)
+                                        class_react_message, guild.id)
             if recs:
                 for (rec, reaction, role) in recs:
                     self.db.add_course_recitation(class_canvas_id, rec, reaction, role)
