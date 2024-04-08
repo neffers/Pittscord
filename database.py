@@ -171,7 +171,7 @@ class Database:
 
         pittid = cursor.execute("SELECT pitt_id FROM user WHERE user_discord_id = (?)", (discord_user_id,)).fetchone()
 
-        return {pittid}
+        return pittid[0] if pittid else pittid
     
     """Add an entry to the users table"""
     def add_student(self, pittid, discord_user_id):
@@ -187,7 +187,7 @@ class Database:
 
         course_name = cursor.execute("SELECT course_name FROM course WHERE course_canvas_id = (?)", (class_canvas_id,)).fetchone()
 
-        return course_name
+        return course_name[0] if course_name else course_name
 
     """Return a tuple of (student_role_id, ta_role_id) associated with a given class"""
     def get_class_roles(self, class_canvas_id):
