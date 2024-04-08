@@ -68,13 +68,13 @@ class Database:
     
         pitt_id = cursor.execute("SELECT pitt_id FROM user JOIN server ON user.user_discord_id = server.admin_discord_id WHERE user.user_discord_id = (?)", (admin_id[0],)).fetchone()
         
-        return pitt_id
+        return pitt_id[0]
 
     """Add a server to our database associated with a given userid, including the role IDs we care about"""
     def add_server(self, admin_discord_user_id, server_discord_id, previous_student_role_id, previous_ta_role_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO server (server_id, admin_discord_id, previous_user_role_id, previous_ta_role_id) VALUES (?, ?, ?, ?)", (server_discord_id, admin_discord_user_id, previous_student_role_id, previous_ta_role_id))
+        cursor.execute("INSERT INTO server (server_id, admin_discord_id, previous_user_role_id, previous_ta_role_id) VALUES (?, ?, ?, ?)", (server_discord_id, admin_discord_user_id, previous_student_role_id, previous_ta_role_id,))
         
         self.conn.commit()
 
@@ -83,15 +83,15 @@ class Database:
         cursor = self.conn.cursor()
         admin_id = cursor.execute("SELECT user_discord_id from user WHERE pitt_id = (?)", (pitt_id,)).fetchone()
 
-        server_id = cursor.execute("SELECT server_id FROM server WHERE admin_discord_id = (?)", (admin_id)).fetchone()
+        server_id = cursor.execute("SELECT server_id FROM server WHERE admin_discord_id = (?)", (admin_id[0],)).fetchone()
 
-        return server_id
+        return server_id[0]
 
     """Return a tuple of (previous_student_role_id, previous_ta_role_id) associated with a guild"""
     def get_server_student_roles(self, guild_id):
         cursor = self.conn.cursor()
 
-        student_ta_roles = cursor.execute("SELECT previous_user_role_id, previous_ta_role_id FROM server WHERE server_id = (?)", (guild_id,)).fetchall()
+        student_ta_roles = cursor.execute("SELECT previous_user_role_id, previous_ta_role_id FROM server WHERE server_id = (?)", (guild_id,)).fetchone()
 
         return student_ta_roles
 
@@ -99,7 +99,7 @@ class Database:
     def add_semester_course(self, class_canvas_id, class_name, student_role_id, ta_role_id, category_channel_id, class_react_message, server_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO course (course_canvas_id, course_name, category_channel_id, recitation_react_message_id, user_role_id, ta_role_id, server_id) VALUES (?, ?, ?, ?, ?, ?, ?)", (class_canvas_id, class_name, category_channel_id, class_react_message, student_role_id, ta_role_id, server_id))
+        cursor.execute("INSERT INTO course (course_canvas_id, course_name, category_channel_id, recitation_react_message_id, user_role_id, ta_role_id, server_id) VALUES (?, ?, ?, ?, ?, ?, ?)", (class_canvas_id, class_name, category_channel_id, class_react_message, student_role_id, ta_role_id, server_id,))
         
         self.conn.commit()
 
@@ -107,7 +107,7 @@ class Database:
     def add_course_recitation(self, class_canvas_id, recitation_name, reaction, role_id):
         cursor = self.conn.cursor() 
 
-        cursor.execute("INSERT INTO recitation (course_canvas_id, recitation_name, reaction_id, associated_role_id) VALUES (?, ?, ?, ?)", (class_canvas_id, recitation_name, reaction, role_id))
+        cursor.execute("INSERT INTO recitation (course_canvas_id, recitation_name, reaction_id, associated_role_id) VALUES (?, ?, ?, ?)", (class_canvas_id, recitation_name, reaction, role_id,))
 
         self.conn.commit()
 
@@ -120,8 +120,10 @@ class Database:
                        JOIN course ON recitation.course_canvas_id = course.course_canvas_id
                        JOIN server ON course.server_id = server.server_id
                        WHERE server.server_id = (?)""", (guild_id,)).fetchall()
+        
+        recitation_list = [i[0] for i in recitation_roles]
 
-        return recitation_roles
+        return recitation_list
 
     """Remove the recitations associated with a given guild id from the database"""
     def remove_semester_recitations(self, guild_id):
@@ -152,7 +154,9 @@ class Database:
                                            FROM course
                                            JOIN server ON server.server_id = course.server_id
                                            WHERE server.server_id = (?)""", (guild_id,)).fetchall()
-        return category_channels
+        category_list = [i[0] for i in category_channels]
+
+        return category_list
 
     """Remove the courses associated with a given guild from the database"""
     def remove_semester_courses(self, guild_id):
@@ -171,13 +175,13 @@ class Database:
 
         pittid = cursor.execute("SELECT pitt_id FROM user WHERE user_discord_id = (?)", (discord_user_id,)).fetchone()
 
-        return pittid
+        return pittid[0] if pittid else pittid
     
     """Add an entry to the users table"""
     def add_student(self, pittid, discord_user_id):
         cursor = self.conn.cursor()
 
-        cursor.execute("INSERT INTO user (pitt_id, user_discord_id) VALUES (?,?)", (pittid, discord_user_id))
+        cursor.execute("INSERT INTO user (pitt_id, user_discord_id) VALUES (?,?)", (pittid, discord_user_id,))
 
         self.conn.commit()
 
@@ -186,8 +190,8 @@ class Database:
         cursor = self.conn.cursor()
 
         course_name = cursor.execute("SELECT course_name FROM course WHERE course_canvas_id = (?)", (class_canvas_id,)).fetchone()
-        
-        return course_name
+
+        return course_name[0] if course_name else course_name
 
     """Return a tuple of (student_role_id, ta_role_id) associated with a given class"""
     def get_class_roles(self, class_canvas_id):
@@ -221,7 +225,7 @@ class Database:
                        FROM recitation
                        JOIN course on recitation.course_canvas_id = course.course_canvas_id
                        WHERE course.recitation_react_message_id = (?)
-                       AND recitation.reaction_id = (?)""", (message_id, reaction,)).fetchone()
+                       AND recitation.reaction_id = (?)""", (message_id, reaction,)).fetchone()[0]
         return role_id
 
     # Add a message's ID and the time it was sent
