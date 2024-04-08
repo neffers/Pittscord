@@ -20,10 +20,6 @@
 
             --white: #FFFFFF;
             --green: #91c5a7;
-
-            --blue: #1b44a6;
-            --blueDark1: #14337b;
-            --blueDark2: #0d2252; 
         }
         div {
             border-radius: 25px;
@@ -141,7 +137,7 @@
             display: inline-block;
             border-radius: 4px;
             border: none;
-            color: var(--white);
+            color: #FFFFFF;
             text-align: center;
             font-size: 13px;
             padding: 3px;
@@ -184,110 +180,6 @@
 
         .buttonCommit:active {
             background-color: var(--blurpleDark2);
-            box-shadow: 0 2px #666;
-            transform: translateY(4px);
-        }
-    
-        .buttonAdd {
-            background-color: var(--blue);
-            display: inline-block;
-            border-radius: 4px;
-            border: none;
-            color: #FFFFFF;
-            text-align: center;
-            font-size: 13px;
-            padding: 3px;
-            width: 150px;
-            transition: all 0.5s;
-            cursor: pointer;
-            margin: 5px;
-            /*border-radius: 15px;*/
-            box-shadow: 0 5px #999;
-        }
-
-        .buttonAdd span {
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            transition: 0.5s;
-        }
-
-        .buttonAdd span:after {
-            content: '\0021';
-            position: static;
-            opacity: 0;
-            top: 0;
-            right: -4px;
-            transition: 0.5s;
-        }
-
-        .buttonAdd:hover span {
-            padding-right: 25px;
-        }
-
-        .buttonAdd:hover span:after {
-            opacity: 1;
-            right: 0;
-        }
-
-        .buttonAdd:hover {
-            background-color: var(--blueDark1);
-        }
-
-        .buttonAdd:active {
-            background-color: var(--blueDark2);
-            box-shadow: 0 2px #666;
-            transform: translateY(4px);
-        }
-
-        .buttonRemove {
-            background-color: var(--orange);
-            display: inline-block;
-            border-radius: 4px;
-            border: none;
-            color: #FFFFFF;
-            text-align: center;
-            font-size: 13px;
-            padding: 3px;
-            width: 150px;
-            transition: all 0.5s;
-            cursor: pointer;
-            margin: 5px;
-            /*border-radius: 15px;*/
-            box-shadow: 0 5px #999;
-        }
-
-        .buttonRemove span {
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            transition: 0.5s;
-        }
-
-        .buttonRemove span:after {
-            content: '\0021';
-            position: static;
-            opacity: 0;
-            top: 0;
-            right: -4px;
-            transition: 0.5s;
-        }
-
-        .buttonRemove:hover span {
-            padding-right: 25px;
-        }
-
-        .buttonRemove:hover span:after {
-            opacity: 1;
-            right: 0;
-        }
-
-        .buttonRemove:hover {
-            background-color: var(--orangeDark1);
-        }
-
-        .buttonRemove:active {
-            background-color: var(--orangeDark2);
             box-shadow: 0 2px #666;
             transform: translateY(4px);
         }
@@ -740,7 +632,7 @@
                         <small>(Categories will be inserted at the bottom of the current hierarchy)</small></label><br />
                     <select id="classTemplate" size="10">
                     </select> <br />
-                    <button type="button" class="buttonAdd" id="addChanBtn">Add Channel</button>
+                    <button type="button" id="addChanBtn">Add Channel</button>
                 </div>
                 <div class="inner">
                     <form id="templateConfig">
@@ -762,7 +654,7 @@
                         <input type="checkbox" id="studentOnly" name="studentOnly">
                         <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
                     </form>
-                    <button type="button" class="buttonRemove" background-color="orange" id="rmChanBtn">Remove channel</button>
+                    <button type="button" id="rmChanBtn">Remove channel</button>
                 </div>
             </div>
         </div>
@@ -773,7 +665,7 @@
                     <label for="classes">Semester Classes</label><br />
                     <select id="classes" name="classes" size="5">
                     </select><br />
-                    <button type="button" class="buttonAdd" id="addClassBtn">Add Course</button>
+                    <button type="button" id="addClassBtn">Add Course</button>
                 </div>
                 <form id="classConfig" class="container">
                     <div class="inner">
@@ -781,21 +673,21 @@
                         <input type="text" id="className"><br />
                         <label for="classCanvasID">Canvas ID</label><br />
                         <input type="text" id="classCanvasID"><br />
-                        <button type="button" class="buttonRemove" id="removeClassBtn">Remove Course</button>
+                        <button type="button" id="removeClassBtn">Remove Course</button>
                     </div>
                     <div class="inner">
                         <label for="recitations">Class Recitation Sections</label><br />
                         <select id="recitations" name="recitations" size="5">
                         </select><br />
-                        <button type="button" class="buttonAdd" id="addRecBtn">Add Recitation Section</button>
-                        <button type="button" class="buttonRemove" id="rmRecBtn">Remove Recitation</button><br />
+                        <button type="button" id="addRecBtn">Add Recitation Section</button>
+                        <button type="button" id="rmRecBtn">Remove Recitation</button><br />
                         <label for="recitationTime">Recitation Time</label>
                         <input type="text" id="recitationTime"><br />
                     </div>
                 </form>
             </div>
             <div class="general">
-                <button type="button" class="buttonAdd" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
+                <button type="button" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
                 <button type="button" class="buttonCommit" id="semCommitBtn">Commit Semester Options</button>
             </div>
             <div class="general">
