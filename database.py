@@ -136,14 +136,14 @@ class Database:
         
         self.conn.commit()
 
-    # TODO: Is this not the same as get_server_student_roles?
-    """Return a tuple of (previous_student_role_id, previous_ta_role_id) associated with a given guild in the server"""
+    """Return a tuple of (class_student_role_id, class_ta_role_id) associated with a given guild in the server"""
     def get_semester_course_roles(self, guild_id):
         cursor = self.conn.cursor()
 
-        course_roles = cursor.execute("""SELECT previous_user_role_id, previous_ta_role_id
-                                       FROM server
-                                       WHERE server_id = (?)""", (guild_id,)).fetchall()
+        course_roles = cursor.execute("""SELECT user_role_id, ta_role_id
+                                       FROM course
+                                       JOIN server ON server.server_id = course.server_id
+                                       WHERE server.server_id = (?)""", (guild_id,)).fetchall()
         return course_roles
 
     """return a list of the category ids associated with a guild"""
@@ -201,13 +201,19 @@ class Database:
 
         return course_roles
 
-    """Return a list of tuples of the canvas IDs of courses associated with a given guild"""
+    """Return a list of the canvas IDs of courses associated with a given guild"""
     def get_semester_courses(self, guild_id):
         cursor = self.conn.cursor()
 
-        canvas_course_id_list = cursor.execute("SELECT course_canvas_id FROM course WHERE server_id = (?)", (guild_id,)).fetchall()
+        canvas_course_ids = cursor.execute("SELECT course_canvas_id FROM course WHERE server_id = (?)", (guild_id,)).fetchall()
 
-        return canvas_course_id_list
+        canvas_course_id_list = []
+
+        for x in canvas_course_ids:
+            for course_id in x:
+                canvas_course_id_list.append(course_id)
+
+        return list(canvas_course_id_list)
 
     """Remove a row from the users table"""
     def remove_student_association(self, discord_user_id):
