@@ -13,6 +13,10 @@
             --orangeDark1: #d24419;
             --orangeDark2: #b43a14;
 
+            --yellow: #eab73e;
+            --yellowDark1: #bc9334;
+            --yellowDark2: #826522;
+
             --nodeBackground: #383a40;
             --lighterNodeBackground: #555860;
 
@@ -48,6 +52,7 @@
         }
         .inner {
             background-color: var(--green);
+            padding: 15px;
         }
         .general {
             /*background-color: lemonchiffon;*/
@@ -161,10 +166,12 @@
         }
 
         .buttonCommit span:after {
-            content: '\0021';
-            position: static;
+            content: '\00bb';
+            position: absolute;
+            text-align: center;
+            align-content: center-right;
             opacity: 0;
-            top: 0;
+            /*top: 0;*/
             right: -4px;
             transition: 0.5s;
         }
@@ -241,7 +248,7 @@
         }
 
         .buttonRemove {
-            background-color: var(--orange);
+            background-color: var(--yellow);
             display: inline-block;
             border-radius: 4px;
             border: none;
@@ -283,11 +290,11 @@
         }
 
         .buttonRemove:hover {
-            background-color: var(--orangeDark1);
+            background-color: var(--yellowDark1);
         }
 
         .buttonRemove:active {
-            background-color: var(--orangeDark2);
+            background-color: var(--yellowDark2);
             box-shadow: 0 2px #666;
             transform: translateY(4px);
         }
@@ -799,7 +806,7 @@
             </div>
             <div class="general">
                 <button type="button" class="buttonAdd" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
-                <button type="button" class="buttonCommit" id="semCommitBtn">Commit Semester Options</button>
+                <button type="button" class="buttonCommit" id="semCommitBtn"><span>Commit Semester Options</span></button>
             </div>
             <div class="general">
                 <button class="buttonCleanup" type="button" id="semCleanupBtn"> <span>Semester Cleanup</span></button><br />
