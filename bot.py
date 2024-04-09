@@ -232,18 +232,28 @@ class PittscordBot(commands.Bot):
         # Delete channels saving logs
         print("Deleting channels...")
         for category_id in self.db.get_semester_category_channels(server_id):
-            category = guild.get_channel(category_id)
+            category = await guild.fetch_channel(category_id)
             print(f"Deleting channels in category {category_id}")
             for channel in category.channels:
-                print(f'Logging channel {channel.id}')
-                # TODO: This doesn't work for forumchannels
-                channel_messages = [
-                    {'message': message.content, 'author': message.author.id, 'time': message.created_at.timestamp()}
-                    async for message in channel.history()]
                 logfile_name = ('logs/' + datetime.datetime.now().strftime('%Y-%M-%d-') + category.name + '-' +
                                 channel.name + '-log.json')
-                print(f'logging to {logfile_name}')
+                print(f'Logging channel {channel.id} to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
+                    if channel.type == discord.ChannelType.forum:
+                        channel_messages = []
+                        visible_threads = channel.threads
+                        archived_threads = [thread async for thread in channel.archived_threads()]
+                        for thread in visible_threads + archived_threads:
+                            thread_messages = [{'message': message.content, 'author': message.author.id,
+                                                'time': message.created_at.timestamp()} async for message in
+                                               thread.history()]
+                            channel_messages.append({'author': thread.owner_id, 'time': thread.created_at.timestamp(),
+                                                     'message': thread.starter_message.content,
+                                                     'replies': thread_messages, 'name': thread.name})
+                    else:
+                        channel_messages = [{'message': message.content, 'author': message.author.id,
+                                             'time': message.created_at.timestamp()} async for message in
+                                            channel.history()]
                     json.dump(channel_messages, logfile)
                 print(f'Deleting channel {channel.id}')
                 await channel.delete()
