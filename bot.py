@@ -241,25 +241,28 @@ class PittscordBot(commands.Bot):
                 os.makedirs(os.path.dirname(logfile_name), exist_ok=True)
                 print(f'Logging channel {channel.id} to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
-                    if channel.type == discord.ChannelType.forum:
-                        channel_messages = []
+                    channel_threads = []
+                    channel_messages = []
+                    if channel.type != discord.ChannelType.voice:
                         visible_threads = channel.threads
                         archived_threads = [thread async for thread in channel.archived_threads()]
                         for thread in visible_threads + archived_threads:
-                            thread_messages = [{'message': message.content, 'author': message.author.id,
-                                                'time': message.created_at.timestamp(),
-                                                'student': self.db.get_student_id(message.author.id)} async for message
-                                               in thread.history()]
-                            channel_messages.append({'author': thread.owner_id, 'time': thread.created_at.timestamp(),
-                                                     'message': thread.starter_message.content,
-                                                     'replies': thread_messages, 'name': thread.name,
-                                                     'student': self.db.get_student_id(thread.owner_id)})
-                    else:
+                            if thread.history():
+                                thread_messages = [{'message': message.content, 'author': message.author.id,
+                                                    'time': message.created_at.timestamp(),
+                                                    'student': self.db.get_student_id(message.author.id)} async for
+                                                   message in thread.history()]
+                            channel_threads.append({'author': thread.owner_id, 'time': thread.created_at.timestamp(),
+                                                    'message': thread.starter_message.content,
+                                                    'replies': thread_messages, 'name': thread.name,
+                                                    'student': self.db.get_student_id(thread.owner_id)})
+                    if channel.type != discord.ChannelType.forum:
                         channel_messages = [{'message': message.content, 'author': message.author.id,
                                              'time': message.created_at.timestamp(),
                                              'student': self.db.get_student_id(message.author.id)} async for message in
                                             channel.history()]
-                    json.dump(channel_messages, logfile)
+                    channel_log = {'messages': channel_messages, 'threads': channel_threads}
+                    json.dump(channel_log, logfile)
                 print(f'Deleting channel {channel.id}')
                 await channel.delete()
             print(f'Deleting category {category_id}')
