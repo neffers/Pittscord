@@ -6,6 +6,9 @@
 # Don't upload databases
 *.db
 
+# Don't upload logs
+*.json
+
 # ignore any files with secret in the name
 *secret*
 
