@@ -7,8 +7,7 @@ from discord import app_commands
 from discord.ext import commands
 
 import canvas
-# import database
-import pretend_database as database
+import database
 from config import db_filename, id_regex_string
 from secret import canvas_token
 
@@ -76,14 +75,18 @@ class PittscordBot(commands.Bot):
         await bot_testing_channel.send("Hello World!")
 
     async def process_semester_config(self, config_json: str):
-        print("processing semester config")
+        print('Processing semester config')
         config_dict = json.loads(config_json)
-        print(config_dict)
         server_id = self.db.get_admin_server(config_dict['admin'])
+        if server_id is None:
+            print("No server found! Did you run /configure_server?")
+            return 1
+        print(f'Admin identified: {config_dict["admin"]} of server {server_id}')
         guild = self.get_guild(server_id)
         (previous_student_role_id, _) = self.db.get_server_student_roles(server_id)
         previous_student_role = guild.get_role(previous_student_role_id)
         previous_student_perms = previous_student_role.permissions
+        print("Processing classes...")
         for semester_class in config_dict['classes']:
             # Extract data
             class_name = semester_class['name']
@@ -91,10 +94,9 @@ class PittscordBot(commands.Bot):
             class_recitations = semester_class['recitations']
 
             # Roles (for permission dicts)
+            print(f"Creating roles for {class_name}")
             ta_role = await guild.create_role(name=class_name + ' TA', hoist=True, permissions=previous_student_perms)
             student_role = await guild.create_role(name=class_name, hoist=True, permissions=previous_student_perms)
-            # don't use @everyone, use @student (need to get from database)
-            everyone = guild.default_role
 
             # Create category channel and a placeholder for the announcements channel
             category_overwrites = {
@@ -103,6 +105,7 @@ class PittscordBot(commands.Bot):
             class_category = await guild.create_category(class_name, overwrites=category_overwrites)
             class_announcements = None
 
+            print("Creating channels...")
             for channel_template in config_dict['template']:
                 # Extract data
                 channel_name = channel_template['channelName']
@@ -155,12 +158,13 @@ class PittscordBot(commands.Bot):
             class_react_message = None
             recs = None
             if class_recitations and class_announcements:
+                print('Configuring recitations...')
                 message = "React to sign up for the following recitation roles:"
                 recs = []
 
                 for (index, rec) in enumerate(class_recitations):
                     reaction = reactions[index]
-                    role = await guild.create_role(name=class_name+" "+rec, mentionable=True)
+                    role = await guild.create_role(name=class_name + " " + rec, mentionable=True)
                     message += f'\n\n{reaction}: {role.name}'
                     recs.append((rec, reaction, role.id))
 
@@ -169,25 +173,45 @@ class PittscordBot(commands.Bot):
                 for (_, reaction, _) in recs:
                     await class_react_message.add_reaction(reaction)
 
-            self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id,
-                                        class_react_message)
+            print(f'Adding {class_name} to database')
+            try:
+                self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id,
+                                            class_react_message.id, guild.id)
+            except Exception as e:
+                print('Database Error:')
+                print(e)
+                return 1
             if recs:
+                print('Adding recitations to database...')
                 for (rec, reaction, role) in recs:
-                    self.db.add_course_recitation(class_canvas_id, rec, reaction, role)
+                    try:
+                        self.db.add_course_recitation(class_canvas_id, rec, reaction, role)
+                    except Exception as e:
+                        print('Database Error:')
+                        print(e)
+                        return 1
 
         # If everything went alright
+        print("Done!")
         return 0
 
     async def semester_cleanup(self, server_id: int):
+        print("Cleaning up...")
         guild = self.get_guild(server_id)
 
         # Get recitation roles to remove them and then delete database entries
-        for role_id in self.db.get_server_recitation_roles(server_id):
-            role = guild.get_role(role_id)
-            await role.delete()
-        self.db.remove_semester_recitations(server_id)
+        print("Cleaning up recitation roles...")
+        try:
+            for role_id in self.db.get_server_recitation_roles(server_id):
+                role = guild.get_role(role_id)
+                await role.delete()
+            self.db.remove_semester_recitations(server_id)
+        except Exception as e:
+            print('Database Error:')
+            print(e)
 
         # Move students from old roles to new
+        print("Moving students from semester roles...")
         (previous_student_role_id, previous_ta_role_id) = self.db.get_server_student_roles(server_id)
         ta_role = guild.get_role(previous_ta_role_id)
         student_role = guild.get_role(previous_student_role_id)
@@ -197,22 +221,33 @@ class PittscordBot(commands.Bot):
             course_ta_role = guild.get_role(course_ta_role_id)
             role_transitions = {course_student_role: student_role, course_ta_role: ta_role}
             for (course_role, server_role) in role_transitions.items():
+                if course_role is None:
+                    print("Course role not found, did you try to cleanup before?")
+                    continue
                 for user in course_role.members:
                     await user.add_roles(server_role)
                 await course_role.delete()
 
         # Delete channels saving logs
+        print("Deleting channels...")
         for category_id in self.db.get_semester_category_channels(server_id):
             category = guild.get_channel(category_id)
+            print(f"Deleting channels in category {category_id}")
             for channel in category.channels:
-                channel_messages = [{'message': message.content, 'author': message.author.id, 'time': message.created_at}
-                                    async for message in channel.history()]
+                print(f'Logging channel {channel.id}')
+                channel_messages = [
+                    {'message': message.content, 'author': message.author.id, 'time': message.created_at.timestamp()}
+                    async for message in channel.history()]
                 logfile_name = 'logs/' + datetime.datetime.now().strftime('%Y-%M-%d-') + channel.name + '-log.json'
+                print(f'logging to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
-                    logfile.write(json.dumps(channel_messages))
+                    json.dump(channel_messages, logfile)
+                print(f'Deleting channel {channel.id}')
                 await channel.delete()
+            print(f'Deleting category {category_id}')
             await category.delete()
 
+        print("Removing courses from database...")
         self.db.remove_semester_courses(server_id)
 
         # If everything went alright
@@ -387,6 +422,15 @@ async def configure_server(interaction: discord.Interaction):
     prev_ta_role = await guild.create_role(name="Previous TA", permissions=student_perms, hoist=True)
 
     bot.db.add_server(interaction.user.id, interaction.guild.id, prev_student_role.id, prev_ta_role.id)
+    await interaction.response.send_message("Success!", ephemeral=True)
+
+
+@configure_server.error
+async def configure_server_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    """Runs when the configure function encounters some error."""
+    response = "Encountered some unknown error! Check the logs for more."
+    print(error)
+    await interaction.response.send_message(response, ephemeral=True)
 
 
 @bot.command()
