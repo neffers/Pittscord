@@ -236,6 +236,7 @@ class PittscordBot(commands.Bot):
             print(f"Deleting channels in category {category_id}")
             for channel in category.channels:
                 print(f'Logging channel {channel.id}')
+                # TODO: This doesn't work for forumchannels
                 channel_messages = [
                     {'message': message.content, 'author': message.author.id, 'time': message.created_at.timestamp()}
                     async for message in channel.history()]
