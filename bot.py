@@ -245,14 +245,17 @@ class PittscordBot(commands.Bot):
                         archived_threads = [thread async for thread in channel.archived_threads()]
                         for thread in visible_threads + archived_threads:
                             thread_messages = [{'message': message.content, 'author': message.author.id,
-                                                'time': message.created_at.timestamp()} async for message in
-                                               thread.history()]
+                                                'time': message.created_at.timestamp(),
+                                                'student': self.db.get_student_id(message.author.id)} async for message
+                                               in thread.history()]
                             channel_messages.append({'author': thread.owner_id, 'time': thread.created_at.timestamp(),
                                                      'message': thread.starter_message.content,
-                                                     'replies': thread_messages, 'name': thread.name})
+                                                     'replies': thread_messages, 'name': thread.name,
+                                                     'student': self.db.get_student_id(thread.owner_id)})
                     else:
                         channel_messages = [{'message': message.content, 'author': message.author.id,
-                                             'time': message.created_at.timestamp()} async for message in
+                                             'time': message.created_at.timestamp(),
+                                             'student': self.db.get_student_id(message.author.id)} async for message in
                                             channel.history()]
                     json.dump(channel_messages, logfile)
                 print(f'Deleting channel {channel.id}')
@@ -401,6 +404,10 @@ async def reregister(interaction: discord.Interaction, user: discord.User):
 async def configure_server(interaction: discord.Interaction):
     """Configure server for use with the bot. Will set most channels as not visible to non-verified users,
     create roles for verified students, previous students, and previous TAs. Expects community mode."""
+    # Add the bot to the users table if it hasn't been already
+    if bot.db.get_student_id(bot.user.id) is None:
+        bot.db.add_student('pittscord', bot.user.id)
+
     # Check for a previous entry and fail if this has already been done
     if bot.db.get_server_admin(interaction.guild.id):
         await interaction.response.send_message("Server is already configured", ephemeral=True)
