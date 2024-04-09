@@ -5,10 +5,11 @@ import json
 import re
 from discord import app_commands
 from discord.ext import commands
+import os
 
 import canvas
 import database
-from config import db_filename, id_regex_string
+from config import db_filename, id_regex_string, log_file_directory
 from secret import canvas_token
 
 reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
@@ -235,8 +236,9 @@ class PittscordBot(commands.Bot):
             category = await guild.fetch_channel(category_id)
             print(f"Deleting channels in category {category_id}")
             for channel in category.channels:
-                logfile_name = ('logs/' + datetime.datetime.now().strftime('%Y-%M-%d-') + category.name + '-' +
+                logfile_name = (log_file_directory + datetime.datetime.now().strftime('%Y-%m-%d-') + category.name + '-' +
                                 channel.name + '-log.json')
+                os.makedirs(os.path.dirname(logfile_name), exist_ok=True)
                 print(f'Logging channel {channel.id} to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
                     if channel.type == discord.ChannelType.forum:
