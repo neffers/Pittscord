@@ -42,6 +42,7 @@ class PittscordBot(commands.Bot):
                 cat = {
                     'name': category.name,
                     'type': 'category',
+                    'managed': category.id in self.db.get_semester_category_channels(server_id),
                     'channels': []
                 }
                 json_channels.append(cat)
@@ -238,7 +239,8 @@ class PittscordBot(commands.Bot):
                 channel_messages = [
                     {'message': message.content, 'author': message.author.id, 'time': message.created_at.timestamp()}
                     async for message in channel.history()]
-                logfile_name = 'logs/' + datetime.datetime.now().strftime('%Y-%M-%d-') + channel.name + '-log.json'
+                logfile_name = ('logs/' + datetime.datetime.now().strftime('%Y-%M-%d-') + category.name + '-' +
+                                channel.name + '-log.json')
                 print(f'logging to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
                     json.dump(channel_messages, logfile)

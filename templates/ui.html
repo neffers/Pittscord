@@ -420,6 +420,9 @@
                 if(entry.channels) {
                     const grp_elem = document.createElement('optgroup')
                     grp_elem.label = entry.name
+                    if(entry.managed) {
+                        grp_elem.classList.add('managed')
+                    }
                     for(let chan of entry.channels) {
                         const chan_elem = document.createElement('option')
                         chan_elem.innerText = chan.name
