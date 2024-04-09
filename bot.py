@@ -422,6 +422,15 @@ async def configure_server(interaction: discord.Interaction):
     prev_ta_role = await guild.create_role(name="Previous TA", permissions=student_perms, hoist=True)
 
     bot.db.add_server(interaction.user.id, interaction.guild.id, prev_student_role.id, prev_ta_role.id)
+    await interaction.response.send_message("Success!", ephemeral=True)
+
+
+@configure_server.error
+async def configure_server_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    """Runs when the configure function encounters some error."""
+    response = "Encountered some unknown error! Check the logs for more."
+    print(error)
+    await interaction.response.send_message(response, ephemeral=True)
 
 
 @bot.command()
