@@ -63,12 +63,16 @@ class Database:
     """get the pittid of the admin of a given server"""
     def get_server_admin(self, server_discord_id):
         cursor = self.conn.cursor()
+        cmd = """SELECT pitt_id from
+                 user JOIN server on user.user_discord_id = server.admin_discord_id
+                 where server_id = ?"""
+        args = (server_discord_id,)
+        out = cursor.execute(cmd, args).fetchone()
+        if out:
+            (pitt_id,) = out
+            return pitt_id
+        return None
 
-        admin_id = cursor.execute("SELECT admin_discord_id FROM server WHERE server_id = (?)", (server_discord_id,)).fetchone()
-    
-        pitt_id = cursor.execute("SELECT pitt_id FROM user JOIN server ON user.user_discord_id = server.admin_discord_id WHERE user.user_discord_id = (?)", (admin_id[0],)).fetchone()
-        
-        return pitt_id[0]
 
     """Add a server to our database associated with a given userid, including the role IDs we care about"""
     def add_server(self, admin_discord_user_id, server_discord_id, previous_student_role_id, previous_ta_role_id):
@@ -128,12 +132,14 @@ class Database:
     """Remove the recitations associated with a given guild id from the database"""
     def remove_semester_recitations(self, guild_id):
         cursor = self.conn.cursor()
-
-        cursor.execute("""DELETE associated_role_id FROM recitation
-                       JOIN course ON course.course_canvas_id = recitation.course_canvas_id
-                       JOIN server ON server.server_id = course.server_id
-                       WHERE server.server_id = (?)""", (guild_id,))
-        
+        cmd = """DELETE
+                 FROM recitation
+                 WHERE recitation.course_canvas_id IN (
+                    SELECT course.course_canvas_id
+                    FROM course
+                    WHERE server_id = ?)"""
+        ags = (guild_id,)
+        cursor.execute(cmd, ags)
         self.conn.commit()
 
     """Return a tuple of (class_student_role_id, class_ta_role_id) associated with a given guild in the server"""
