@@ -1,4 +1,4 @@
-from quart import Quart, render_template, session, request, redirect, url_for
+from quart import Quart, render_template, session, request, redirect, url_for, abort
 import grpc
 import json
 from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
@@ -41,14 +41,18 @@ async def recv_config():
             stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
             response = await stub.SendConfig(Pittscord_ipc_pb2.ConfigRequest(config=json.dumps(config)))
         return [response.code]
-    except grpc.aio.AioRpcError:
-        return 500
+    except grpc.aio.AioRpcError as e:
+        print(e)
+        return abort(500)
 
 
 @app.route("/get_server_json")
 async def get_json():
     ret = await get_json_from_server(session['admin'])
-    return json.loads(ret)
+    if ret:
+        return json.loads(ret)
+    else:
+        return abort(500)
 
 
 @app.route("/cleanup", methods=["DELETE"])
@@ -58,8 +62,9 @@ async def cleanup():
             stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
             response = await stub.Cleanup(Pittscord_ipc_pb2.CleanupRequest(admin_name=session['admin']))
         return [response.code]
-    except grpc.aio.AioRpcError:
-        return 500
+    except grpc.aio.AioRpcError as e:
+        print(e)
+        return abort(500)
 
 
 if __name__ == "__main__":

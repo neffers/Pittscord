@@ -3,7 +3,7 @@
 /__pycache__/
 *.pyc
 
-# Ignore database files
+# Don't upload databases
 *.db
 
 # ignore any files with secret in the name
