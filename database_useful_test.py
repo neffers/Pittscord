@@ -19,6 +19,7 @@ reaction = '1️⃣'
 recitation_role_id = 2329
 
 db.add_student(admin_name, admin_discord_id)
+db.get_server_admin(server_discord_id)
 db.add_server(admin_discord_id, server_discord_id, prev_stud_role_id, prev_ta_role_id)
 db.get_server_admin(server_discord_id)
 assert db.get_admin_server(admin_name) == server_discord_id
