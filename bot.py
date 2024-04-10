@@ -235,12 +235,12 @@ class PittscordBot(commands.Bot):
         print("Deleting channels...")
         for category_id in self.db.get_semester_category_channels(server_id):
             category = await guild.fetch_channel(category_id)
-            print(f"Deleting channels in category {category_id}")
+            print(f"Deleting channels in category {category.id} ({category.name})")
             for channel in category.channels:
                 logfile_name = (log_file_directory + datetime.datetime.now().strftime('%Y-%m-%d-') + category.name + '-' +
                                 channel.name + '-log.json')
                 os.makedirs(os.path.dirname(logfile_name), exist_ok=True)
-                print(f'Logging channel {channel.id} to {logfile_name}')
+                print(f'Logging channel {channel.id} ({category.name} - {channel.name}) to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
                     channel_threads = []
                     channel_messages = []
@@ -264,9 +264,9 @@ class PittscordBot(commands.Bot):
                                             channel.history()]
                     channel_log = {'messages': channel_messages, 'threads': channel_threads}
                     json.dump(channel_log, logfile)
-                print(f'Deleting channel {channel.id}')
+                print(f'Deleting channel {channel.id} ({category.name} - {channel.name})')
                 await channel.delete()
-            print(f'Deleting category {category_id}')
+            print(f'Deleting category {category_id} ({category.name})')
             await category.delete()
 
         print("Removing courses from database...")
@@ -321,7 +321,7 @@ async def on_member_join(member: discord.Member):
         def check(m):
             return m.channel == member.dm_channel and m.author == member
 
-        # Matches three alphabetic characters followed at least one numeric digit
+        # By default, matches three alphabetic characters followed at least one numeric digit
         pitt_id_regex = re.compile(id_regex_string)
 
         while True:
