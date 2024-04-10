@@ -14,6 +14,7 @@ from secret import canvas_token
 
 reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
+# TODO: We can probably change this
 intents = discord.Intents.all()
 
 # For Testing Purposes
@@ -342,22 +343,26 @@ async def on_member_join(member: discord.Member):
     class_ids_to_check = bot.db.get_semester_courses(member.guild.id)
     student_class_roles = bot.canvas.find_user_in_classes(student_id, class_ids_to_check)
 
-    for (class_id, role) in student_class_roles.items():
-        class_name = bot.db.get_class_name(class_id)
-        (student_role_id, ta_role_id) = bot.db.get_class_roles(class_id)
-        student_role = member.guild.get_role(student_role_id)
-        ta_role = member.guild.get_role(ta_role_id)
-        match role:
-            case canvas.EnrollmentType.Student:
-                await member.dm_channel.send(f"I found you in {class_name}!")
-                await member.add_roles(student_role)
-            case canvas.EnrollmentType.TA:
-                await member.dm_channel.send(f"I found as a TA in {class_name}!")
-                await member.add_roles(previous_student_role)
-                await member.add_roles(ta_role)
-
-    if len(member.roles) == 1:
-        await member.dm_channel.send("I didn't find you in any of the courses! Please let your professor know.")
+    if student_class_roles:
+        for (class_id, role) in student_class_roles.items():
+            class_name = bot.db.get_class_name(class_id)
+            (student_role_id, ta_role_id) = bot.db.get_class_roles(class_id)
+            student_role = member.guild.get_role(student_role_id)
+            ta_role = member.guild.get_role(ta_role_id)
+            match role:
+                case canvas.EnrollmentType.Student:
+                    await member.dm_channel.send(f"I found you in {class_name}!")
+                    await member.add_roles(student_role)
+                case canvas.EnrollmentType.TA:
+                    await member.dm_channel.send(f"I found you as a TA in {class_name}!")
+                    await member.add_roles(previous_student_role)
+                    await member.add_roles(ta_role)
+    else:
+        # We don't recognize the student?
+        # TODO: Ask Luis what we should do here
+        if len(member.roles) < 2:
+            # Student has no assigned roles (not assigned previous_student at migration)
+            await member.dm_channel.send("I don't recognize you! Please let your professor know.")
 
 
 @bot.tree.command()
