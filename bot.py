@@ -455,7 +455,11 @@ async def configure_server(interaction: discord.Interaction):
     prev_ta_role = await guild.create_role(name="Previous TA", permissions=student_perms, hoist=True)
 
     bot.db.add_server(interaction.user.id, interaction.guild.id, prev_student_role.id, prev_ta_role.id)
-    await interaction.response.send_message("Success!", ephemeral=True)
+    await interaction.response.send_message("Successfully configured server, I will now ask current users to register "
+                                            "with me!", ephemeral=True)
+    for member in guild.members:
+        await member.add_roles(prev_student_role)
+        await on_member_join(member)
 
 
 @configure_server.error
