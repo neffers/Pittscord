@@ -421,7 +421,9 @@ async def configure_server(interaction: discord.Interaction):
     guild = interaction.guild
 
     # Set minimal permissions for the default role
-    await guild.default_role.edit(permissions=discord.Permissions.none())
+    default_user_perms = discord.Permissions.none()
+    default_user_perms.read_message_history = True
+    await guild.default_role.edit(permissions=default_user_perms)
     await guild.rules_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
         view_channel=True, read_message_history=True)})
     await guild.rules_channel.send("Welcome to the server! In order to use most of the channels,you will need to reply "
