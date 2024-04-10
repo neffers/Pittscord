@@ -100,6 +100,8 @@ class PittscordBot(commands.Bot):
             print(f"Creating roles for {class_name}")
             ta_role = await guild.create_role(name=class_name + ' TA', hoist=True, permissions=previous_student_perms)
             student_role = await guild.create_role(name=class_name, hoist=True, permissions=previous_student_perms)
+            default_role = guild.default_role
+            pittscord_role = guild.me.top_role
 
             # Create category channel and a placeholder for the announcements channel
             category_overwrites = {
@@ -126,24 +128,26 @@ class PittscordBot(commands.Bot):
                         send_messages=not channel_ta_only
                     ),
                     previous_student_role: discord.PermissionOverwrite(
-                        read_messages=True if (not channel_student_only) else None
+                        read_messages=(not channel_student_only)
+                    ),
+                    default_role: discord.PermissionOverwrite(
+                        read_messages=False
+                    ),
+                    pittscord_role: discord.PermissionOverwrite(
+                        read_messages=True,
+                        send_messages=True
                     )
                 }
                 match channel_type:
                     case 'A':
-                        channel_overwrites = {
-                            ta_role: discord.PermissionOverwrite(
+                        channel_overwrites[ta_role] = discord.PermissionOverwrite(
                                 read_messages=True,
                                 send_messages=channel_ta_only
-                            ),
-                            student_role: discord.PermissionOverwrite(
+                            )
+                        channel_overwrites[student_role] = discord.PermissionOverwrite(
                                 read_messages=True,
                                 send_messages=False
-                            ),
-                            previous_student_role: discord.PermissionOverwrite(
-                                read_messages=True if (not channel_student_only) else None
                             )
-                        }
 
                         channel = await guild.create_text_channel(channel_name, news=True, category=class_category,
                                                                   overwrites=channel_overwrites)
