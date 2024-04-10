@@ -4,36 +4,85 @@
     <meta charset="UTF-8">
     <title>Example UI</title>
     <style>
+        :root {
+            --blurple: #7770cc;
+            --blurpleDark1: #5d579d;
+            --blurpleDark2: #454074;
+
+            --orange: #f4511e;
+            --orangeDark1: #d24419;
+            --orangeDark2: #b43a14;
+
+            --yellow: #eab73e;
+            --yellowDark1: #bc9334;
+            --yellowDark2: #826522;
+
+            --nodeBackground: #383a40;
+            --lighterNodeBackground: #555860;
+
+            --darkBackground: #2a2f37;
+
+            --white: #FFFFFF;
+            --green: #448661;
+            --darkerGreen: #396f50;
+
+            --redShade: #403838;
+            --lighterNodeBackgroundRedShade: #605555;
+
+            --blue: #1b44a6;
+            --blueDark1: #14337b;
+            --blueDark2: #0d2252; 
+        }
         div {
-            margin: 1px;
-            padding: 4px;
+            border-radius: 25px;
+            margin: 4px;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--white);
         }
         .container {
             display: flex;
         }
         .left {
-            background-color: antiquewhite;
-            border: 1px solid black;
+            background-color: var(--lighterNodeBackground);
+            border: 2px solid darkgray;
         }
         .right {
             margin-left: auto;
         }
-        .outer {
-        }
+        
         .middle {
         }
-        .inner {
-            background-color: navajowhite;
-            border: 2px solid black;
-        }
         .general {
-            background-color: lemonchiffon;
-            border: 2px solid gray;
+            /*background-color: lemonchiffon;*/
+            background-color: var(--nodeBackground);
+            border: 2px solid var(--lighterNodeBackground);
+            /*border: 2px solid gray;*/
         }
         .parent {
-            background-color: antiquewhite;
+            background-color: var(--lighterNodeBackground);
             border: 2px solid darkgray;
         }
+        .parent div {
+            border: 2px solid var(--blurpleDark2);
+            background-color: var(--nodeBackground);
+            padding: 15px;
+        }
+        .parent div:first-of-type {
+            /*background-color: cyan;
+            border: 2px solid var(--blurpleDark2);
+            background-color: var(--nodeBackground);
+            padding: 15px;*/
+        }
+        .parent form div {
+            border: 2px solid var(--darkerGreen);
+            background-color: var(--nodeBackground);
+        }
+        .parent form div:first-of-type {
+            border: 2px solid var(--green);
+            /*background-color: var(--nodeBackground);*/
+        }
+       
         .sink {
             align-self: flex-end;
         }
@@ -42,10 +91,234 @@
             min-width: 50%;
         }
         .managed {
-            background-color: wheat;
+            background-color: var(--orange);
         }
         .warning {
             background-color: red;
+        }
+        body {
+            /*background-color: #e5c040;*/
+            /*background-color: #efe07f;*/
+            
+            /* 383a40
+            e5c040
+            efe07f
+            #efe07f
+            dark_background = #2a2f37; */
+            background-color: var(--darkBackground);
+            
+        }
+        .channelConfig {
+            background-color: cyan;
+        }
+        .buttonCleanup {
+            display: inline-block;
+            border-radius: 4px;
+            background-color: var(--orange);
+            border: none;
+            color: var(--white);
+            text-align: center;
+            font-size: 13px;
+            padding: 3px;
+            width: 150px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+            /*border-radius: 15px;*/
+            box-shadow: 0 5px #999;
+        }
+
+        .buttonCleanup span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .buttonCleanup span:after {
+            content: '\0021';
+            position: static;
+            opacity: 0;
+            top: 0;
+            right: -4px;
+            transition: 0.5s;
+        }
+
+        .buttonCleanup:hover span {
+            padding-right: 25px;
+        }
+
+        .buttonCleanup:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+
+        .buttonCleanup:hover {
+            background-color: var(--orangeDark1);
+        }
+
+        .buttonCleanup:active {
+            background-color: var(--orangeDark2);
+            box-shadow: 0 2px #666;
+            transform: translateY(4px);
+        }
+
+        .buttonCommit {
+            background-color: var(--blurple);
+            display: inline-block;
+            border-radius: 4px;
+            border: none;
+            color: var(--white);
+            text-align: center;
+            font-size: 13px;
+            padding: 3px;
+            width: 150px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+            /*border-radius: 15px;*/
+            box-shadow: 0 5px #999;
+        }
+
+        .buttonCommit span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .buttonCommit span:after {
+            content: '\00bb';
+            position: absolute;
+            text-align: center;
+            align-content: center-right;
+            opacity: 0;
+            /*top: 0;*/
+            right: -4px;
+            transition: 0.5s;
+        }
+
+        .buttonCommit:hover span {
+            padding-right: 25px;
+        }
+
+        .buttonCommit:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+
+        .buttonCommit:hover {
+            background-color: var(--blurpleDark1);
+        }
+
+        .buttonCommit:active {
+            background-color: var(--blurpleDark2);
+            box-shadow: 0 2px #666;
+            transform: translateY(4px);
+        }
+    
+        .buttonAdd {
+            background-color: var(--blue);
+            display: inline-block;
+            border-radius: 4px;
+            border: none;
+            color: #FFFFFF;
+            text-align: center;
+            font-size: 13px;
+            padding: 3px;
+            width: 150px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+            /*border-radius: 15px;*/
+            box-shadow: 0 5px #999;
+        }
+
+        .buttonAdd span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .buttonAdd span:after {
+            content: '\0021';
+            position: static;
+            opacity: 0;
+            top: 0;
+            right: -4px;
+            transition: 0.5s;
+        }
+
+        .buttonAdd:hover span {
+            padding-right: 25px;
+        }
+
+        .buttonAdd:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+
+        .buttonAdd:hover {
+            background-color: var(--blueDark1);
+        }
+
+        .buttonAdd:active {
+            background-color: var(--blueDark2);
+            box-shadow: 0 2px #666;
+            transform: translateY(4px);
+        }
+
+        .buttonRemove {
+            background-color: var(--yellow);
+            display: inline-block;
+            border-radius: 4px;
+            border: none;
+            color: #FFFFFF;
+            text-align: center;
+            font-size: 13px;
+            padding: 3px;
+            width: 150px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+            /*border-radius: 15px;*/
+            box-shadow: 0 5px #999;
+        }
+
+        .buttonRemove span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .buttonRemove span:after {
+            content: '\0021';
+            position: static;
+            opacity: 0;
+            top: 0;
+            right: -4px;
+            transition: 0.5s;
+        }
+
+        .buttonRemove:hover span {
+            padding-right: 25px;
+        }
+
+        .buttonRemove:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+
+        .buttonRemove:hover {
+            background-color: var(--yellowDark1);
+        }
+
+        .buttonRemove:active {
+            background-color: var(--yellowDark2);
+            box-shadow: 0 2px #666;
+            transform: translateY(4px);
         }
     </style>
     <script>
@@ -401,17 +674,20 @@
         }
 
         function send_semester_cleanup() {
-            const fetch_options = {
-                method: "DELETE"
+            if (confirm("Are you sure you want to ERASE all managed categories, and migrate current students and TAs to former-student roles?")) {
+                const fetch_options = {
+                    method: "DELETE"
+                }
+                fetch("/cleanup", fetch_options)
+                    .then((response) => {
+                        return response.json()
+                    })
+                    .then((response) => {
+                        // TODO: Do something with this?
+                        console.log(response)
+                    })
+                alert("Semester Cleanup done - have a nice break!")
             }
-            fetch("/cleanup", fetch_options)
-                .then((response) => {
-                    return response.json()
-                })
-                .then((response) => {
-                    // TODO: Do something with this?
-                    console.log(response)
-                })
         }
 
         function fill_out_server_panel(config) {
@@ -499,9 +775,9 @@
                         <small>(Categories will be inserted at the bottom of the current hierarchy)</small></label><br />
                     <select id="classTemplate" size="10">
                     </select> <br />
-                    <button type="button" id="addChanBtn">Add Channel</button>
+                    <button type="button" class="buttonAdd" id="addChanBtn">Add Channel</button>
                 </div>
-                <div class="inner">
+                <div class="channelConfig">
                     <form id="templateConfig">
                         <label for="channelName">Channel Name</label><br />
                         <input type="text" id="channelName" name="channelName"><br />
@@ -521,7 +797,7 @@
                         <input type="checkbox" id="studentOnly" name="studentOnly">
                         <label for="studentOnly">Make this channel accessible only to students currently in the class</label><br />
                     </form>
-                    <button type="button" id="rmChanBtn">Remove channel</button>
+                    <button type="button" class="buttonRemove" background-color="orange" id="rmChanBtn">Remove channel</button>
                 </div>
             </div>
         </div>
@@ -532,7 +808,7 @@
                     <label for="classes">Semester Classes</label><br />
                     <select id="classes" name="classes" size="5">
                     </select><br />
-                    <button type="button" id="addClassBtn">Add Course</button>
+                    <button type="button" class="buttonAdd" id="addClassBtn">Add Course</button>
                 </div>
                 <form id="classConfig" class="container">
                     <div class="inner">
@@ -540,25 +816,25 @@
                         <input type="text" id="className"><br />
                         <label for="classCanvasID">Canvas ID</label><br />
                         <input type="text" id="classCanvasID"><br />
-                        <button type="button" id="removeClassBtn">Remove Course</button>
+                        <button type="button" class="buttonRemove" id="removeClassBtn">Remove Course</button>
                     </div>
                     <div class="inner">
                         <label for="recitations">Class Recitation Sections</label><br />
                         <select id="recitations" name="recitations" size="5">
                         </select><br />
-                        <button type="button" id="addRecBtn">Add Recitation Section</button>
-                        <button type="button" id="rmRecBtn">Remove Recitation</button><br />
+                        <button type="button" class="buttonAdd" id="addRecBtn">Add Recitation Section</button>
+                        <button type="button" class="buttonRemove" id="rmRecBtn">Remove Recitation</button><br />
                         <label for="recitationTime">Recitation Time</label>
                         <input type="text" id="recitationTime"><br />
                     </div>
                 </form>
             </div>
             <div class="general">
-                <button type="button" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
-                <button type="button" id="semCommitBtn">Commit Semester Options</button>
+                <button type="button" class="buttonAdd" id="previewBtn">Preview Changes in Left Panel</button><br /><br />
+                <button type="button" class="buttonCommit" id="semCommitBtn"><span>Commit Semester Options</span></button>
             </div>
             <div class="general">
-                <button class="warning" type="button" id="semCleanupBtn">Semester Cleanup</button><br />
+                <button class="buttonCleanup" type="button" id="semCleanupBtn"> <span>Semester Cleanup</span></button><br />
                 <p>Warning! This will ERASE all <span class="managed">managed</span> categories, and migrate current students and TAs to former-student roles. Logs for each channel will be downloaded.</p>
             </div>
         </div>
