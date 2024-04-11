@@ -3,7 +3,7 @@ import grpc
 import json
 from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
 
-from config import admin_pitt_id
+from config import admin_pitt_id, grpc_address
 
 app = Quart(__name__)
 
@@ -12,11 +12,12 @@ app.secret_key = "secret"
 
 async def get_json_from_server(admin_name):
     try:
-        async with grpc.aio.insecure_channel('[::]:50051') as channel:
+        async with grpc.aio.insecure_channel(grpc_address) as channel:
             stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
             response = await stub.GetJSON(Pittscord_ipc_pb2.JSONRequest(admin_name=admin_name))
         return response.json
-    except grpc.aio.AioRpcError:
+    except grpc.aio.AioRpcError as e:
+        print(e)
         return None
 
 
@@ -37,7 +38,7 @@ async def recv_config():
     config = await request.json
     config['admin'] = session['admin']
     try:
-        async with grpc.aio.insecure_channel('[::]:50051') as channel:
+        async with grpc.aio.insecure_channel(grpc_address) as channel:
             stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
             response = await stub.SendConfig(Pittscord_ipc_pb2.ConfigRequest(config=json.dumps(config)))
         return [response.code]
@@ -58,7 +59,7 @@ async def get_json():
 @app.route("/cleanup", methods=["DELETE"])
 async def cleanup():
     try:
-        async with grpc.aio.insecure_channel('[::]:50051') as channel:
+        async with grpc.aio.insecure_channel(grpc_address) as channel:
             stub = Pittscord_ipc_pb2_grpc.Pittscord_ipcStub(channel)
             response = await stub.Cleanup(Pittscord_ipc_pb2.CleanupRequest(admin_name=session['admin']))
         return [response.code]
