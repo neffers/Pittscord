@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 import discord
@@ -415,6 +416,19 @@ async def reregister(interaction: discord.Interaction, user: discord.User):
 @bot.tree.command()
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
+async def reregister_all(interaction: discord.Interaction):
+    """Run reregister on all members in the guild, won't bother registered students.
+    Should also add students to class roles (but won't remove them!)"""
+    await interaction.response.send_message("Asking!", ephemeral=True)
+    for member in interaction.guild.members:
+        if member == interaction.guild.me:
+            continue
+        task = asyncio.create_task(on_member_join(member))
+
+
+@bot.tree.command()
+@app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
 async def configure_server(interaction: discord.Interaction):
     """Configure server for use with the bot. Will set most channels as not visible to non-verified users,
     create roles for verified students, previous students, and previous TAs. Expects community mode."""
@@ -462,8 +476,10 @@ async def configure_server(interaction: discord.Interaction):
     await interaction.response.send_message("Successfully configured server, I will now ask current users to register "
                                             "with me!", ephemeral=True)
     for member in guild.members:
+        if member == guild.me:
+            continue
         await member.add_roles(prev_student_role)
-        await on_member_join(member)
+        task = asyncio.create_task(on_member_join(member))
 
 
 @configure_server.error
