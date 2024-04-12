@@ -33,6 +33,10 @@
             --blueDark1: #14337b;
             --blueDark2: #0d2252; 
         }
+        ::backdrop {
+            background-color: var(--darkBackground);
+            opacity: 50%;
+        }
         div {
             border-radius: 25px;
             margin: 4px;
@@ -649,16 +653,23 @@
                 body: JSON.stringify(config)
             }
 
+            showWaitDialog('Sending config to the bot! Please wait...')
+
             fetch("/config", fetch_options)
                 .then((response) => {
                     return response.json()
                 })
                 .then((response) => {
-                    // TODO: do something with this
-                    console.log(response)
+                    if(response[0] === 0) {
+                        get_current_json()
+                        showFinishedDialog('Successfully configured semester channels and roles!')
+                    } else {
+                        showFinishedDialog('Something went wrong during the process! Sorry! Try the semester cleanup option, and manually delete what remains. Then, try again.')
+                    }
                 })
                 .catch((err) => {
                     console.log(err)
+                    showFinishedDialog('Something went wrong! Please check the javascript console for more.')
                 })
         }
 
@@ -675,6 +686,7 @@
 
         function send_semester_cleanup() {
             if (confirm("Are you sure you want to ERASE all managed categories, and migrate current students and TAs to former-student roles?")) {
+                showWaitDialog('Sending cleanup request! Please wait...')
                 const fetch_options = {
                     method: "DELETE"
                 }
@@ -683,15 +695,25 @@
                         return response.json()
                     })
                     .then((response) => {
-                        // TODO: Do something with this?
-                        console.log(response)
-                        alert("Semester Cleanup done - have a nice break!")
+                        if(response[0] === 0) {
+                            get_current_json()
+                            showFinishedDialog('Successfully cleaned up!')
+                        } else {
+                            showFinishedDialog('Something went wrong during the process! Sorry! You may need to manually delete channels and migrate students.')
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                        showFinishedDialog('Some error occurred! Check the javascript console for more information')
                     })
             }
         }
 
         function fill_out_server_panel(config) {
             let server_elem = document.getElementById('server')
+            while(server_elem.hasChildNodes()) {
+                server_elem.removeChild(server_elem.firstChild)
+            }
             for(let entry of config) {
                 if(entry.channels) {
                     const grp_elem = document.createElement('optgroup')
@@ -711,6 +733,22 @@
                     server_elem.appendChild(chan_elem)
                 }
             }
+        }
+
+        function showWaitDialog(string = 'Processing! Please wait...') {
+            document.getElementById('waitDialogText').innerText = string
+            document.getElementById('waitDialog').showModal()
+        }
+
+        function showFinishedDialog(string = "Finished!") {
+            document.getElementById('finishedDialogText').innerText = string
+            document.getElementById('finishedDialog').showModal()
+            document.getElementById('finishedDialogBtn').focus()
+        }
+
+        function closeDialogs() {
+            document.getElementById('finishedDialog').close()
+            document.getElementById('waitDialog').close()
         }
 
         function onload() {
@@ -754,6 +792,8 @@
             document.getElementById('semCommitBtn').addEventListener('click', send_config)
             document.getElementById('semCleanupBtn').addEventListener('click', send_semester_cleanup)
 
+            document.getElementById('finishedDialogBtn').addEventListener('click', closeDialogs)
+
             get_current_json()
         }
 
@@ -761,6 +801,13 @@
     </script>
 </head>
 <body>
+<dialog id="waitDialog">
+    <p id="waitDialogText" class="center"></p>
+</dialog>
+<dialog id="finishedDialog">
+    <p id="finishedDialogText"></p>
+    <button type="button" id="finishedDialogBtn">Close</button>
+</dialog>
 <div class="container">
     <div class="left">
         <label for="server">Current Server Outline</label><br />
