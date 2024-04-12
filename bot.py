@@ -415,6 +415,13 @@ async def reregister(interaction: discord.Interaction, user: discord.User):
 
 @bot.tree.command()
 @app_commands.guild_only()
+async def register(interaction: discord.Interaction):
+    await interaction.response.send_message("Sure!", ephemeral=True)
+    await on_member_join(interaction.user)
+
+
+@bot.tree.command()
+@app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
 async def reregister_all(interaction: discord.Interaction):
     """Run reregister on all members in the guild, won't bother registered students.
