@@ -457,7 +457,7 @@ async def configure_server(interaction: discord.Interaction):
     await guild.default_role.edit(permissions=default_user_perms)
     await guild.rules_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
         view_channel=True, read_message_history=True)})
-    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels,you will need to "
+    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels, you will need to "
                                    "reply to the message that I send you!\n\nIf you haven't been assigned a class "
                                    "role that you think you should have, you can try using the `/register` command!",
                                    silent=True)
