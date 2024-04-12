@@ -357,7 +357,7 @@ function get_current_json() {
 }
 
 function send_semester_cleanup() {
-    if (confirm("Are you sure you want to ERASE all managed categories, and migrate current students and TAs to former-student roles?")) {
+    if (prompt("Are you sure you want to ERASE all managed categories, and migrate current students and TAs to former-student roles?\nType YES to confirm!") === "YES") {
         showWaitDialog('Sending cleanup request! Please wait...')
         const fetch_options = {
             method: "DELETE"
@@ -378,6 +378,8 @@ function send_semester_cleanup() {
                 console.log(error)
                 showFinishedDialog('Some error occurred! Check the javascript console for more information')
             })
+    } else {
+        showFinishedDialog("You didn't type YES, cleanup not performed")
     }
 }
 
