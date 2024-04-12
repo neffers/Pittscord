@@ -7,18 +7,22 @@
         .container {
             display: flex;
         }
-        .center {
-            margin-left: 50%;
-            margin-right: 50%;
-        }
         .vcenter {
             margin-top: auto;
             margin-bottom: auto;
         }
+        .right {
+            margin-left: auto;
+            float: right;
+        }
         .pittscord {
             background-color: gold;
+            border: 3px solid blue;
             color: blue;
             margin: 10px;
+        }
+        .fillwide {
+            width: 100%
         }
         h2 {
             margin: 20px;
@@ -26,12 +30,14 @@
     </style>
 </head>
 <body>
-<div class="center">
-    <div class="container">
-        <div class="pittscord">
+<div class="container">
+    <div class="fillwide">
+        <div class="pittscord right">
             <h2>Pittscord Admin Login</h2>
         </div>
-        <div class="vcenter">
+    </div>
+    <div class="fillwide vcenter">
+        <div>
             <form method="post">
                 <label for="uname">Enter your Pitt ID</label><br>
                 <input type="text" autocomplete="username" id="uname" name="username" autofocus><br>
