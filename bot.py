@@ -364,10 +364,9 @@ async def on_member_join(member: discord.Member):
                     await member.add_roles(ta_role)
     else:
         # We don't recognize the student?
-        # TODO: Ask Luis what we should do here
         if len(member.roles) < 2:
             # Student has no assigned roles (not assigned previous_student at migration)
-            await member.dm_channel.send("I don't recognize you! Please let your professor know.")
+            await member.dm_channel.send("I still don't recognize you! Please let your professor know.")
 
 
 @bot.tree.command()
