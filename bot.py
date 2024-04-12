@@ -481,7 +481,7 @@ async def configure_server(interaction: discord.Interaction):
     student_perms.speak = True
     student_perms.stream = True
 
-    prev_student_role = await guild.create_role(name="Previous Student", permissions=student_perms)
+    prev_student_role = await guild.create_role(name="Previous Student", permissions=student_perms, hoist=True)
     prev_ta_role = await guild.create_role(name="Previous TA", permissions=student_perms, hoist=True)
 
     bot.db.add_server(interaction.user.id, interaction.guild.id, prev_student_role.id, prev_ta_role.id)
