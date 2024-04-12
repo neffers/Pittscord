@@ -373,7 +373,7 @@ async def on_member_join(member: discord.Member):
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
-    """Look up a user's Pitt ID. Currently only responds with Discord ID."""
+    """Look up a user's Pitt ID."""
     student_id = bot.db.get_student_id(user.id)
     if student_id is None:
         await interaction.response.send_message(f"No pitt id available!", ephemeral=True)
