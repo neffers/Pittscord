@@ -352,11 +352,20 @@ function send_config() {
 function get_current_json() {
     fetch("/get_server_json")
         .then((response) => {
-            return response.json()
+            if(response.status === 200) {
+                return response.json()
+            } else {
+                throw new Error('Getting server JSON failed!')
+            }
         })
         .then((response) => {
-            console.log(response)
+            document.getElementById('serverPanel').style.opacity = "1"
             fill_out_server_panel(response)
+            console.log("Successfully loaded server layout")
+        })
+        .catch((err) => {
+            document.getElementById('serverPanel').style.opacity = "0.5"
+            console.log(err)
         })
 }
 
