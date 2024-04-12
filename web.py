@@ -73,5 +73,10 @@ async def cleanup():
         return abort(500)
 
 
+@app.route("/favicon.ico")
+async def favicon():
+    return redirect(url_for('static', filename='favicon.ico'))
+
+
 if __name__ == "__main__":
     app.run()
