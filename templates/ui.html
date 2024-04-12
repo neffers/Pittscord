@@ -23,9 +23,9 @@
     <div class="outer">
         <div class="middle container">
             <div class="container parent">
-                <div>
+                <div class="descriptor">
                     <label for="classTemplate">Templates per class<br />
-                        <small>(Categories will be inserted at the bottom of the current hierarchy)</small></label><br />
+                        <small>(Categories will be inserted at the<br />bottom of the current hierarchy)</small></label><br />
                     <select id="classTemplate" size="10">
                     </select> <br />
                     <button type="button" class="buttonAdd" id="addChanBtn">Add Channel</button>
@@ -57,7 +57,7 @@
         <br/>
         <div class="middle container sink">
             <div class="container parent">
-                <div class="">
+                <div class="descriptor">
                     <label for="classes">Semester Classes</label><br />
                     <select id="classes" name="classes" size="5">
                     </select><br />
@@ -71,14 +71,14 @@
                         <input type="text" id="classCanvasID"><br />
                         <button type="button" class="buttonRemove" id="removeClassBtn">Remove Course</button>
                     </div>
-                    <div class="inner">
+                    <div class="inner second">
                         <label for="recitations">Class Recitation Sections</label><br />
                         <select id="recitations" name="recitations" size="5">
                         </select><br />
-                        <button type="button" class="buttonAdd" id="addRecBtn">Add Recitation Section</button>
-                        <button type="button" class="buttonRemove" id="rmRecBtn">Remove Recitation</button><br />
                         <label for="recitationTime">Recitation Time</label>
                         <input type="text" id="recitationTime"><br />
+                        <button type="button" class="buttonAdd" id="addRecBtn">Add Recitation Section</button>
+                        <button type="button" class="buttonRemove" id="rmRecBtn">Remove Recitation</button><br />
                     </div>
                 </form>
             </div>
