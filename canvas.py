@@ -7,12 +7,14 @@ class EnrollmentType(IntEnum):
     Student = auto()
     TA = auto()
 
+
 class Canvas:
     def __init__(self, canvas_token: str):
         self.c = canvasapi.Canvas(canvas_base_url, canvas_token)
 
     def get_courses_by_term(self):
-        """Right now this probably won't get used, but if we end up implementing some auto-population it would probably involve this"""
+        """Right now this probably won't get used, but if we end up implementing some auto-population it would probably
+        involve this"""
         all_courses_paginated = self.c.get_courses()
         visible_courses = []
         for course in all_courses_paginated:

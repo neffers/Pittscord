@@ -115,7 +115,7 @@ function remove_recitation() {
 
     // because we're storing data in the html element this is actually all we need to do
     recitations_elem.removeChild(selected)
-    // it might conceivably be more efficient to only save the changed item (recitations) but i'm not worried
+    // it might conceivably be more efficient to only save the changed item (recitations) but I'm not worried
     update_course()
 
     // make sure the UI stays nice

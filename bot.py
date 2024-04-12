@@ -242,8 +242,8 @@ class PittscordBot(commands.Bot):
             category = await guild.fetch_channel(category_id)
             print(f"Deleting channels in category {category.id} ({category.name})")
             for channel in category.channels:
-                logfile_name = (log_file_directory + datetime.datetime.now().strftime('%Y-%m-%d-') + category.name + '-' +
-                                channel.name + '-log.json')
+                logfile_name = (log_file_directory + datetime.datetime.now().strftime('%Y-%m-%d-') + category.name +
+                                '-' + channel.name + '-log.json')
                 os.makedirs(os.path.dirname(logfile_name), exist_ok=True)
                 print(f'Logging channel {channel.id} ({category.name} - {channel.name}) to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
