@@ -5,7 +5,7 @@ canvas_base_url = "https://canvas.pitt.edu"
 db_filename = "pittscord.db"
 
 # School ID regex string
-id_regex_string = '[a-z]{3}\d+'
+id_regex_string = '[a-z]{3}\\d+'
 
 # Log file directory
 log_file_directory = "./logs/"
