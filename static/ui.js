@@ -161,6 +161,10 @@ function add_new_recitation(new_rec) {
 
     // add the new recitation to the list
     const recs_elem = document.getElementById('recitations')
+    if(recs_elem.children.length > 9) {
+        alert("Can't have more than 10 recitations!")
+        return
+    }
     recs_elem.appendChild(new_rec_elem)
 
     // Save the newly added recitation
