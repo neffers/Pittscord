@@ -416,6 +416,7 @@ async def reregister(interaction: discord.Interaction, user: discord.User):
 @bot.tree.command()
 @app_commands.guild_only()
 async def register(interaction: discord.Interaction):
+    """Attempt to re-register your school username and get added to classes. Won't undo registration."""
     await interaction.response.send_message("Sure!", ephemeral=True)
     await on_member_join(interaction.user)
 
@@ -453,11 +454,14 @@ async def configure_server(interaction: discord.Interaction):
     # Set minimal permissions for the default role
     default_user_perms = discord.Permissions.none()
     default_user_perms.read_message_history = True
+    default_user_perms.use_application_commands = True
     await guild.default_role.edit(permissions=default_user_perms)
     await guild.rules_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
         view_channel=True, read_message_history=True)})
-    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels,you will need to reply "
-                                   "to the message that I send you!", silent=True)
+    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels,you will need to "
+                                   "reply to the message that I send you!\n\nIf you haven't been assigned a class "
+                                   "role that you think you should have, you can try using the `/register` command!",
+                                   silent=True)
     await guild.system_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
         view_channel=True, read_message_history=True, send_messages=True)})
 
