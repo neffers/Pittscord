@@ -2,6 +2,7 @@ import grpc
 
 from bot import bot
 from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
+from config import grpc_address
 
 
 class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
@@ -50,7 +51,7 @@ async def launch(discord_token):
     server = grpc.aio.server()
     ipc_server = PittscordIpcServer()
     Pittscord_ipc_pb2_grpc.add_Pittscord_ipcServicer_to_server(ipc_server, server)
-    listen_addr = "[::]:50051"
+    listen_addr = grpc_address
     server.add_insecure_port(listen_addr)
     print("starting rpc server")
     await server.start()

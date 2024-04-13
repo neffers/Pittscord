@@ -49,7 +49,7 @@ class Database:
         pass
 
     def get_role_id(self, message_id, reaction):
-        """Return the role id id that should be assigned / removed after a given reaction, or None if there is none."""
+        """Return the role id that should be assigned / removed after a given reaction, or None if there is none."""
         pass
 
     def get_student_id(self, discord_user_id):

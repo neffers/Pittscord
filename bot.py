@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 import discord
@@ -5,14 +6,16 @@ import json
 import re
 from discord import app_commands
 from discord.ext import commands
+import os
 
 import canvas
 import database
-from config import db_filename, id_regex_string
+from config import db_filename, id_regex_string, log_file_directory
 from secret import canvas_token
 
 reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
+# TODO: We can probably change this
 intents = discord.Intents.all()
 
 # For Testing Purposes
@@ -42,6 +45,7 @@ class PittscordBot(commands.Bot):
                 cat = {
                     'name': category.name,
                     'type': 'category',
+                    'managed': category.id in self.db.get_semester_category_channels(server_id),
                     'channels': []
                 }
                 json_channels.append(cat)
@@ -97,6 +101,8 @@ class PittscordBot(commands.Bot):
             print(f"Creating roles for {class_name}")
             ta_role = await guild.create_role(name=class_name + ' TA', hoist=True, permissions=previous_student_perms)
             student_role = await guild.create_role(name=class_name, hoist=True, permissions=previous_student_perms)
+            default_role = guild.default_role
+            pittscord_role = guild.me.top_role
 
             # Create category channel and a placeholder for the announcements channel
             category_overwrites = {
@@ -123,24 +129,26 @@ class PittscordBot(commands.Bot):
                         send_messages=not channel_ta_only
                     ),
                     previous_student_role: discord.PermissionOverwrite(
-                        read_messages=True if (not channel_student_only) else None
+                        read_messages=(not channel_student_only)
+                    ),
+                    default_role: discord.PermissionOverwrite(
+                        read_messages=False
+                    ),
+                    pittscord_role: discord.PermissionOverwrite(
+                        read_messages=True,
+                        send_messages=True
                     )
                 }
                 match channel_type:
                     case 'A':
-                        channel_overwrites = {
-                            ta_role: discord.PermissionOverwrite(
+                        channel_overwrites[ta_role] = discord.PermissionOverwrite(
                                 read_messages=True,
                                 send_messages=channel_ta_only
-                            ),
-                            student_role: discord.PermissionOverwrite(
+                            )
+                        channel_overwrites[student_role] = discord.PermissionOverwrite(
                                 read_messages=True,
                                 send_messages=False
-                            ),
-                            previous_student_role: discord.PermissionOverwrite(
-                                read_messages=True if (not channel_student_only) else None
                             )
-                        }
 
                         channel = await guild.create_text_channel(channel_name, news=True, category=class_category,
                                                                   overwrites=channel_overwrites)
@@ -231,20 +239,39 @@ class PittscordBot(commands.Bot):
         # Delete channels saving logs
         print("Deleting channels...")
         for category_id in self.db.get_semester_category_channels(server_id):
-            category = guild.get_channel(category_id)
-            print(f"Deleting channels in category {category_id}")
+            category = await guild.fetch_channel(category_id)
+            print(f"Deleting channels in category {category.id} ({category.name})")
             for channel in category.channels:
-                print(f'Logging channel {channel.id}')
-                channel_messages = [
-                    {'message': message.content, 'author': message.author.id, 'time': message.created_at.timestamp()}
-                    async for message in channel.history()]
-                logfile_name = 'logs/' + datetime.datetime.now().strftime('%Y-%M-%d-') + channel.name + '-log.json'
-                print(f'logging to {logfile_name}')
+                logfile_name = (log_file_directory + datetime.datetime.now().strftime('%Y-%m-%d-') + category.name +
+                                '-' + channel.name + '-log.json')
+                os.makedirs(os.path.dirname(logfile_name), exist_ok=True)
+                print(f'Logging channel {channel.id} ({category.name} - {channel.name}) to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
-                    json.dump(channel_messages, logfile)
-                print(f'Deleting channel {channel.id}')
+                    channel_threads = []
+                    channel_messages = []
+                    if channel.type != discord.ChannelType.voice:
+                        visible_threads = channel.threads
+                        archived_threads = [thread async for thread in channel.archived_threads()]
+                        for thread in visible_threads + archived_threads:
+                            if thread.history():
+                                thread_messages = [{'message': message.content, 'author': message.author.id,
+                                                    'time': message.created_at.timestamp(),
+                                                    'student': self.db.get_student_id(message.author.id)} async for
+                                                   message in thread.history()]
+                            channel_threads.append({'author': thread.owner_id, 'time': thread.created_at.timestamp(),
+                                                    'message': thread.starter_message.content,
+                                                    'replies': thread_messages, 'name': thread.name,
+                                                    'student': self.db.get_student_id(thread.owner_id)})
+                    if channel.type != discord.ChannelType.forum:
+                        channel_messages = [{'message': message.content, 'author': message.author.id,
+                                             'time': message.created_at.timestamp(),
+                                             'student': self.db.get_student_id(message.author.id)} async for message in
+                                            channel.history()]
+                    channel_log = {'messages': channel_messages, 'threads': channel_threads}
+                    json.dump(channel_log, logfile)
+                print(f'Deleting channel {channel.id} ({category.name} - {channel.name})')
                 await channel.delete()
-            print(f'Deleting category {category_id}')
+            print(f'Deleting category {category_id} ({category.name})')
             await category.delete()
 
         print("Removing courses from database...")
@@ -299,7 +326,7 @@ async def on_member_join(member: discord.Member):
         def check(m):
             return m.channel == member.dm_channel and m.author == member
 
-        # Matches three alphabetic characters followed at least one numeric digit
+        # By default, matches three alphabetic characters followed at least one numeric digit
         pitt_id_regex = re.compile(id_regex_string)
 
         while True:
@@ -321,29 +348,32 @@ async def on_member_join(member: discord.Member):
     class_ids_to_check = bot.db.get_semester_courses(member.guild.id)
     student_class_roles = bot.canvas.find_user_in_classes(student_id, class_ids_to_check)
 
-    for (class_id, role) in student_class_roles.items():
-        class_name = bot.db.get_class_name(class_id)
-        (student_role_id, ta_role_id) = bot.db.get_class_roles(class_id)
-        student_role = member.guild.get_role(student_role_id)
-        ta_role = member.guild.get_role(ta_role_id)
-        match role:
-            case canvas.EnrollmentType.Student:
-                await member.dm_channel.send(f"I found you in {class_name}!")
-                await member.add_roles(student_role)
-            case canvas.EnrollmentType.TA:
-                await member.dm_channel.send(f"I found as a TA in {class_name}!")
-                await member.add_roles(previous_student_role)
-                await member.add_roles(ta_role)
-
-    if len(member.roles) == 1:
-        await member.dm_channel.send("I didn't find you in any of the courses! Please let your professor know.")
+    if student_class_roles:
+        for (class_id, role) in student_class_roles.items():
+            class_name = bot.db.get_class_name(class_id)
+            (student_role_id, ta_role_id) = bot.db.get_class_roles(class_id)
+            student_role = member.guild.get_role(student_role_id)
+            ta_role = member.guild.get_role(ta_role_id)
+            match role:
+                case canvas.EnrollmentType.Student:
+                    await member.dm_channel.send(f"I found you in {class_name}!")
+                    await member.add_roles(student_role)
+                case canvas.EnrollmentType.TA:
+                    await member.dm_channel.send(f"I found you as a TA in {class_name}!")
+                    await member.add_roles(previous_student_role)
+                    await member.add_roles(ta_role)
+    else:
+        # We don't recognize the student?
+        if len(member.roles) < 2:
+            # Student has no assigned roles (not assigned previous_student at migration)
+            await member.dm_channel.send("I still don't recognize you! Please let your professor know.")
 
 
 @bot.tree.command()
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
-    """Look up a user's Pitt ID. Currently only responds with Discord ID."""
+    """Look up a user's Pitt ID."""
     student_id = bot.db.get_student_id(user.id)
     if student_id is None:
         await interaction.response.send_message(f"No pitt id available!", ephemeral=True)
@@ -384,10 +414,35 @@ async def reregister(interaction: discord.Interaction, user: discord.User):
 
 @bot.tree.command()
 @app_commands.guild_only()
+async def register(interaction: discord.Interaction):
+    """Attempt to re-register your school username and get added to classes. Won't undo registration."""
+    await interaction.response.send_message("Sure!", ephemeral=True)
+    await on_member_join(interaction.user)
+
+
+@bot.tree.command()
+@app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
+async def reregister_all(interaction: discord.Interaction):
+    """Run reregister on all members in the guild, won't bother registered students.
+    Should also add students to class roles (but won't remove them!)"""
+    await interaction.response.send_message("Asking!", ephemeral=True)
+    for member in interaction.guild.members:
+        if member == interaction.guild.me:
+            continue
+        task = asyncio.create_task(on_member_join(member))
+
+
+@bot.tree.command()
+@app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
 async def configure_server(interaction: discord.Interaction):
     """Configure server for use with the bot. Will set most channels as not visible to non-verified users,
     create roles for verified students, previous students, and previous TAs. Expects community mode."""
+    # Add the bot to the users table if it hasn't been already
+    if bot.db.get_student_id(bot.user.id) is None:
+        bot.db.add_student('pittscord', bot.user.id)
+
     # Check for a previous entry and fail if this has already been done
     if bot.db.get_server_admin(interaction.guild.id):
         await interaction.response.send_message("Server is already configured", ephemeral=True)
@@ -396,10 +451,18 @@ async def configure_server(interaction: discord.Interaction):
     guild = interaction.guild
 
     # Set minimal permissions for the default role
-    await guild.default_role.edit(permissions=discord.Permissions.none())
-    await guild.rules_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(view_channel=True)})
-    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels,you will need to reply "
-                                   "to the message that I send you!")
+    default_user_perms = discord.Permissions.none()
+    default_user_perms.read_message_history = True
+    default_user_perms.use_application_commands = True
+    await guild.default_role.edit(permissions=default_user_perms)
+    await guild.rules_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
+        view_channel=True, read_message_history=True)})
+    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels, you will need to "
+                                   "reply to the message that I send you!\n\nIf you haven't been assigned a class "
+                                   "role that you think you should have, you can try using the `/register` command!",
+                                   silent=True)
+    await guild.system_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
+        view_channel=True, read_message_history=True, send_messages=True)})
 
     # Create "Previous Student" and "TA" roles
     student_perms = discord.Permissions.none()
@@ -418,11 +481,17 @@ async def configure_server(interaction: discord.Interaction):
     student_perms.speak = True
     student_perms.stream = True
 
-    prev_student_role = await guild.create_role(name="Previous Student", permissions=student_perms)
+    prev_student_role = await guild.create_role(name="Previous Student", permissions=student_perms, hoist=True)
     prev_ta_role = await guild.create_role(name="Previous TA", permissions=student_perms, hoist=True)
 
     bot.db.add_server(interaction.user.id, interaction.guild.id, prev_student_role.id, prev_ta_role.id)
-    await interaction.response.send_message("Success!", ephemeral=True)
+    await interaction.response.send_message("Successfully configured server, I will now ask current users to register "
+                                            "with me!", ephemeral=True)
+    for member in guild.members:
+        if member == guild.me:
+            continue
+        await member.add_roles(prev_student_role)
+        task = asyncio.create_task(on_member_join(member))
 
 
 @configure_server.error
