@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pittscord Login</title>
+    <style>
+        .container {
+            display: flex;
+        }
+        .vcenter {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .right {
+            margin-left: auto;
+            float: right;
+        }
+        .pittscord {
+            background-color: gold;
+            border: 3px solid blue;
+            color: blue;
+            margin: 10px;
+        }
+        .fillwide {
+            width: 100%
+        }
+        h2 {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="fillwide">
+        <div class="pittscord right">
+            <h2>Pittscord Admin Login</h2>
+        </div>
+    </div>
+    <div class="fillwide vcenter">
+        <div>
+            <form method="post">
+                <label for="uname">Enter your Pitt ID</label><br>
+                <input type="text" autocomplete="username" id="uname" name="username" autofocus><br>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

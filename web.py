@@ -3,7 +3,7 @@ import grpc
 import json
 from rpc import Pittscord_ipc_pb2_grpc, Pittscord_ipc_pb2
 
-from config import admin_pitt_id, grpc_address
+from config import grpc_address
 
 app = Quart(__name__)
 
@@ -21,15 +21,20 @@ async def get_json_from_server(admin_name):
         return None
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 async def default():
-    # wanted this to come from a login page but ran out of time
-    session['admin'] = admin_pitt_id
-    return redirect(url_for('ui'))
+    session.clear()
+    if request.method == 'POST':
+        form = await request.form
+        session['admin'] = form['username']
+        return redirect(url_for('ui'))
+    return await render_template('login.html')
 
 
 @app.route("/ui")
 async def ui():
+    if not session.get('admin'):
+        return redirect(url_for('default'))
     return await render_template("ui.html")
 
 
@@ -66,6 +71,11 @@ async def cleanup():
     except grpc.aio.AioRpcError as e:
         print(e)
         return abort(500)
+
+
+@app.route("/favicon.ico")
+async def favicon():
+    return redirect(url_for('static', filename='favicon.ico'))
 
 
 if __name__ == "__main__":

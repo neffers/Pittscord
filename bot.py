@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 import discord
@@ -241,8 +242,8 @@ class PittscordBot(commands.Bot):
             category = await guild.fetch_channel(category_id)
             print(f"Deleting channels in category {category.id} ({category.name})")
             for channel in category.channels:
-                logfile_name = (log_file_directory + datetime.datetime.now().strftime('%Y-%m-%d-') + category.name + '-' +
-                                channel.name + '-log.json')
+                logfile_name = (log_file_directory + datetime.datetime.now().strftime('%Y-%m-%d-') + category.name +
+                                '-' + channel.name + '-log.json')
                 os.makedirs(os.path.dirname(logfile_name), exist_ok=True)
                 print(f'Logging channel {channel.id} ({category.name} - {channel.name}) to {logfile_name}')
                 with open(logfile_name, 'w') as logfile:
@@ -363,17 +364,16 @@ async def on_member_join(member: discord.Member):
                     await member.add_roles(ta_role)
     else:
         # We don't recognize the student?
-        # TODO: Ask Luis what we should do here
         if len(member.roles) < 2:
             # Student has no assigned roles (not assigned previous_student at migration)
-            await member.dm_channel.send("I don't recognize you! Please let your professor know.")
+            await member.dm_channel.send("I still don't recognize you! Please let your professor know.")
 
 
 @bot.tree.command()
 @app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
 async def identify(interaction: discord.Interaction, user: discord.User):
-    """Look up a user's Pitt ID. Currently only responds with Discord ID."""
+    """Look up a user's Pitt ID."""
     student_id = bot.db.get_student_id(user.id)
     if student_id is None:
         await interaction.response.send_message(f"No pitt id available!", ephemeral=True)
@@ -414,6 +414,27 @@ async def reregister(interaction: discord.Interaction, user: discord.User):
 
 @bot.tree.command()
 @app_commands.guild_only()
+async def register(interaction: discord.Interaction):
+    """Attempt to re-register your school username and get added to classes. Won't undo registration."""
+    await interaction.response.send_message("Sure!", ephemeral=True)
+    await on_member_join(interaction.user)
+
+
+@bot.tree.command()
+@app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
+async def reregister_all(interaction: discord.Interaction):
+    """Run reregister on all members in the guild, won't bother registered students.
+    Should also add students to class roles (but won't remove them!)"""
+    await interaction.response.send_message("Asking!", ephemeral=True)
+    for member in interaction.guild.members:
+        if member == interaction.guild.me:
+            continue
+        task = asyncio.create_task(on_member_join(member))
+
+
+@bot.tree.command()
+@app_commands.guild_only()
 @app_commands.default_permissions(administrator=True)
 async def configure_server(interaction: discord.Interaction):
     """Configure server for use with the bot. Will set most channels as not visible to non-verified users,
@@ -432,11 +453,16 @@ async def configure_server(interaction: discord.Interaction):
     # Set minimal permissions for the default role
     default_user_perms = discord.Permissions.none()
     default_user_perms.read_message_history = True
+    default_user_perms.use_application_commands = True
     await guild.default_role.edit(permissions=default_user_perms)
     await guild.rules_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
         view_channel=True, read_message_history=True)})
-    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels,you will need to reply "
-                                   "to the message that I send you!")
+    await guild.rules_channel.send("Welcome to the server! In order to use most of the channels, you will need to "
+                                   "reply to the message that I send you!\n\nIf you haven't been assigned a class "
+                                   "role that you think you should have, you can try using the `/register` command!",
+                                   silent=True)
+    await guild.system_channel.edit(overwrites={guild.default_role: discord.PermissionOverwrite(
+        view_channel=True, read_message_history=True, send_messages=True)})
 
     # Create "Previous Student" and "TA" roles
     student_perms = discord.Permissions.none()
@@ -455,15 +481,17 @@ async def configure_server(interaction: discord.Interaction):
     student_perms.speak = True
     student_perms.stream = True
 
-    prev_student_role = await guild.create_role(name="Previous Student", permissions=student_perms)
+    prev_student_role = await guild.create_role(name="Previous Student", permissions=student_perms, hoist=True)
     prev_ta_role = await guild.create_role(name="Previous TA", permissions=student_perms, hoist=True)
 
     bot.db.add_server(interaction.user.id, interaction.guild.id, prev_student_role.id, prev_ta_role.id)
     await interaction.response.send_message("Successfully configured server, I will now ask current users to register "
                                             "with me!", ephemeral=True)
     for member in guild.members:
+        if member == guild.me:
+            continue
         await member.add_roles(prev_student_role)
-        await on_member_join(member)
+        task = asyncio.create_task(on_member_join(member))
 
 
 @configure_server.error

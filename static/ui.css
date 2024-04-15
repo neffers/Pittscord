@@ -1,0 +1,316 @@
+:root {
+    --blurple: #7770cc;
+    --blurpleDark1: #5d579d;
+    --blurpleDark2: #454074;
+
+    --orange: #f4511e;
+    --orangeDark1: #d24419;
+    --orangeDark2: #b43a14;
+
+    --yellow: #eab73e;
+    --yellowDark1: #bc9334;
+    --yellowDark2: #826522;
+
+    --nodeBackground: #383a40;
+    --lighterNodeBackground: #555860;
+
+    --darkBackground: #2a2f37;
+
+    --white: #FFFFFF;
+    --green: #448661;
+    --darkerGreen: #396f50;
+
+    --redShade: #403838;
+    --lighterNodeBackgroundRedShade: #605555;
+
+    --blue: #1b44a6;
+    --blueDark1: #14337b;
+    --blueDark2: #0d2252;
+}
+::backdrop {
+    background-color: var(--darkBackground);
+    opacity: 50%;
+}
+div {
+    border-radius: 15px;
+    margin: 4px;
+    padding: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--white);
+}
+.container {
+    display: flex;
+}
+.left {
+    background-color: var(--lighterNodeBackground);
+    border: 2px solid darkgray;
+}
+.right {
+    margin-left: auto;
+}
+
+.middle {
+}
+.general {
+    /*background-color: lemonchiffon;*/
+    background-color: var(--nodeBackground);
+    border: 2px solid var(--lighterNodeBackground);
+    /*border: 2px solid gray;*/
+}
+.parent {
+    background-color: var(--lighterNodeBackground);
+    border: 2px solid darkgray;
+}
+.parent div {
+    border: 2px solid var(--blurpleDark2);
+    background-color: var(--nodeBackground);
+    padding: 15px;
+}
+.parent .second {
+    border: 2px solid var(--darkerGreen);
+}
+.parent .descriptor {
+    border: none;
+    background-color: inherit;
+    padding: 15px;
+}
+
+.sink {
+    align-self: flex-end;
+}
+select {
+    overflow-y: auto;
+    min-width: 50%;
+}
+.managed {
+    background-color: var(--orange);
+}
+.warning {
+    background-color: red;
+}
+body {
+    /*background-color: #e5c040;*/
+    /*background-color: #efe07f;*/
+
+    /* 383a40
+    e5c040
+    efe07f
+    #efe07f
+    dark_background = #2a2f37; */
+    background-color: var(--darkBackground);
+
+}
+.channelConfig {
+    background-color: cyan;
+}
+.buttonCleanup {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: var(--orange);
+    border: none;
+    color: var(--white);
+    text-align: center;
+    font-size: 13px;
+    padding: 3px;
+    width: 150px;
+    height: 50px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    /*border-radius: 15px;*/
+    box-shadow: 0 5px #999;
+}
+
+.buttonCleanup span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.buttonCleanup span:after {
+    content: '\0021';
+    position: static;
+    opacity: 0;
+    top: 0;
+    right: -4px;
+    transition: 0.5s;
+}
+
+.buttonCleanup:hover span {
+    padding-right: 25px;
+}
+
+.buttonCleanup:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.buttonCleanup:hover {
+    background-color: var(--orangeDark1);
+}
+
+.buttonCleanup:active {
+    background-color: var(--orangeDark2);
+    box-shadow: 0 2px #666;
+    transform: translateY(4px);
+}
+
+.buttonCommit {
+    background-color: var(--blurple);
+    display: inline-block;
+    border-radius: 4px;
+    border: none;
+    color: var(--white);
+    text-align: center;
+    font-size: 13px;
+    padding: 3px;
+    width: 150px;
+    height: 100px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    /*border-radius: 15px;*/
+    box-shadow: 0 5px #999;
+}
+
+.buttonCommit span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.buttonCommit span:after {
+    content: '\00bb';
+    position: absolute;
+    text-align: center;
+    align-content: center-right;
+    opacity: 0;
+    /*top: 0;*/
+    right: -4px;
+    transition: 0.5s;
+}
+
+.buttonCommit:hover span {
+    padding-right: 25px;
+}
+
+.buttonCommit:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.buttonCommit:hover {
+    background-color: var(--blurpleDark1);
+}
+
+.buttonCommit:active {
+    background-color: var(--blurpleDark2);
+    box-shadow: 0 2px #666;
+    transform: translateY(4px);
+}
+
+.buttonAdd {
+    background-color: var(--blue);
+    display: inline-block;
+    border-radius: 4px;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 13px;
+    padding: 3px;
+    width: 150px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    /*border-radius: 15px;*/
+    box-shadow: 0 5px #999;
+}
+
+.buttonAdd span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.buttonAdd span:after {
+    content: '\0021';
+    position: static;
+    opacity: 0;
+    top: 0;
+    right: -4px;
+    transition: 0.5s;
+}
+
+.buttonAdd:hover span {
+    padding-right: 25px;
+}
+
+.buttonAdd:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.buttonAdd:hover {
+    background-color: var(--blueDark1);
+}
+
+.buttonAdd:active {
+    background-color: var(--blueDark2);
+    box-shadow: 0 2px #666;
+    transform: translateY(4px);
+}
+
+.buttonRemove {
+    background-color: var(--yellow);
+    display: inline-block;
+    border-radius: 4px;
+    border: none;
+    color: #0F0F0F;
+    text-align: center;
+    font-size: 13px;
+    padding: 3px;
+    width: 150px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+    /*border-radius: 15px;*/
+    box-shadow: 0 5px #999;
+}
+
+.buttonRemove span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.buttonRemove span:after {
+    content: '\0021';
+    position: static;
+    opacity: 0;
+    top: 0;
+    right: -4px;
+    transition: 0.5s;
+}
+
+.buttonRemove:hover span {
+    padding-right: 25px;
+}
+
+.buttonRemove:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+.buttonRemove:hover {
+    background-color: var(--yellowDark1);
+}
+
+.buttonRemove:active {
+    background-color: var(--yellowDark2);
+    box-shadow: 0 2px #666;
+    transform: translateY(4px);
+}
