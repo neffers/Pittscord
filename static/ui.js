@@ -439,6 +439,7 @@ function closeDialogs() {
 }
 
 function onload() {
+    document.body.classList.add('lightMode');
     for(let chan of template) {
         add_new_channel(chan)
     }
@@ -480,6 +481,8 @@ function onload() {
     document.getElementById('semCleanupBtn').addEventListener('click', send_semester_cleanup)
 
     document.getElementById('finishedDialogBtn').addEventListener('click', closeDialogs)
+
+    
 
     get_current_json()
 }

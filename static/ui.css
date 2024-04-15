@@ -7,7 +7,7 @@
     --orangeDark1: #d24419;
     --orangeDark2: #b43a14;
 
-    --yellow: #eab73e;
+    --yellow: #d7a01f;
     --yellowDark1: #bc9334;
     --yellowDark2: #826522;
 
@@ -27,6 +27,25 @@
     --blueDark1: #14337b;
     --blueDark2: #0d2252;
 }
+
+.lightMode {
+
+    --nodeBackground: #d4daef;
+    --lighterNodeBackground: #dfe6f6;
+
+    --darkBackground: #a7bad8;
+
+    --white: #000000;
+
+    /*  
+    --redShade: #403838;
+    --lighterNodeBackgroundRedShade: #605555;
+    */
+
+    background-color: var(--darkBackground);
+
+}
+
 ::backdrop {
     background-color: var(--darkBackground);
     opacity: 50%;
@@ -100,6 +119,7 @@ body {
     background-color: var(--darkBackground);
 
 }
+
 .channelConfig {
     background-color: cyan;
 }
@@ -108,7 +128,7 @@ body {
     border-radius: 4px;
     background-color: var(--orange);
     border: none;
-    color: var(--white);
+    color: #FFFFFF;
     text-align: center;
     font-size: 13px;
     padding: 3px;
@@ -161,7 +181,7 @@ body {
     display: inline-block;
     border-radius: 4px;
     border: none;
-    color: var(--white);
+    color: #FFFFFF;
     text-align: center;
     font-size: 13px;
     padding: 3px;
@@ -268,7 +288,7 @@ body {
     display: inline-block;
     border-radius: 4px;
     border: none;
-    color: #0F0F0F;
+    color: #FFFFFF;
     text-align: center;
     font-size: 13px;
     padding: 3px;
