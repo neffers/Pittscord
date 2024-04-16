@@ -41,6 +41,8 @@ The bot requires the following permissions:
 
 rough directions below:
 
+minimum permissions link: https://discord.com/oauth2/authorize?client_id=1208123423763730434&permissions=309576715856&scope=bot
+
 In order to work the bot:
 Pre-anything else, click the link to add the bot to your server. The bot expects a "community server" with all those bells and whistles, which are (for some reason) required to have forum channels. It will make the rules channel visible and nothing else. It will create two roles (Previous Student and Previous TA) which will serve as 'default' roles, but will be assigned by the bot.
 Proper bot rundown:
