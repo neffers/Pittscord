@@ -35,7 +35,26 @@ deactivate
 
 ## Usage
 The bot requires the following permissions:
-- TODO
+- TODO ROUGH BELOW:
+
+- ![image](https://github.com/neffers/Pittscord/assets/109564234/0d02a5f7-56ad-4ecb-bfad-a014fe03674a)
+
+rough directions below:
+
+In order to work the bot:
+Pre-anything else, click the link to add the bot to your server. The bot expects a "community server" with all those bells and whistles, which are (for some reason) required to have forum channels. It will make the rules channel visible and nothing else. It will create two roles (Previous Student and Previous TA) which will serve as 'default' roles, but will be assigned by the bot.
+Proper bot rundown:
+First, edit config.py to have abc123 as the admin.
+Next, run the bot, either by executing the run_both.py or if you want to be able to run the web interface separate from the bot and have it work, ipc_server.py and in a separate terminal run web.py. If you don't need the web interface at all, you can simply run bot.py. Remember to be in a venv with the requirements installed.
+Then, /reregister @yourself to and reply to the bot to register your id, and then /configure_server to perform initial setup.
+A WARNING: /configure_server will alter the default role of the server, making most things not visible to a freshly joining user.
+At that point, you should be able to use the web UI to perform management at-will.
+
+
+
+
+
+
 ### Configuration
 In order to run the bot, there must be a `secret.py` containing the bot account's token.
 
