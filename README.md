@@ -20,7 +20,31 @@ Next install the requirements
 pip install -r requirements.txt
 ```
 ## Bot Creation
-These are the minimum permissions required for the Discord bot to run properly ![image](https://github.com/neffers/Pittscord/assets/109564234/0d02a5f7-56ad-4ecb-bfad-a014fe03674a)
+These are the minimum permissions required for the Discord bot to run properly:
+
+### General Permissions
+* Manage Roles
+* Manage Channels
+* Change Nickname
+* Read Messages/View Channels
+
+### Text Permissions
+* Send Messages
+* Create Public Threads
+* Send Messages in Threads
+* Embed Links
+* Attach Files
+* Read Message History
+* Use External Emojis
+* Add Reactions
+* Use Slash Commands
+
+### Voice Permissions
+* Connect
+* Speak
+* Video
+
+![image](https://github.com/neffers/Pittscord/assets/109564234/0d02a5f7-56ad-4ecb-bfad-a014fe03674a)
 
 To create your own Discord bot, first ensure that your account has access to the Discord Development Portal.
 Next, create a "New Application" and check that "Guild Install" is selected.
@@ -33,7 +57,7 @@ If a bot-created role is ever moved above the role of the Discord bot, in terms 
 If a permission is added to a student/TA role that the Discord bot cannot fulfill, the Discord bot will no longer be able to handle those roles administratively.
 
 ## Usage
-Bot Invitation Link: https://discord.com/oauth2/authorize?client_id=1208123423763730434&permissions=8&scope=bot
+Bot Invitation Link: https://discord.com/oauth2/authorize?client_id=1208123423763730434&permissions=311724199504&scope=bot
 Click the above link to add our bot to your server. The bot expects a "Community Server", as it is requires access to forum channels. 
 
 In order to work the bot:
@@ -52,5 +76,6 @@ It will create two roles (Previous Student and Previous TA) which will serve as 
 
 ### Configuration
 In order to run the bot, there must be a `secret.py` containing the bot account's token, as well as your Canvas token.
+The Discord token in `secret.py` must be edited/updated when creating a new bot account. Also, whenever you look at the Discord application's token on Discord, it changes, and so `secret.py` must be edited as well.
 
-See `secret.example.py`
+See `secret.example.py` for an example of what is expected.
