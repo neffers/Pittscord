@@ -51,6 +51,9 @@ On the "OAuth2" tab, click "bot" and select the minimum permissions needed.
 Enter the generated URL, and select the server you wish for your bot to run in.
 Congrats! Your bot should have joined the server
 
+## Discord Bot Warnings
+If a bot-created role is ever moved above the role of the Discord bot, in terms of Discord roles and their priority, it will no longer have permissions to edit that role. So, make sure you do not.
+If a permission is added to a student/TA role that the Discord bot cannot fulfill, the Discord bot will no longer be able to handle those roles administratively.
 
 ## Usage
 Bot Invitation Link: https://discord.com/oauth2/authorize?client_id=1208123423763730434&permissions=8&scope=bot
