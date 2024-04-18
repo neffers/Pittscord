@@ -2,7 +2,7 @@
 A University of Pittsburgh Capstone Project Discord Bot
 
 ## Installation
-### Unix
+### Unix and Mac
 First, create a python virtual environment, e.g.:
 ```
 python3 -m venv venv
