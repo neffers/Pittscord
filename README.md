@@ -57,7 +57,7 @@ If a bot-created role is ever moved above the role of the Discord bot, in terms 
 If a permission is added to a student/TA role that the Discord bot cannot fulfill, the Discord bot will no longer be able to handle those roles administratively.
 
 ## Usage
-Bot Invitation Link: https://discord.com/oauth2/authorize?client_id=1208123423763730434&permissions=8&scope=bot
+Bot Invitation Link: https://discord.com/oauth2/authorize?client_id=1208123423763730434&permissions=311724199504&scope=bot
 Click the above link to add our bot to your server. The bot expects a "Community Server", as it is requires access to forum channels. 
 
 In order to work the bot:
