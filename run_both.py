@@ -6,7 +6,7 @@ import ipc_server
 from secret import discord_token
 import web
 
-
+# gracefully terminate the processes
 def sigint_handler(sig, frame):
     print("Caught ctrl+c, terminating processes")
     bot_process.terminate()
@@ -16,7 +16,7 @@ def sigint_handler(sig, frame):
 def start_server(token):
     asyncio.run(ipc_server.launch(token))
 
-
+# run the web.py and the ipc_server.py as two processes
 if __name__ == "__main__":
     bot_process = multiprocessing.Process(target=start_server, args=(discord_token,))
     web_process = multiprocessing.Process(target=web.app.run, args=())

@@ -1,3 +1,4 @@
+/*colors for normal(dark) mode of application*/
 :root {
     --blurple: #7770cc;
     --blurpleDark1: #5d579d;
@@ -14,9 +15,9 @@
     --nodeBackground: #383a40;
     --lighterNodeBackground: #555860;
 
-    --darkBackground: #2a2f37;
+    --backgroundColor: #2a2f37;
 
-    --white: #FFFFFF;
+    --textColor: #FFFFFF;
     --green: #448661;
     --darkerGreen: #396f50;
 
@@ -28,34 +29,33 @@
     --blueDark2: #0d2252;
 }
 
+/*colors for UI to be in lightmode*/
 .lightMode {
 
+    /*changing background colors*/
     --nodeBackground: #d4daef;
     --lighterNodeBackground: #dfe6f6;
+    --backgroundColor: #a7bad8;
+    background-color: var(--backgroundColor);
 
-    --darkBackground: #a7bad8;
-
-    --white: #000000;
-
-    /*  
-    --redShade: #403838;
-    --lighterNodeBackgroundRedShade: #605555;
-    */
-
-    background-color: var(--darkBackground);
+    /* change color of text to black to be visible on lighter background*/
+    --textColor: #000000;
 
 }
 
+/*background*/
 ::backdrop {
-    background-color: var(--darkBackground);
+    background-color: var(--backgroundColor);
     opacity: 50%;
 }
+
+/*general style for sections*/
 div {
     border-radius: 15px;
     margin: 4px;
     padding: 5px;
     font-family: Arial, Helvetica, sans-serif;
-    color: var(--white);
+    color: var(--textColor);
 }
 .container {
     display: flex;
@@ -67,14 +67,13 @@ div {
 .right {
     margin-left: auto;
 }
-
 .middle {
+    
 }
+
 .general {
-    /*background-color: lemonchiffon;*/
     background-color: var(--nodeBackground);
     border: 2px solid var(--lighterNodeBackground);
-    /*border: 2px solid gray;*/
 }
 .parent {
     background-color: var(--lighterNodeBackground);
@@ -108,21 +107,17 @@ select {
     background-color: red;
 }
 body {
-    /*background-color: #e5c040;*/
-    /*background-color: #efe07f;*/
-
-    /* 383a40
-    e5c040
-    efe07f
-    #efe07f
-    dark_background = #2a2f37; */
-    background-color: var(--darkBackground);
+    background-color: var(--backgroundColor);
 
 }
 
 .channelConfig {
     background-color: cyan;
 }
+
+/* setup of buttons*/
+
+/* cleanup button*/
 .buttonCleanup {
     display: inline-block;
     border-radius: 4px;
@@ -137,17 +132,14 @@ body {
     transition: all 0.5s;
     cursor: pointer;
     margin: 5px;
-    /*border-radius: 15px;*/
     box-shadow: 0 5px #999;
 }
-
 .buttonCleanup span {
     cursor: pointer;
     display: inline-block;
     position: relative;
     transition: 0.5s;
 }
-
 .buttonCleanup span:after {
     content: '\0021';
     position: static;
@@ -156,26 +148,23 @@ body {
     right: -4px;
     transition: 0.5s;
 }
-
 .buttonCleanup:hover span {
     padding-right: 25px;
 }
-
 .buttonCleanup:hover span:after {
     opacity: 1;
     right: 0;
 }
-
 .buttonCleanup:hover {
     background-color: var(--orangeDark1);
 }
-
 .buttonCleanup:active {
     background-color: var(--orangeDark2);
     box-shadow: 0 2px #666;
     transform: translateY(4px);
 }
 
+/*commit button*/
 .buttonCommit {
     background-color: var(--blurple);
     display: inline-block;
@@ -190,47 +179,40 @@ body {
     transition: all 0.5s;
     cursor: pointer;
     margin: 5px;
-    /*border-radius: 15px;*/
     box-shadow: 0 5px #999;
 }
-
 .buttonCommit span {
     cursor: pointer;
     display: inline-block;
     position: relative;
     transition: 0.5s;
 }
-
 .buttonCommit span:after {
     content: '\00bb';
     position: absolute;
     text-align: center;
     align-content: center-right;
     opacity: 0;
-    /*top: 0;*/
     right: -4px;
     transition: 0.5s;
 }
-
 .buttonCommit:hover span {
     padding-right: 25px;
 }
-
 .buttonCommit:hover span:after {
     opacity: 1;
     right: 0;
 }
-
 .buttonCommit:hover {
     background-color: var(--blurpleDark1);
 }
-
 .buttonCommit:active {
     background-color: var(--blurpleDark2);
     box-shadow: 0 2px #666;
     transform: translateY(4px);
 }
 
+/*general button - including add class and channel buttons, preview changes button, and change to lightmode/darkmode button*/
 .buttonAdd {
     background-color: var(--blue);
     display: inline-block;
@@ -247,14 +229,12 @@ body {
     /*border-radius: 15px;*/
     box-shadow: 0 5px #999;
 }
-
 .buttonAdd span {
     cursor: pointer;
     display: inline-block;
     position: relative;
     transition: 0.5s;
 }
-
 .buttonAdd span:after {
     content: '\0021';
     position: static;
@@ -263,26 +243,23 @@ body {
     right: -4px;
     transition: 0.5s;
 }
-
 .buttonAdd:hover span {
     padding-right: 25px;
 }
-
 .buttonAdd:hover span:after {
     opacity: 1;
     right: 0;
 }
-
 .buttonAdd:hover {
     background-color: var(--blueDark1);
 }
-
 .buttonAdd:active {
     background-color: var(--blueDark2);
     box-shadow: 0 2px #666;
     transform: translateY(4px);
 }
 
+/*remove class and channel buttons*/
 .buttonRemove {
     background-color: var(--yellow);
     display: inline-block;
@@ -299,14 +276,12 @@ body {
     /*border-radius: 15px;*/
     box-shadow: 0 5px #999;
 }
-
 .buttonRemove span {
     cursor: pointer;
     display: inline-block;
     position: relative;
     transition: 0.5s;
 }
-
 .buttonRemove span:after {
     content: '\0021';
     position: static;
@@ -315,20 +290,16 @@ body {
     right: -4px;
     transition: 0.5s;
 }
-
 .buttonRemove:hover span {
     padding-right: 25px;
 }
-
 .buttonRemove:hover span:after {
     opacity: 1;
     right: 0;
 }
-
 .buttonRemove:hover {
     background-color: var(--yellowDark1);
 }
-
 .buttonRemove:active {
     background-color: var(--yellowDark2);
     box-shadow: 0 2px #666;

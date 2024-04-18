@@ -1,3 +1,6 @@
+// declaring lightMode variable and retreiving value from local storage
+let lightMode = localStorage.getItem("lightMode")
+
 // Default classes to display
 let classes = [
     {
@@ -12,6 +15,7 @@ let classes = [
     }
 ]
 
+// Default channels to display
 let template = [
     {
         channelName: "Announcements",
@@ -45,6 +49,7 @@ let template = [
     }
 ]
 
+// return the integer index of the item you selected in the selection box
 function get_selected_child_index(element) {
     for(let i = 0; i < element.children.length; i++) {
         if (element.children[i].selected) {
@@ -53,10 +58,12 @@ function get_selected_child_index(element) {
     }
 }
 
+// boolean function, returns true if the object is an event
 function is_event(obj) {
     return Event.prototype.isPrototypeOf(obj)
 }
 
+// no return, updating the fields for classes
 function update_class_ui() {
     // Get selected class
     const classes_elem = document.getElementById('classes')
@@ -92,6 +99,7 @@ function update_class_ui() {
     }
 }
 
+// no return, updating the fields for recitations
 function update_recitation_ui() {
     const recitations_elem = document.getElementById('recitations')
     const recitation_time_elem = document.getElementById('recitationTime')
@@ -108,6 +116,7 @@ function update_recitation_ui() {
     recitation_time_elem.value = selected_child.innerText
 }
 
+// no return, removing a recitation from the config and calling update_ui()
 function remove_recitation() {
     const recitations_elem = document.getElementById('recitations')
     const selected_index = get_selected_child_index(recitations_elem)
@@ -127,6 +136,7 @@ function remove_recitation() {
     }
 }
 
+// no return, adding a new course to the config and calling update_ui()
 function add_new_course(new_course) {
     // if this is used as an event handler (it is) then the first argument that gets passed in is the event
     if(!new_course || is_event(new_course)) {
@@ -149,6 +159,7 @@ function add_new_course(new_course) {
     update_class_ui()
 }
 
+// no return, adding a new recitation to the config and calling update_ui()
 function add_new_recitation(new_rec) {
     // same as above, prevents trying to parse an event as the argument
     if(!new_rec || is_event(new_rec)) {
@@ -175,6 +186,7 @@ function add_new_recitation(new_rec) {
     update_recitation_ui()
 }
 
+// no return, removing a course from the config and calling update_ui()
 function remove_course () {
     const classes_elem = document.getElementById('classes')
     let selected_index = get_selected_child_index(classes_elem)
@@ -196,6 +208,7 @@ function remove_course () {
     update_class_ui()
 }
 
+// update a course in the UI
 function update_course() {
     // This saves the data elsewhere in the UI to our storage (the option element)
     const class_name_elem = document.getElementById('className')
@@ -216,6 +229,7 @@ function update_course() {
     selected.dataset.recitations = JSON.stringify(recs)
 }
 
+// update a recitation in the UI
 function update_rec() {
     const rec_time_elem = document.getElementById('recitationTime')
     const recs_elem = document.getElementById('recitations')
@@ -227,6 +241,7 @@ function update_rec() {
 
 /* BEGIN TEMPLATE MANAGEMENT CODE */
 
+// save a channel into the config
 function save_channel() {
     const channels_elem = document.getElementById('classTemplate')
     const selected_index = get_selected_child_index(channels_elem)
@@ -239,6 +254,7 @@ function save_channel() {
     selected.dataset.taOnly = JSON.stringify(template_form.elements.taOnly.checked)
 }
 
+// load a channel into the ui
 function load_channel() {
     const channels_elem = document.getElementById('classTemplate')
     const selected_index = get_selected_child_index(channels_elem)
@@ -251,6 +267,7 @@ function load_channel() {
     form_elem.elements.taOnly.checked = JSON.parse(selected.dataset.taOnly)
 }
 
+// add a channel into the config and have it be seen in the ui
 function add_new_channel(new_channel) {
     if(!new_channel || is_event(new_channel)) {
         new_channel = {
@@ -270,6 +287,7 @@ function add_new_channel(new_channel) {
     channels_elem.appendChild(new_channel_elem)
 }
 
+// remove a channel from the config and from being seen in the ui
 function remove_channel() {
     const channels_elem = document.getElementById('classTemplate')
     let selected_index = get_selected_child_index(channels_elem)
@@ -287,6 +305,7 @@ function remove_channel() {
 
 /* END TEMPLATE MANAGEMENT CODE */
 
+//send the config to the Discord bot
 function send_config() {
     const courses_elem = document.getElementById('classes')
     const template_elem = document.getElementById('classTemplate')
@@ -349,6 +368,7 @@ function send_config() {
         })
 }
 
+//get the json from the server and inputting it into the left div
 function get_current_json() {
     fetch("/get_server_json")
         .then((response) => {
@@ -369,8 +389,9 @@ function get_current_json() {
         })
 }
 
+// send semester cleanup to bot, freeze interaction for UI, and display informative popups to user
 function send_semester_cleanup() {
-    if (prompt("Are you sure you want to ERASE all managed categories, and migrate current students and TAs to former-student roles?\nType YES to confirm!") === "YES") {
+    if (prompt('Are you sure you want to ERASE all managed categories, and migrate current students and TAs to former-student roles?\nType "YES" to confirm!') === "YES") {
         showWaitDialog('Sending cleanup request! Please wait...')
         const fetch_options = {
             method: "DELETE"
@@ -396,6 +417,7 @@ function send_semester_cleanup() {
     }
 }
 
+// fill in top div with channel information
 function fill_out_server_panel(config) {
     let server_elem = document.getElementById('server')
     while(server_elem.hasChildNodes()) {
@@ -422,24 +444,51 @@ function fill_out_server_panel(config) {
     }
 }
 
+// show the wait pop up while the user is waiting
 function showWaitDialog(string = 'Processing! Please wait...') {
     document.getElementById('waitDialogText').innerText = string
     document.getElementById('waitDialog').showModal()
 }
 
+// show the finished pop up once the user is done waiting
 function showFinishedDialog(string = "Finished!") {
     document.getElementById('finishedDialogText').innerText = string
     document.getElementById('finishedDialog').showModal()
     document.getElementById('finishedDialogBtn').focus()
 }
 
+// close the notices that pop up when waiting
 function closeDialogs() {
     document.getElementById('finishedDialog').close()
     document.getElementById('waitDialog').close()
 }
 
+// no return, change the colors of the ui - from a darker color pallete, to a lighter color pallete (or reverse)
+function changeMode() {
+    lightMode = localStorage.getItem('lightMode')
+
+    if (lightMode === 'enabled') {
+        enableDark()
+    } else {
+        enableLight()
+    }
+}
+
+// helper function for changeMode(), changing the colors to light ones and storing in local sorage
+function enableLight() {
+    document.body.classList.add('lightMode')
+    localStorage.setItem('lightMode', 'enabled')
+}
+
+// helper function for changeMode(), changing the colors to dark ones and storing in local sorage
+function enableDark() {
+    document.body.classList.remove('lightMode')
+    localStorage.setItem('lightMode', null)
+}
+
+// once content has been loaded, make all buttons and entry fields active
 function onload() {
-    document.body.classList.add('lightMode');
+    // document.body.classList.add('lightMode');
     for(let chan of template) {
         add_new_channel(chan)
     }
@@ -482,7 +531,9 @@ function onload() {
 
     document.getElementById('finishedDialogBtn').addEventListener('click', closeDialogs)
 
+    document.getElementById('modeBtn').addEventListener('click', changeMode)
     
+    if (lightMode === "enabled") enableLight()
 
     get_current_json()
 }
