@@ -44,7 +44,7 @@ These are the minimum permissions required for the Discord bot to run properly:
 * Speak
 * Video
 
-![image](https://github.com/neffers/Pittscord/assets/109564234/0d02a5f7-56ad-4ecb-bfad-a014fe03674a)
+![image](./images/botPermissionsChecklist.png)
 
 To create your own Discord bot, first ensure that your account has access to the Discord Development Portal.
 Next, create a "New Application" and check that "Guild Install" is selected.
