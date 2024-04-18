@@ -76,5 +76,6 @@ It will create two roles (Previous Student and Previous TA) which will serve as 
 
 ### Configuration
 In order to run the bot, there must be a `secret.py` containing the bot account's token, as well as your Canvas token.
+The Discord token in `secret.py` must be edited/updated when creating a new bot account. Also, whenever you look at the Discord application's token on Discord, it changes, and so `secret.py` must be edited as well.
 
-See `secret.example.py`
+See `secret.example.py` for an example of what is expected.
