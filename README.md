@@ -43,7 +43,31 @@ pip install -r requirements.txt
 
 
 ## Bot Creation
-These are the minimum permissions required for the Discord bot to run properly ![image](https://github.com/neffers/Pittscord/assets/109564234/0d02a5f7-56ad-4ecb-bfad-a014fe03674a)
+These are the minimum permissions required for the Discord bot to run properly:
+
+### General Permissions
+* Manage Roles
+* Manage Channels
+* Change Nickname
+* Read Messages/View Channels
+
+### Text Permissions
+* Send Messages
+* Create Public Threads
+* Send Messages in Threads
+* Embed Links
+* Attach Files
+* Read Message History
+* Use External Emojis
+* Add Reactions
+* Use Slash Commands
+
+### Voice Permissions
+* Connect
+* Speak
+* Video
+
+![image](https://github.com/neffers/Pittscord/assets/109564234/0d02a5f7-56ad-4ecb-bfad-a014fe03674a)
 
 To create your own Discord bot, first ensure that your account has access to the Discord Development Portal.
 Next, create a "New Application" and check that "Guild Install" is selected.
