@@ -1,8 +1,3 @@
-import {lightMode, onLoginLoad, enableFromStart, changeMode, enableLight, enableDark} from '../changeMode.js';
-
-
-
-
 // Default classes to display
 let classes = [
     {
@@ -465,29 +460,6 @@ function closeDialogs() {
     document.getElementById('waitDialog').close()
 }
 
-// // no return, change the colors of the ui - from a darker color pallete, to a lighter color pallete (or reverse)
-// function changeMode() {
-//     console.log("changeMode()")
-//     lightMode = localStorage.getItem('lightMode')
-//     if (lightMode === 'enabled') {
-//         enableDark()
-//     } else {
-//         enableLight()
-//     }
-// }
-
-// // helper function for changeMode(), changing the colors to light ones and storing in local sorage
-// function enableLight() {
-//     document.body.classList.add('lightMode')
-//     localStorage.setItem('lightMode', 'enabled')
-// }
-
-// // helper function for changeMode(), changing the colors to dark ones and storing in local sorage
-// function enableDark() {
-//     document.body.classList.remove('lightMode')
-//     localStorage.setItem('lightMode', null)
-// }
-
 // once content has been loaded, make all buttons and entry fields active
 function onload() {
     // document.body.classList.add('lightMode');
@@ -536,8 +508,6 @@ function onload() {
     // document.getElementById('modeBtn').addEventListener('click', changeMode)
     
     // enableFromStart()
-
-    onLoginLoad()
 
     get_current_json()
 }
