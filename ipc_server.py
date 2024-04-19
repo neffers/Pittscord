@@ -46,7 +46,7 @@ class PittscordIpcServer(Pittscord_ipc_pb2_grpc.Pittscord_ipcServicer):
         response_code = await self.bot.semester_cleanup(server_id)
         return Pittscord_ipc_pb2.CleanupResponse(code=response_code)
 
-
+# start rpc and Discord bot
 async def launch(discord_token):
     server = grpc.aio.server()
     ipc_server = PittscordIpcServer()

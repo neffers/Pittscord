@@ -11,4 +11,4 @@ id_regex_string = '[a-z]{3}\\d+'
 log_file_directory = "./logs/"
 
 # GRPC address
-grpc_address = "[::]:50051"
+grpc_address = "127.0.0.1:50051"
