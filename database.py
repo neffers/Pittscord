@@ -3,12 +3,32 @@ import sqlite3
 
 class Database:
     """
-    So far, I've outlined functions in here according to this schema:
-    Student-table: pitt id, discord id
-    courses table: canvas course id, name, associated category of channels, and a message id for people to add reactions
-    to recitations table: course table foreign key, recitation name (indicating time probably), reaction id for its role and the role id
-
-    I don't remember if there was more that we talked about when sketching the db schema, probably.
+    SCHEMA:
+    User table: 
+                Pitt ID, 
+                Discord ID, 
+                Row Number (PK)
+    Server table: 
+                Discord Server ID, 
+                Admin Discord ID (FK referencing Discord ID in User), 
+                Previous User Role ID, 
+                Previous TA Role ID, 
+                Row Number(PK)
+    Course table: 
+                Canvas Course ID, 
+                Course Name, 
+                Discord Category Channel ID, 
+                Message ID for people to add reactions to,
+                User Role ID, 
+                TA Role ID, 
+                Row Number(PK), 
+                Discord Server ID(FK refencing Discord Server ID in Server)
+    Recitation table: 
+                Canvas Course ID (FK referencing Course Canvas ID in Course),
+                Recitation Name/Time,
+                Reaction Emoji,
+                Associated Recitation Role ID,
+                Row Number (PK)
     """
 
     def __init__(self, db_filename):
@@ -55,12 +75,6 @@ class Database:
                        recitation_row_num INTEGER PRIMARY KEY NOT NULL,
                        FOREIGN KEY (course_canvas_id) REFERENCES course(course_canvas_id)
                        ON DELETE CASCADE)""")
-
-        cursor.execute("""CREATE TABLE IF NOT EXISTS messages(
-                       message_id INTEGER NOT NULL, 
-                       server_id INTEGER NOT NULL,
-                       message_row_num INTEGER PRIMARY KEY NOT NULL,
-                       FOREIGN KEY (server_id) REFERENCES server(server_id))""")
 
     """get the pittid of the admin of a given server"""
 
@@ -272,27 +286,6 @@ class Database:
                        WHERE course.recitation_react_message_id = (?)
                        AND recitation.reaction_id = (?)""", (message_id, reaction,)).fetchone()[0]
         return role_id
-
-    # Add a message's ID and the time it was sent
-    def add_message(self, message_id, server_id):
-        cursor = self.conn.cursor()
-
-        cursor.execute("INSERT INTO messages (message_id, server_id) VALUES (?, ?)", (message_id, server_id,))
-
-        self.conn.commit()
-
-    # Returns the id of a message that has been sent
-    def get_messages(self):
-        cursor = self.conn.cursor()
-
-        messageList = cursor.execute("SELECT message_id FROM messages").fetchall()
-
-        return messageList
-
-    def remove_message(self, message_id):
-        cursor = self.conn.cursor()
-
-        cursor.execute("DELETE FROM messages WHERE message_id = (?)", (message_id,))
 
     def close(self):
         self.conn.close()
