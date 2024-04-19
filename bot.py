@@ -129,7 +129,7 @@ class PittscordBot(commands.Bot):
                         send_messages=not channel_ta_only
                     ),
                     previous_student_role: discord.PermissionOverwrite(
-                        read_messages=(not channel_student_only)
+                        read_messages=not (channel_student_only or channel_ta_only)
                     ),
                     default_role: discord.PermissionOverwrite(
                         read_messages=False
