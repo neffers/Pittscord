@@ -163,7 +163,7 @@ class PittscordBot(commands.Bot):
                         channel = await guild.create_voice_channel(channel_name, category=class_category,
                                                                    overwrites=channel_overwrites)
 
-            class_react_message = None
+            class_react_message_id = None
             recs = None
             if class_recitations and class_announcements:
                 print('Configuring recitations...')
@@ -177,6 +177,7 @@ class PittscordBot(commands.Bot):
                     recs.append((rec, reaction, role.id))
 
                 class_react_message = await class_announcements.send(message, silent=True)
+                class_react_message_id = class_react_message.id
 
                 for (_, reaction, _) in recs:
                     await class_react_message.add_reaction(reaction)
@@ -184,7 +185,7 @@ class PittscordBot(commands.Bot):
             print(f'Adding {class_name} to database')
             try:
                 self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id,
-                                            class_react_message.id, guild.id)
+                                            class_react_message_id, guild.id)
             except Exception as e:
                 print('Database Error:')
                 print(e)
