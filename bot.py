@@ -110,6 +110,7 @@ class PittscordBot(commands.Bot):
             }
             class_category = await guild.create_category(class_name, overwrites=category_overwrites)
             class_announcements = None
+            first_text_channel = None
 
             print("Creating channels...")
             for channel_template in config_dict['template']:
@@ -156,6 +157,8 @@ class PittscordBot(commands.Bot):
                     case 'T':
                         channel = await guild.create_text_channel(channel_name, category=class_category,
                                                                   overwrites=channel_overwrites)
+                        if not first_text_channel:
+                            first_text_channel = channel
                     case 'F':
                         channel = await guild.create_forum(channel_name, category=class_category,
                                                            overwrites=channel_overwrites)
@@ -163,9 +166,11 @@ class PittscordBot(commands.Bot):
                         channel = await guild.create_voice_channel(channel_name, category=class_category,
                                                                    overwrites=channel_overwrites)
 
+            if not class_announcements:
+                class_announcements = first_text_channel
             class_react_message_id = None
             recs = None
-            if class_recitations and class_announcements:
+            if class_recitations:
                 print('Configuring recitations...')
                 message = "React to sign up for the following recitation roles:"
                 recs = []
