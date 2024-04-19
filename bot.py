@@ -157,7 +157,7 @@ class PittscordBot(commands.Bot):
                     case 'T':
                         channel = await guild.create_text_channel(channel_name, category=class_category,
                                                                   overwrites=channel_overwrites)
-                        if not first_text_channel:
+                        if not first_text_channel and not channel_ta_only:
                             first_text_channel = channel
                     case 'F':
                         channel = await guild.create_forum(channel_name, category=class_category,
