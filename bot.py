@@ -110,6 +110,7 @@ class PittscordBot(commands.Bot):
             }
             class_category = await guild.create_category(class_name, overwrites=category_overwrites)
             class_announcements = None
+            first_text_channel = None
 
             print("Creating channels...")
             for channel_template in config_dict['template']:
@@ -129,7 +130,7 @@ class PittscordBot(commands.Bot):
                         send_messages=not channel_ta_only
                     ),
                     previous_student_role: discord.PermissionOverwrite(
-                        read_messages=(not channel_student_only)
+                        read_messages=not (channel_student_only or channel_ta_only)
                     ),
                     default_role: discord.PermissionOverwrite(
                         read_messages=False
@@ -156,6 +157,8 @@ class PittscordBot(commands.Bot):
                     case 'T':
                         channel = await guild.create_text_channel(channel_name, category=class_category,
                                                                   overwrites=channel_overwrites)
+                        if not first_text_channel and not channel_ta_only:
+                            first_text_channel = channel
                     case 'F':
                         channel = await guild.create_forum(channel_name, category=class_category,
                                                            overwrites=channel_overwrites)
@@ -163,9 +166,11 @@ class PittscordBot(commands.Bot):
                         channel = await guild.create_voice_channel(channel_name, category=class_category,
                                                                    overwrites=channel_overwrites)
 
-            class_react_message = None
+            if not class_announcements:
+                class_announcements = first_text_channel
+            class_react_message_id = None
             recs = None
-            if class_recitations and class_announcements:
+            if class_recitations:
                 print('Configuring recitations...')
                 message = "React to sign up for the following recitation roles:"
                 recs = []
@@ -177,6 +182,7 @@ class PittscordBot(commands.Bot):
                     recs.append((rec, reaction, role.id))
 
                 class_react_message = await class_announcements.send(message, silent=True)
+                class_react_message_id = class_react_message.id
 
                 for (_, reaction, _) in recs:
                     await class_react_message.add_reaction(reaction)
@@ -184,7 +190,7 @@ class PittscordBot(commands.Bot):
             print(f'Adding {class_name} to database')
             try:
                 self.db.add_semester_course(class_canvas_id, class_name, student_role.id, ta_role.id, class_category.id,
-                                            class_react_message.id, guild.id)
+                                            class_react_message_id, guild.id)
             except Exception as e:
                 print('Database Error:')
                 print(e)

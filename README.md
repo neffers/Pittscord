@@ -50,6 +50,22 @@ In order to work the bot:
 
 Once you've done the above, you should be able to use the web UI to perform management at-will.
 
+### Available Commands
+#### Administrator Only
+- `/configure_server`
+   - Intended for a one-time use to configure the server for usage.
+- `/identify @user`
+   - Provides the pitt id associated with the user's account.
+- `/reregister @user`
+   - Pretends that the user just joined the server, asking for a pittid and assigning to classes if available.
+- `/reregister_all`
+   - As above, performed on all accounts in the server. Will probably send a message to every user in the server.
+- `/deregister @user`
+   - Removes a user's pitt id from the database
+#### Available to all users
+- `/register`
+   - Allows a user to simulate re-joining the server (to try to register with the bot for a new class, for example)
+
 ## Warnings / Be aware
 If a bot-created role is ever moved above the role of the Discord bot, in terms of Discord roles and their priority, it will no longer have permissions to edit that role. So, make sure you do not.
 If a permission is added to a student/TA role that the Discord bot does not have, the Discord bot will no longer be able to handle those roles administratively.
